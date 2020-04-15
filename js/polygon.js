@@ -8,24 +8,59 @@ var DrawCircle =
     BorderWidth: 4,
     ContentColor: 'rgb(0,0,255)',
     CanFilled: false,
-    DrawFunction: function(Ctx,OffsetX,OffsetY)
+    NextX:0,
+    NextY:0,
+    ifDrawing: false,
+    ifMouseMove: false,
+    MouseDown: function(e){
+        [this.LastX, this.LastY] = [e.offsetX, e.offsetY];
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+        this.ifDrawing = true;
+        this.ifMouseMove = false;
+        this.CanFinishDrawing = false;
+    },
+    MouseMove: function(e){
+        if(!this.ifDrawing) return;
+    
+        this.ifMouseMove = true;
+        
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+    },
+    MouseUp: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false;
+    },
+    MouseOut: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false; 
+    },
+    CanFinishDrawing :true,
+    DrawFunction: function(Ctx)
     { 
-        Ctx.clearRect(0, 0, Ctx.canvas.clientWidth, Ctx.canvas.clientHeight);
-        Ctx.strokeStyle = DrawCircle.BorderBrush;
-        Ctx.lineWidth = DrawCircle.BorderWidth;
-        Ctx.beginPath();
         
-        //Get radius
-        let dx = OffsetX - DrawCircle.LastX;
-        let dy = OffsetY - DrawCircle.LastY;
-        let dst = Math.sqrt(dx * dx + dy * dy);
-        
-        Ctx.arc(DrawCircle.LastX, DrawCircle.LastY, dst, 0, 2*Math.PI);
-        if(DrawCircle.CanFilled)
+        if(this.ifDrawing)
         {
-            Ctx.fillStyle = DrawCircle.ContentColor;
-            Ctx.fill();
+            Ctx.clearRect(0, 0, Ctx.canvas.clientWidth, Ctx.canvas.clientHeight);
+            Ctx.strokeStyle = DrawCircle.BorderBrush;
+            Ctx.lineWidth = DrawCircle.BorderWidth;
+            Ctx.beginPath();
+
+            //Get radius
+            let dx = DrawCircle.NextX - DrawCircle.LastX;
+            let dy = DrawCircle.NextY - DrawCircle.LastY;
+            let dst = Math.sqrt(dx * dx + dy * dy);
+
+            Ctx.arc(DrawCircle.LastX, DrawCircle.LastY, dst, 0, 2*Math.PI);
+            if(DrawCircle.CanFilled)
+            {
+                Ctx.fillStyle = DrawCircle.ContentColor;
+                Ctx.fill();
+            }
+            Ctx.stroke();
         }
+        
         
     },
     LoadProperty: function(Width)
@@ -47,27 +82,62 @@ var DrawTriangle =
     BorderWidth: 4,
     ContentColor: 'rgb(255,0,255)',
     CanFilled:false,
-    DrawFunction: function(Ctx,OffsetX,OffsetY)
+    NextX:0,
+    NextY:0,
+    ifDrawing: false,
+    ifMouseMove: false,
+    MouseDown: function(e){
+        [this.LastX, this.LastY] = [e.offsetX, e.offsetY];
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+        this.ifDrawing = true;
+        this.ifMouseMove = false;
+        this.CanFinishDrawing = false;
+    },
+    MouseMove: function(e){
+        if(!this.ifDrawing) return;
+    
+        this.ifMouseMove = true;
+        
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+    },
+    MouseUp: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false;
+    },
+    MouseOut: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false; 
+    },
+    CanFinishDrawing :true,
+    DrawFunction: function(Ctx)
     { 
-        Ctx.clearRect(0, 0, Ctx.canvas.clientWidth, Ctx.canvas.clientHeight);
-        Ctx.strokeStyle = DrawTriangle.BorderBrush;
-        Ctx.lineWidth = DrawTriangle.BorderWidth;
-        Ctx.beginPath();
-        
-        //Get radius
-        Ctx.moveTo(OffsetX,OffsetY);
-        Ctx.lineTo(DrawTriangle.LastX,OffsetY);
-        Ctx.lineTo((DrawTriangle.LastX + OffsetX)/2,DrawTriangle.LastY);
-        Ctx.lineTo(OffsetX,OffsetY);
-        
-        
-        
-        //Ctx.arc(DrawCircle.LastX, DrawCircle.LastY, dst, 0, 2*Math.PI);
-        if(DrawTriangle.CanFilled)
+        console.log('Test');
+        if(this.ifDrawing)
         {
-            Ctx.fillStyle = DrawTriangle.ContentColor;
-            Ctx.fill();
+            Ctx.clearRect(0, 0, Ctx.canvas.clientWidth, Ctx.canvas.clientHeight);
+            Ctx.strokeStyle = DrawTriangle.BorderBrush;
+            Ctx.lineWidth = DrawTriangle.BorderWidth;
+            Ctx.beginPath();
+
+            //Get radius
+            Ctx.moveTo(this.NextX,this.NextY);
+            Ctx.lineTo(DrawTriangle.LastX,this.NextY);
+            Ctx.lineTo((DrawTriangle.LastX + this.NextX)/2,DrawTriangle.LastY);
+            Ctx.lineTo(this.NextX,this.NextY);
+
+
+
+            //Ctx.arc(DrawCircle.LastX, DrawCircle.LastY, dst, 0, 2*Math.PI);
+            if(DrawTriangle.CanFilled)
+            {
+                Ctx.fillStyle = DrawTriangle.ContentColor;
+                Ctx.fill();
+            }
+            Ctx.stroke();
         }
+        
         
     },
     LoadProperty: function(Width)
@@ -89,24 +159,62 @@ var DrawRectangle =
     BorderWidth: 4,
     ContentColor: 'rgb(0,0,255)',
     CanFilled:false,
-    DrawFunction: function(Ctx,OffsetX,OffsetY)
+    NextX:0,
+    NextY:0,
+    ifDrawing: false,
+    ifMouseMove: false,
+    MouseDown: function(e){
+        [this.LastX, this.LastY] = [e.offsetX, e.offsetY];
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+        this.ifDrawing = true;
+        this.ifMouseMove = false;
+        this.CanFinishDrawing = false;
+    },
+    MouseMove: function(e){
+        if(!this.ifDrawing) return;
+    
+        this.ifMouseMove = true;
+        
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+    },
+    MouseUp: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false;
+    },
+    MouseOut: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false; 
+    },
+    CanFinishDrawing :true,
+    DrawFunction: function(Ctx)
     { 
-        Ctx.clearRect(0, 0, Ctx.canvas.clientWidth, Ctx.canvas.clientHeight);
-        Ctx.strokeStyle = DrawRectangle.BorderBrush;
-        Ctx.lineWidth = DrawRectangle.BorderWidth;
-        Ctx.beginPath();
-        
-        //Get radius
-        let dx = OffsetX - DrawRectangle.LastX;
-        let dy = OffsetY - DrawRectangle.LastY;
-        
-        
-        Ctx.rect(DrawRectangle.LastX,DrawRectangle.LastY,dx,dy);
-        if(DrawRectangle.CanFilled)
+        if(this.ifDrawing)
         {
-            Ctx.fillStyle = DrawRectangle.ContentColor;
-            Ctx.fill();
+            let OffsetX = this.NextX;
+            let OffsetY = this.NextY;
+            
+            
+            Ctx.clearRect(0, 0, Ctx.canvas.clientWidth, Ctx.canvas.clientHeight);
+            Ctx.strokeStyle = DrawRectangle.BorderBrush;
+            Ctx.lineWidth = DrawRectangle.BorderWidth;
+            Ctx.beginPath();
+
+            //Get radius
+            let dx = OffsetX - DrawRectangle.LastX;
+            let dy = OffsetY - DrawRectangle.LastY;
+
+
+            Ctx.rect(DrawRectangle.LastX,DrawRectangle.LastY,dx,dy);
+            if(DrawRectangle.CanFilled)
+            {
+                Ctx.fillStyle = DrawRectangle.ContentColor;
+                Ctx.fill();
+            }
+            Ctx.stroke();
         }
+        
         
     },
     LoadProperty: function(Width)

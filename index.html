@@ -16,8 +16,8 @@
     <body>
         <div class="menu">
             <input id="btnUpload"   type="button" class="menu-item menu-left" style="background-image:url(img/upload.png);"     onclick="btnUpload_onClick(this)"   onmouseover="UpdateTip('Upload a image to edit')">
-            <input id="btnUndo"     type="button" class="menu-item menu-left" style="background-image:url(img/undo.png);"       onclick="btnUndo_onClick(this)"     onmouseover="UpdateTip('Undo')">
-            <input id="btnRedo"     type="button" class="menu-item menu-left" style="background-image:url(img/redo.png);"       onclick="btnRedo_onClick(this)"     onmouseover="UpdateTip('Redo')">
+            <input id="btnUndo"     type="button" class="menu-item menu-left" style="background-image:url(img/undo.png);"       onclick="UndoCanvas()"              onmouseover="UpdateTip('Undo')">
+            <input id="btnRedo"     type="button" class="menu-item menu-left" style="background-image:url(img/redo.png);"       onclick="RedoCanvas()"     onmouseover="UpdateTip('Redo')">
             <input id="btnClear"    type="button" class="menu-item menu-left" style="background-image:url(img/clear.png);"      onclick="btnClear_onClick(this)"    onmouseover="UpdateTip('Clear the canvas')">
             <input id="btnEraser"   type="button" class="menu-item menu-left" style="background-image:url(img/eraser.png);"     onclick="UpdateFunction(Eraser)"    onmouseover="UpdateTip('Eraser')">
             

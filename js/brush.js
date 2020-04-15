@@ -5,18 +5,54 @@ var Brush = {
     BrushWidth:10,
     LastX:0,
     LastY:0,
-    DrawFunction: function(Ctx,OffsetX,OffsetY)
+    NextX:0,
+    NextY:0,
+    ifDrawing: false,
+    ifMouseMove: false,
+    MouseDown: function(e){
+        [this.LastX, this.LastY] = [e.offsetX, e.offsetY];
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+        this.ifDrawing = true;
+        this.ifMouseMove = false;
+        this.CanFinishDrawing = false;
+    },
+    MouseMove: function(e){
+        if(!this.ifDrawing) return;
+    
+        this.ifMouseMove = true;
+        
+        [this.NextX, this.NextY] = [e.offsetX, e.offsetY];
+    },
+    MouseUp: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false;
+    },
+    MouseOut: function(e){
+        this.CanFinishDrawing = true;
+        this.ifMouseMove = false;
+        this.ifDrawing = false; 
+        
+    },
+    CanFinishDrawing :true,
+    DrawFunction: function(Ctx)
     { 
-        //console.log('Test');
-        Ctx.strokeStyle = Brush.BrushColor;
-        Ctx.lineWidth = Brush.BrushWidth;
-        Ctx.lineJoin = 'round';
-        Ctx.lineCap = 'round';
-        Ctx.beginPath();
-        Ctx.moveTo(Brush.LastX, Brush.LastY);
-        Ctx.lineTo(OffsetX, OffsetY);
-
-        [Brush.LastX, Brush.LastY] = [OffsetX, OffsetY];
+        
+        if(this.ifDrawing)
+        {
+            //console.log('Drawing...');
+            Ctx.strokeStyle = Brush.BrushColor;
+            Ctx.lineWidth = Brush.BrushWidth;
+            Ctx.lineJoin = 'round';
+            Ctx.lineCap = 'round';
+            Ctx.beginPath();
+            Ctx.moveTo(Brush.LastX, Brush.LastY);
+            Ctx.lineTo(Brush.NextX, Brush.NextY);
+            Ctx.stroke();
+        }
+       
+        
+        [Brush.LastX, Brush.LastY] = [Brush.NextX, Brush.NextY];
     },
     LoadProperty: function(Width)
     {

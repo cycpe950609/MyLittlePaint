@@ -30,16 +30,6 @@ function UploadFileHandler(files)
     CloseDialog();
 }
 
-function btnUndo_onClick(btn)
-{
-    console.log('Undo');
-}
-
-function btnRedo_onClick(btn)
-{
-    console.log('Redo');
-}
-
 /* Clear Canvas */
 function btnClear_onClick(btn)
 {
