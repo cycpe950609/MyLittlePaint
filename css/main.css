@@ -1,0 +1,105 @@
+html 
+{
+    height: 100%;
+}
+body
+{
+    background-color: gray;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+}
+
+/* Menu */
+.menu
+{
+    background-color: black;
+    height: 40px;
+    width: 100%;
+    
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-bottom-color: white;
+}
+
+.menu-item
+{
+    height: 32px;
+    width: 32px;
+    margin: 4px;
+    background-size: cover;
+}
+
+.menu-left
+{
+    float: left;
+}
+
+.menu-right
+{
+    float: right;
+}
+
+
+/* Workspace */
+.workspace
+{
+    display: grid ;
+
+    grid-template-columns: 50px auto 300px;
+    grid-template-rows: auto 20px;
+    grid-template-areas: 
+        "toolbar main-canvas property"
+        "footer footer footer";
+
+    width: 100%;
+    height: calc(100% - 40px);
+    overflow: hidden;
+}
+
+
+
+
+
+/* Toolbar vertical */
+
+.toolbar-vertical
+{
+    grid-area: toolbar ;
+    background-color: white;
+    
+    border-style: solid;
+    border-color: black;
+    border-width: 4px;
+
+    position: relative;
+}
+
+.toolbar-item
+{
+    width: 34px;
+    height: 34px;
+    background-size: cover;
+    margin: 4px;
+}
+.toolbar-item-bottom
+{
+
+}
+
+.status-bar
+{
+
+    grid-area: footer;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+}
+#status_help_tip
+{
+    grid-area: footer;
+    text-align: center;
+    width: 100%;
+}
+

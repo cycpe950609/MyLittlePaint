@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Little Painter</title>
+
+        <link rel="stylesheet" type="text/css" href="css/main.css">
+        <link rel="stylesheet" type="text/css" href="css/canvas.css">
+        <link rel="stylesheet" type="text/css" href="css/dialog.css">
+        <link rel="stylesheet" type="text/css" href="css/color-picker.css">
+        <link rel="stylesheet" type="text/css" href="css/property.css">
+        
+        
+
+        
+    </head>
+    <body>
+        <div class="menu">
+            <input id="btnUpload"   type="button" class="menu-item menu-left" style="background-image:url(img/upload.png);"     onclick="btnUpload_onClick(this)"   onmouseover="UpdateTip('Upload a image to edit')">
+            <input id="btnUndo"     type="button" class="menu-item menu-left" style="background-image:url(img/undo.png);"       onclick="btnUndo_onClick(this)"     onmouseover="UpdateTip('Undo')">
+            <input id="btnRedo"     type="button" class="menu-item menu-left" style="background-image:url(img/redo.png);"       onclick="btnRedo_onClick(this)"     onmouseover="UpdateTip('Redo')">
+            <input id="btnClear"    type="button" class="menu-item menu-left" style="background-image:url(img/clear.png);"      onclick="btnClear_onClick(this)"    onmouseover="UpdateTip('Clear the canvas')">
+            <input id="btnEraser"   type="button" class="menu-item menu-left" style="background-image:url(img/eraser.png);"     onclick="UpdateFunction(Eraser)"    onmouseover="UpdateTip('Eraser')">
+            
+            
+            <input id="btnSave"     type="button" class="menu-item menu-right" style="background-image:url(img/save.png);"      onclick="btnSave_onClick(this)"     onmouseover="UpdateTip('Download a image')">
+        </div>
+        
+        <div class="workspace">
+            <div class="toolbar-vertical">
+                <input type="button" id="btnBrush"      class="toolbar-item" style="background-image:url(img/brush.png);"       onclick="UpdateFunction(Brush)"         onmouseover="UpdateTip('Uas A Brush !')">
+                <input type="button" id="btnCircle"     class="toolbar-item" style="background-image:url(img/circle.png);"      onclick="UpdateFunction(DrawCircle)"    onmouseover="UpdateTip('Draw Circle')">
+                <input type="button" id="btnTriangle"   class="toolbar-item" style="background-image:url(img/triangle.png);"    onclick="UpdateFunction(DrawTriangle)"  onmouseover="UpdateTip('Draw Triangle')">
+                <input type="button" id="btnRectangle"  class="toolbar-item" style="background-image:url(img/rectangle.png);"   onclick="UpdateFunction(DrawRectangle)" onmouseover="UpdateTip('Draw Rectangle')">
+                <input type="button" id="btnTextInput"  class="toolbar-item" style="background-image:url(img/Text.png);"        onclick="UpdateFunction(Text)"          onmouseover="UpdateTip('Text Input')">
+                
+                <!-- Eraser -->
+                
+            </div>
+    
+            <div class="canvas_group">
+                <canvas id="prev_canvas"></canvas>
+                <canvas id="bg_canvas"></canvas>
+            </div>
+            
+
+            <div class="property-bar" id="pb_Property">
+                <div class="pd_title">
+                    <span id="pb_Property_title">Title~</span>
+                </div>
+
+                <div id="pb_Property_bdy">
+
+                </div>
+            </div>
+            
+            
+            <div class="status-bar">
+                <label id="status_help_tip"></label>
+            </div>
+        </div>
+
+        <!-- Dialog -->
+        <div class="TD_Background" id="td_dialog_bg">
+            <div class="Top_Dialog" id="td_dialog">
+                <div class="TD_Header">
+                    <span class="TD_Title" id="td_title">Title~</span>
+                    <span class="TD_BtnDialogCloss" id="td_dialog_btncloss" onclick="btnDialogCloss_onClick(this)">&times;</span>
+                </div>
+                <div class="TD_Body" id="td_dialog_body"></div>
+            </div>
+            
+        </div>
+
+        <script src="js/brush.js"></script>
+        <script src="js/eraser.js"></script>
+        <script src="js/polygon.js"></script>
+        <script src="js/text.js"></script>
+        <script src="js/color-picker.js"></script>
+        <script src="js/property.js"></script>
+        <script src="js/dialog.js"></script>
+        <script src="js/canvas.js"></script>
+        <script src="js/main.js"></script>
+
+
+
+    </body>
+
+
+
+</html>
