@@ -16,7 +16,7 @@ canvas
 
 #prev_canvas
 {
-    z-index: 1;
+    
     background-color: transparent;
     position: absolute;
     top: 0;
@@ -25,7 +25,7 @@ canvas
 
 #bg_canvas
 {
-    z-index: 0;
+    
     background-color: white;
     position: absolute;
     top: 0;
