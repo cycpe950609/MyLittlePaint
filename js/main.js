@@ -119,3 +119,35 @@ function UpdateFunction(FunctionObject)
     SetPropertyBodyContext( FunctionObject.LoadProperty(getPropertybarWidth()) );
 }
 
+let ctrl_down = false;
+function BodyKeyDown(event)
+{
+    if(event.key == 'Control')
+    {
+        ctrl_down = true;
+        return;
+    }
+    if(event.key == 'z' && ctrl_down)
+    {
+        UndoCanvas();
+        return;
+    }
+        
+    if(event.key == 'y' && ctrl_down)
+    {
+        RedoCanvas();
+        return;
+    }
+    CanvasKeyDown(event);
+        
+}
+function BodyKeyUp(event)
+{
+    if(event.key == 'Control')
+    {
+        ctrl_down = false;
+        return;
+    }
+    CanvasKeyUp(event);
+        
+}

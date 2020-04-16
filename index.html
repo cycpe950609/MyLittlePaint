@@ -13,7 +13,7 @@
 
         
     </head>
-    <body onkeydown="CanvasKeyDown(event)" onkeyup="CanvasKeyUp(event)">
+    <body onkeydown="BodyKeyDown(event)" onkeyup="BodyKeyUp(event)">
         <div class="menu">
             <input id="btnUpload"   type="button" class="menu-item menu-left" style="background-image:url(img/upload.png);"     onclick="btnUpload_onClick(this)"   onmouseover="UpdateTip('Upload a image to edit')">
             <input id="btnUndo"     type="button" class="menu-item menu-left" style="background-image:url(img/undo.png);"       onclick="UndoCanvas()"              onmouseover="UpdateTip('Undo')">
@@ -27,9 +27,7 @@
         
         <div class="workspace">
             <div class="toolbar-vertical">
-                <input type="button" id="btnBrush"      class="toolbar-item"
-		style="background-image:url(img/brush.png);"       onclick="UpdateFunction(Brush)"
-		onmouseover="UpdateTip('Use A Brush !')">
+                <input type="button" id="btnBrush"      class="toolbar-item" style="background-image:url(img/brush.png);"       onclick="UpdateFunction(Brush)"    		onmouseover="UpdateTip('Use A Brush !')">
                 <input type="button" id="btnLine"       class="toolbar-item" style="background-image:url(img/line.jpg);"        onclick="UpdateFunction(Line)"          onmouseover="UpdateTip('Draw Line')">
                 <input type="button" id="btnCircle"     class="toolbar-item" style="background-image:url(img/circle.png);"      onclick="UpdateFunction(DrawCircle)"    onmouseover="UpdateTip('Draw Circle')">
                 <input type="button" id="btnTriangle"   class="toolbar-item" style="background-image:url(img/triangle.png);"    onclick="UpdateFunction(DrawTriangle)"  onmouseover="UpdateTip('Draw Triangle')">
