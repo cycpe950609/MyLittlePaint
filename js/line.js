@@ -76,14 +76,14 @@ var Line = {
         
         
         br_color_dv.addEventListener('click',(e)=>{
-            let rgb = Brush.BrushColor;
+            let rgb = Line.BrushColor;
             let my_clr = rgb.substring(4, rgb.length-1).replace(/ /g, '').split(',');
             Color.ColorSelected = [ parseInt(my_clr[0]) , parseInt(my_clr[1]) , parseInt(my_clr[2]) ];
         });
         
         Color.RegisColorChangeCallback(function(new_color){
             
-            Brush.BrushColor = new_color;
+            Line.BrushColor = new_color;
             console.log(Brush.BrushColor);
             br_color_dv.style.backgroundColor = Brush.BrushColor;
         });
@@ -111,7 +111,7 @@ var Line = {
         brush_width.style.width = '80%';
         brush_width.addEventListener('change',()=>{
             brush_width_text.innerText = brush_width.value + 'px';
-            Brush.BrushWidth = brush_width.value;
+            Line.BrushWidth = brush_width.value;
         });
         
         doc.appendChild(brush_width);

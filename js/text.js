@@ -48,13 +48,14 @@ var Text = {
                     this.TextContent = this.TextContent.substring(0,this.TextContent.length-1);
                     break;
                 default:
-                    this.TextContent = this.TextContent + e.key;
+                    if(e.key.length == 1)//it menu that it is a text
+                        this.TextContent = this.TextContent + e.key;
                     break;
             }
             //console.log(this.TextContent);
         }
     },
-    DrawFunction: function(Ctx,OffsetX,OffsetY)
+    DrawFunction: function(Ctx)
     { 
 
         Ctx.clearRect(0,0,Ctx.canvas.clientWidth,Ctx.canvas.clientHeight);
@@ -64,9 +65,9 @@ var Text = {
         if(this.CanFinishDrawing)
         {
             Ctx.fillText(this.TextContent,this.TextX,this.TextY);
-            console.log('Test');
+            this.TextContent = '';
         }
-        else
+        else if(this.TextColor != '')
             Ctx.fillText(this.TextContent + '_',this.TextX,this.TextY);
 
         Ctx.stroke();

@@ -20,7 +20,8 @@
 
 | **Other useful widgets**                         | **Score** | **Check** |
 | :----------------------------------------------- | :-------: | :-------: |
-| Name of widgets                                  | 1~5%     | N         |
+| StatusBar                          | 1~5%     | Y         |
+|  Colro Picker 					 |			|	Y		|
 
 ---
 
@@ -49,7 +50,9 @@
 
 ### 左方屬性欄
 
-12. Property ：屬性欄，依功能不同可選擇色彩、比刷粗細...等。
+12. Property ：屬性欄，依功能不同可選擇色彩、筆刷粗細...等。
+
+更改色彩：要更改色彩時，先點選正方形的方塊（通常在Brush Color/Border Color 下方），再進行色彩選擇。
 
 ### Function description
 
@@ -64,9 +67,3 @@ c. Ctrl - Z 可復原畫板，Ctrl + Y可取消復原
 ### Others (Optional)
 
 Nothing here
-
-<style>
-table th{
-    width: 100%;
-}
-</style>
