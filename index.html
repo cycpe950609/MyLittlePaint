@@ -13,7 +13,7 @@
 
         
     </head>
-    <body>
+    <body onkeydown="CanvasKeyDown(event)" onkeyup="CanvasKeyUp(event)">
         <div class="menu">
             <input id="btnUpload"   type="button" class="menu-item menu-left" style="background-image:url(img/upload.png);"     onclick="btnUpload_onClick(this)"   onmouseover="UpdateTip('Upload a image to edit')">
             <input id="btnUndo"     type="button" class="menu-item menu-left" style="background-image:url(img/undo.png);"       onclick="UndoCanvas()"              onmouseover="UpdateTip('Undo')">
@@ -38,8 +38,8 @@
             </div>
     
             <div class="canvas_group">
-                <canvas id="bg_canvas"></canvas><!--先宣告會在下層-->
-                <canvas id="prev_canvas"></canvas>
+                <canvas id="bg_canvas" ></canvas><!--先宣告會在下層-->
+                <canvas id="prev_canvas" tabindex='1'></canvas>
             </div>
             
 

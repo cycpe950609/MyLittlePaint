@@ -60,38 +60,41 @@ function InitialCanvas()
                 FinishDrawing();
         }
     });
-    prev_canvas.addEventListener('keydown',function(e){
-        if(func.hasOwnProperty('KeyDown'))
-        {
-            EventFired = true;
-            func.KeyDown(e);
-            func.DrawFunction(prev_ctx);
-            if(func.CanFinishDrawing)
-                FinishDrawing();
-        }
-    });
-    prev_canvas.addEventListener('keyup', function(e){
-        if(func.hasOwnProperty('KeyUp'))
-        {
-            func.KeyUp(e);
-            func.DrawFunction(prev_ctx);
-            if(func.CanFinishDrawing)
-                FinishDrawing();
-        }
-    });
-    
-    
 
-    
-    prev_canvas.width=800;
-    prev_canvas.height=450;
+    prev_canvas.width=1280;
+    prev_canvas.height=720;
     
     bg_canvas   = document.getElementById('bg_canvas');
     bg_ctx      = bg_canvas.getContext('2d');    
-    bg_canvas.width=800;
-    bg_canvas.height=450;
+    bg_canvas.width=1280;
+    bg_canvas.height=720;
 
     PushStateCanvas();
+}
+
+function CanvasKeyDown(e)
+{
+    //console.log('Canvas KeyDown');
+    if(func.hasOwnProperty('KeyDown'))
+    {
+
+        EventFired = true;
+        func.KeyDown(e);
+        func.DrawFunction(prev_ctx);
+        if(func.CanFinishDrawing)
+            FinishDrawing();
+    }
+}
+
+function CanvasKeyUp(e)
+{
+     if(func.hasOwnProperty('KeyUp'))
+    {
+        func.KeyUp(e);
+        func.DrawFunction(prev_ctx);
+        if(func.CanFinishDrawing)
+            FinishDrawing();
+    }
 }
 
 function ClearCanvas()
@@ -126,6 +129,18 @@ function SaveCanvas(name)
 var func;
 function LoadCanvasFunctionList(FunctionList)
 {
+    if(func != null && func.CanFinishDrawing == false)
+    {
+        let ekey = {};
+        ekey['key'] = 'Enter';
+        let e = new KeyboardEvent('CanvasKeyDown', ekey);
+        CanvasKeyDown(e); 
+        
+        console.log('Enter Emulate');
+        // 假裝按了Enter以結束正在做的事（目前只有 Text Input 需要）
+        // 因為在LoadCanvasFunctionList 之前不會有Canvas的MouseUp，MouseOut會更早Trigger
+    }
+    
     func = FunctionList;
     //console.log(func);
     
@@ -140,7 +155,7 @@ function FinishDrawing()
 {
     if(EventFired)//only mousedown and keydown can fire the event
     {
-        console.log('Finish Drawing ...');
+        //console.log('Finish Drawing ...');
         bg_ctx.globalCompositeOperation = func.CompositeOperation;
         bg_ctx.drawImage(prev_canvas,0,0);
         prev_ctx.clearRect(0, 0, prev_canvas.width, prev_canvas.height);
@@ -188,7 +203,7 @@ function RedoCanvas()
 }
 function PushStateCanvas()
 {
-    console.log('Push State');
+    //console.log('Push State');
     his_step++;
     if(his_step < stk_history.length)
     {
