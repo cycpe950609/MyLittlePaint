@@ -33,6 +33,8 @@ var Text = {
                 case 'Alt':
                 case 'Escape':
                 case 'Control':
+                case 'Shift':
+                case 'CapsLock':
                 case 'Enter':
                     this.ifInputText = false;
                     this.CanFinishDrawing = true;
