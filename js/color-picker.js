@@ -58,8 +58,8 @@ function getColorWheel(Width,ID)
     let img = new Image();
     img.onload = ()=>{ cw_ctx.drawImage(img,0,0,Width,Width); }
     
-    let src = 'img/colorwheel.png';
-    img.src = src;
+    img.src = ColorWheelImg;
+    
     
     cw.addEventListener('mousemove',(e)=>
     {
@@ -175,4 +175,3 @@ function setColorRangeValue(Name,ID,val)
     let txt = document.getElementById(Name + '-lbl-' + ID);
     txt.innerText = val;
 }
-

@@ -30,14 +30,16 @@ var Text = {
             //console.log('KeyDown');
             switch(e.key)
             {
-                case 'Alt':
                 case 'Escape':
-                case 'Control':
-                case 'Shift':
-                case 'CapsLock':
                 case 'Enter':
                     this.ifInputText = false;
                     this.CanFinishDrawing = true;
+                    break;
+                case 'Alt':
+                case 'Control':
+                case 'Shift':
+                case 'CapsLock':
+                    //Nothing Happen
                     break;
                 case 'Tab':
                     this.TextContent = this.TextContent + '    ';
