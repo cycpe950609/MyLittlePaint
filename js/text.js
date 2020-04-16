@@ -1,3 +1,4 @@
+
 var Text = {
     Name: 'Text',
     CursorName:'text',
@@ -19,9 +20,30 @@ var Text = {
             this.TextContent = "";
             this.ifInputText = true;
             this.CanFinishDrawing = false;
+            
+            let txt_box = document.createElement('div');
+            txt_box.setAttribute('id','dv_input');
+            //console.log('position: absolute; top:' + e.offsetY + '; left: ' + e.offsetX + ';');
+            txt_box.style = 'position: absolute; top:' + ( e.offsetY - this.TextSize/2 ) + 'px; left: ' + e.offsetX + 'px;';
+            /*txt.style.position = 'absolute';
+            txt.style.left = "'" + e.OffsetX + "'";
+            txt.style.top = "'" + e.OffsetY + "'";*/
+            txt_box.innerHTML= '<input type="text" id="txt_input" style="font-size: ' + this.TextSize +  'px; " />'
+            document.getElementById("canvas_group").appendChild(txt_box);
+            txt_box.focus();
+            
+        }
+        else
+        {
+            this.ifInputText = false;
+            this.CanFinishDrawing = true;
+            let t_input = document.getElementById('txt_input');
+            this.TextContent = t_input.value;
+            document.getElementById("canvas_group").removeChild(document.getElementById('dv_input'));
         }
         
     },
+    /*
     KeyDown: function(e)
     {
         
@@ -54,7 +76,7 @@ var Text = {
             }
             //console.log(this.TextContent);
         }
-    },
+    },*/
     DrawFunction: function(Ctx)
     { 
 

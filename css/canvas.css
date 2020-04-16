@@ -1,6 +1,6 @@
 /* Canvas */
 
-.canvas_group
+#canvas_group
 {
     overflow: auto;
     position: relative;
