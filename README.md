@@ -50,7 +50,7 @@
 8. Undo：取消復原
 9. Clear：清空畫布
 10. Eraser：橡皮擦
-11. Download：下載畫布
+11. Download：下載畫布內容
 
 ### 左方屬性欄
 
@@ -60,13 +60,13 @@
 
 ### Function description
 
-a. 鼠標放在工具列及Menu的按鈕上，最下方會顯示簡易說明。
+a. 鼠標放在工具列及Menu的按鈕上，最下方狀態列會顯示簡易說明。
 b. 可繪製直線
 c. Ctrl - Z 可復原畫板，Ctrl + Y可取消復原
 
-### Gitlab page link
+### GitHub page link
 
-[Gitlab page](https://107062114.gitlab.io/AS_01_WebCanvas/)
+[GitHub page](https://cycpe950609.github.io/MyLittlePaint/)
 
 ### Others (Optional)
 
