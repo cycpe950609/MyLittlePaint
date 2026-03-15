@@ -1,6 +1,6 @@
 // import { CanvasBase } from "../canvas";
 
-import { VNode } from "snabbdom";
+import { type VNode } from "snabbdom";
 import { Span } from "../util/Element";
 
 /* Sidebar */

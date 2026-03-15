@@ -4,11 +4,6 @@
     "**/.pnp.*": true
   },
   "eslint.nodePath": ".yarn/sdks",
-  "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
-  "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "liveServer.settings.root": "public/",
-  "liveServer.settings.port": 5504,
   "cSpell.customDictionaries": {
     "custom-dictionary-workspace": {
       "name": "custom-dictionary-workspace",
@@ -17,5 +12,8 @@
       "scope": "workspace"
     }
   },
-  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib"
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
 }

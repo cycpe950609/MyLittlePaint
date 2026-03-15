@@ -1,11 +1,9 @@
 // import EditorUI from "./EditorUI";
 import { v4 as uuidv4 } from "uuid";
-import { Unsubscribe } from "@reduxjs/toolkit";
-import { ToolbarStateType, editorUIData, editorUIActions } from "./data";
-import { DIV } from "./util/HTMLElement";
-import FunctionInterface from "./interface/function";
+import { type ToolbarStateType, editorUIData, editorUIActions } from "./data";
+import type FunctionInterface from "./interface/function";
 import createFunctionInterfaceButton from "./util/createFunctionInterfaceButton";
-import Snabbdom from "@herp-inc/snabbdom-jsx";
+import type Snabbdom from "@herp-inc/snabbdom-jsx";
 import { Div } from "./util/Element";
 
 export interface ToolbarInterface {
@@ -15,7 +13,7 @@ export interface ToolbarInterface {
     hasChildren: () => boolean;
 }
 
-export type createFuncType<ButtonInfoType> = (listName:string,name: string,arg0: ButtonInfoType) => FunctionInterface
+export type createFuncType<ButtonInfoType> = (listName: string, name: string, arg0: ButtonInfoType) => FunctionInterface
 
 export class ToolbarPart<ButtonInfoType> {
     private name: string;
@@ -42,11 +40,12 @@ export class ToolbarPart<ButtonInfoType> {
     addButton(func: ButtonInfoType): string {
         const btnID = uuidv4();
         console.log('[TBR] AddButton')
-        editorUIData.dispatch(editorUIActions[this.name].add({id:btnID,func: func}));
+        editorUIData.dispatch(editorUIActions[this.name].add({ id: btnID, func: func }));
         return btnID;
     }
 
     removeButton(id: string): boolean {
+        // @ts-ignore
         if (id in editorUIData.getState()[this.name]) {
             editorUIData.dispatch(editorUIActions[this.name].remove(id));
             return true;
@@ -55,10 +54,11 @@ export class ToolbarPart<ButtonInfoType> {
     }
 
     size() {
-        // console.log(this.button);
+        // @ts-ignore
         return Object.keys(editorUIData.getState()[this.name]).length;
     }
     hasChildren() {
+        // @ts-ignore
         return Object.keys(editorUIData.getState()[this.name]).length > 0;
     }
 }
@@ -81,7 +81,7 @@ class Toolbar<ButtonInfoType> {
     }
 
     removeButton(id: string) {
-        if (!this.Top.removeButton(id)) 
+        if (!this.Top.removeButton(id))
             this.Bottom.removeButton(id);
     }
 
@@ -103,17 +103,17 @@ class Toolbar<ButtonInfoType> {
 
 export default Toolbar;
 
-let createFuncList : {[key:string]:createFuncType<any>} = {};
+let createFuncList: { [key: string]: createFuncType<any> } = {};
 export type ToolbarPropsType = {
     type: string;
 }
 
-const renderToolPart = (type:string,partName: string,partListName:string,partList: ToolbarStateType<any>) => {
+const renderToolPart = (type: string, partName: string, partListName: string, partList: ToolbarStateType<any>) => {
     console.log("[TBR] ToolbarPart render", partListName, Object.keys(partList).length)
     return <Div className={partName}>
         {
-            Object.keys(partList).map((key:string) => {
-                return createFunctionInterfaceButton(createFuncList[type](partListName,key,partList[key]));
+            Object.keys(partList).map((key: string) => {
+                return createFunctionInterfaceButton(createFuncList[type](partListName, key, partList[key]));
             })
         }
     </Div>
@@ -126,12 +126,16 @@ export type ToolbarCompPropsType = {
 export const ToolbarComp: Snabbdom.Component<ToolbarCompPropsType> = (props: ToolbarCompPropsType) => {
     let type = props.type;
     let name = `editorui-${type}`;
-    
-    let underscore      = type.replace('-','_');
-    let dataTop         = editorUIData.getState()[`${underscore}_top_`].data;
-    let dataTopPerm     = editorUIData.getState()[`${underscore}_top_perm`].data;
-    let dataBottom      = editorUIData.getState()[`${underscore}_bottom_`].data;
-    let dataBottomPerm  = editorUIData.getState()[`${underscore}_bottom_perm`].data;
+
+    let underscore = type.replace('-', '_');
+    // @ts-ignore
+    let dataTop = editorUIData.getState()[`${underscore}_top_`].data;
+    // @ts-ignore
+    let dataTopPerm = editorUIData.getState()[`${underscore}_top_perm`].data;
+    // @ts-ignore
+    let dataBottom = editorUIData.getState()[`${underscore}_bottom_`].data;
+    // @ts-ignore
+    let dataBottomPerm = editorUIData.getState()[`${underscore}_bottom_perm`].data;
     // <div class="toolbar-vertical" style="display: flex;">
     //      <div class="toolbar-perm"></div>
     //      <div class="toolbar-top">
@@ -140,23 +144,22 @@ export const ToolbarComp: Snabbdom.Component<ToolbarCompPropsType> = (props: Too
     //      <div class="toolbar-bottom"></div>
     //      <div class="toolbar-perm"></div>
     // </div>
-    console.log("[DEB] ToolbarComp",editorUIData.getState() );
-    if(
-        Object.keys(dataTop         ).length +
-        Object.keys(dataTopPerm     ).length +
-        Object.keys(dataBottom      ).length +
-        Object.keys(dataBottomPerm  ).length 
+    console.log("[DEB] ToolbarComp", editorUIData.getState());
+    if (
+        Object.keys(dataTop).length +
+        Object.keys(dataTopPerm).length +
+        Object.keys(dataBottom).length +
+        Object.keys(dataBottomPerm).length
         === 0
-    )
-    {
+    ) {
         return <Div />;
     }
     return <Div className="toolbar-vertical" >
-        {renderToolPart(type,"toolbar-perm",`${underscore}_top_perm`,dataTopPerm)}
-        {renderToolPart(type,"toolbar-top",`${underscore}_top_`,dataTop)}
-        {renderToolPart(type,"toolbar-bottom",`${underscore}_bottom_`,dataBottom)}
-        {renderToolPart(type,"toolbar-perm",`${underscore}_bottom_perm`,dataBottomPerm)}
+        {renderToolPart(type, "toolbar-perm", `${underscore}_top_perm`, dataTopPerm)}
+        {renderToolPart(type, "toolbar-top", `${underscore}_top_`, dataTop)}
+        {renderToolPart(type, "toolbar-bottom", `${underscore}_bottom_`, dataBottom)}
+        {renderToolPart(type, "toolbar-perm", `${underscore}_bottom_perm`, dataBottomPerm)}
     </Div>
 
-    
+
 }

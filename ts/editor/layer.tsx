@@ -1,10 +1,9 @@
 import Konva from "konva";
-import { GroupConfig } from "konva/lib/Group";
+import { type GroupConfig } from "konva/lib/Group";
 // import { KonvaEventListener } from "konva/lib/Node";
 import { v4 as uuidv4 } from "uuid";
-import { editorUIActions, editorUIData } from "../editorUI/data";
-import SidebarInterface from '../editorUI/interface/sidebar'
-import { HistoryLogEntry } from "./historyLogger";
+import type SidebarInterface from '../editorUI/interface/sidebar'
+import { type HistoryLogEntry } from "./historyLogger";
 import { EditorCanvas } from "./modeEditor";
 import { Div, Img, Table, Td, Tr } from "../editorUI/util/Element";
 import { useConsumer } from "../editorUI/util/useHook";
@@ -48,18 +47,18 @@ export class LayerManager {
 
     public addLayerAfter() {
         const id = this.addLayer();
-        const currentLayerZindex = this.id2zIndex.get(this.defaultLayer);
-        if (currentLayerZindex === undefined) throw new Error("INTERNAL_ERROR: ZIndex of layer is missing.");
+        const currentLayerZIndex = this.id2zIndex.get(this.defaultLayer);
+        if (currentLayerZIndex === undefined) throw new Error("INTERNAL_ERROR: ZIndex of layer is missing.");
         // Update zIndex
         this.id2zIndex.forEach((zIndex: number, layer_id: string) => {
-            if (zIndex >= currentLayerZindex)
+            if (zIndex >= currentLayerZIndex)
                 this.id2zIndex.set(layer_id, zIndex + 1);
         });
-        this.id2zIndex.set(id, currentLayerZindex);
+        this.id2zIndex.set(id, currentLayerZIndex);
         this.layerList.forEach((layer: Layer, layer_id: string) => {
-            let newZindex = this.id2zIndex.get(layer_id);
-            if (newZindex === undefined) throw new Error("INTERNAL_ERROR: ZIndex of layer is missing.");
-            layer.zIndex = newZindex;
+            let newZIndex = this.id2zIndex.get(layer_id);
+            if (newZIndex === undefined) throw new Error("INTERNAL_ERROR: ZIndex of layer is missing.");
+            layer.zIndex = newZIndex;
         })
         this.defaultLayer = id;
         return id;
@@ -157,13 +156,13 @@ export class Layer {
         return this._render.children;
     }
     public merge(layer: Layer) {
-        this._isPreview = false;
+        // this._isPreview = false;
         layer.content().forEach((item) => {
             this._render.add(item);
         })
     }
     private _previewImage: string = "";
-    private _isPreview: boolean = false;
+    // private _isPreview: boolean = false;
     public get Preview() {
         this._previewImage = this._render.toDataURL();
         // TODO : Add code to rerender the preview after redo/undo
@@ -191,7 +190,7 @@ export class Layer {
         return rtv;
     }
     public flush() {
-        this._isPreview = false;
+        // this._isPreview = false;
         this._prev.children.forEach((item) => {
             this._render.add(item);
         })
@@ -199,13 +198,13 @@ export class Layer {
         // editorUIData.dispatch(editorUIActions.sidebar_window.update({ id: "LayerMgrSidebar", new_func: null }));
     }
     public add(item: any) {
-        this._isPreview = false;
+        // this._isPreview = false;
         this._render.add(item);
     }
     public clear() {
         this._prev.destroyChildren();
         this._render.destroyChildren();
-        this._isPreview = false;
+        // this._isPreview = false;
     }
 
     public get render() {
@@ -242,7 +241,7 @@ class LayerMgrSidebar implements SidebarInterface {
 
                 return <Tr className={classNames}
                     onclick={
-                        (e: MouseEvent) => {
+                        (_e: MouseEvent) => {
                             (window.editorUI.CenterCanvas as EditorCanvas).LayerManager.changeTo(layer.ID);
                         }
                     }
@@ -252,10 +251,10 @@ class LayerMgrSidebar implements SidebarInterface {
                     <Td>{layer.Name}</Td>
                 </Tr>
             }
-            let edittedLayer = (window.editorUI.CenterCanvas as EditorCanvas).LayerManager.Layer.ID;
+            let editedLayer = (window.editorUI.CenterCanvas as EditorCanvas).LayerManager.Layer.ID;
             let newTableBody = layersList.map((layer: LayerInfo, idx: number) => {
-                if (layer.ID === edittedLayer) {
-                    return createList("editted-layer", idx, layer);
+                if (layer.ID === editedLayer) {
+                    return createList("edited-layer", idx, layer);
                 }
                 else {
                     return createList("normal-layer", idx, layer);

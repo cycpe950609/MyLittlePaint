@@ -1,6 +1,6 @@
-import { CanvasBase, NoOPCanvas } from "../canvas";
-import FunctionInterface from "./function";
-import SidebarInterface from "./sidebar";
+import { type CanvasBase, NoOPCanvas } from "../canvas";
+import type FunctionInterface from "./function";
+import type SidebarInterface from "./sidebar";
 
 export interface ModeFunctionBase {
     MenuToolbarLeft?: FunctionInterface[];
@@ -22,14 +22,12 @@ export interface SubModeFunction extends ModeFunctionBase {
 }
 
 
-export interface ModeFunction extends ModeFunctionBase {
+export default interface ModeFunction extends ModeFunctionBase {
     ModeSelectorText?: string; //undefine if no need to show in selector
     Tips?: string;
     Enable: boolean; // Default status of Mode when created
     CenterCanvas: CanvasBase;
 }
-
-export default ModeFunction;
 
 export class modeNoop implements ModeFunction {
     ModeName = "NoOP";

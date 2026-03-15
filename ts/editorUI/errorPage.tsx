@@ -1,13 +1,11 @@
 import type Snabbdom from "@herp-inc/snabbdom-jsx";
 import { editorUIData, modeChangeTo } from "./data";
-import { DIV, SPAN } from "./util/HTMLElement";
-// import Alert from "./util/alert";
 import { Div, Span } from "./util/Element";
 
 
-export const ErrorHandlerPage: Snabbdom.Component<any> = (props: any) => {
+export const ErrorHandlerPage: Snabbdom.Component<any> = (_props: any) => {
     setTimeout(() => {
-        editorUIData.dispatch(modeChangeTo(editorUIData.getState().mode.root)) 
+        editorUIData.dispatch(modeChangeTo(editorUIData.getState().mode.root))
     }, 1000);
     return <>
         <Div className="w-full h-full"

@@ -18,11 +18,11 @@ A small painting application based on web canvas
 
 # TODO
 
-* [ ] Layer manager (Create/Visibilty/Delete/Merge)
+* [ ] Layer manager (Create/Visibility/Delete/Merge)
 * [ ] More size of canvas
     * [ ] Infinite Canvas
 * [ ] Group of layers
 * [ ] More tools
     * [ ] Paint Bucket
     * [ ] Text
-* [ ] Use LocalStorage to prevent accidently closing
+* [ ] Use LocalStorage to prevent accidentally closing

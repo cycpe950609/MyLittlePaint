@@ -1,7 +1,5 @@
-import FunctionInterface from "../interface/function";
+import type FunctionInterface from "../interface/function";
 import { Div, Span } from "./Element";
-import { DIV, SPAN } from "./HTMLElement";
-import { useState } from "./useHook";
 
 const createFunctionInterfaceButton = (
     func: FunctionInterface

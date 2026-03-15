@@ -1,8 +1,7 @@
-import { Unsubscribe } from "@reduxjs/toolkit";
-import { ToolbarStateType, editorUIData, editorUIActions } from "./data";
-import { DIV } from "./util/HTMLElement";
+import { type Unsubscribe } from "@reduxjs/toolkit";
+import { type ToolbarStateType, editorUIData } from "./data";
 import createFunctionInterfaceButton from "./util/createFunctionInterfaceButton";
-import Snabbdom from "@herp-inc/snabbdom-jsx";
+import type Snabbdom from "@herp-inc/snabbdom-jsx";
 import { Div } from "./util/Element";
 
 
@@ -18,7 +17,7 @@ export const bootstrap = async (props: MenubarPropsType) => {
     rendered[`menubar_${props.side}_perm`] = false;
 }
 const renderMenuPart = (partListName: string, partList: ToolbarStateType<any>) => {
-    return <Div className="meanu-perm">
+    return <Div className="menu-perm">
         {
             Object.keys(partList).map((key: string) => {
                 rendered[partListName] = true;
@@ -35,8 +34,9 @@ export const MenuboxComp: Snabbdom.Component<MenubarPropsType> = (props: Menubar
     let side = props.side;
     let name = `editorui-menubar-${side}`;
 
-    let dataMode = editorUIData.getState()[`menubar_${side}_`].data;
-    let dataPerm = editorUIData.getState()[`menubar_${side}_perm`].data;
+    const state = editorUIData.getState() as Record<string, { data: any }>;
+    let dataMode = state[`menubar_${side}_`]?.data ?? {};
+    let dataPerm = state[`menubar_${side}_perm`]?.data ?? {};
 
     if (
         Object.keys(dataMode).length +

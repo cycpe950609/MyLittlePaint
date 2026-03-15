@@ -1,6 +1,6 @@
-import { CanvasBase } from "../editorUI/canvas";
+import { type CanvasBase } from "../editorUI/canvas";
 import Dialog from "../editorUI/dialog";
-import FunctionInterface from "../editorUI/interface/function";
+import type FunctionInterface from "../editorUI/interface/function";
 import { BUTTON, DIV, TEXT } from "../editorUI/util/HTMLElement";
 import Alert from "../editorUI/util/alert";
 import axios from "axios";
@@ -13,12 +13,12 @@ class btnCommand implements FunctionInterface {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    StartFunction(cvs: CanvasBase) {
-        let btnSend = BUTTON("ok_btn","Send");
+    StartFunction(_cvs: CanvasBase) {
+        let btnSend = BUTTON("ok_btn", "Send");
         let txtCommand = TEXT("w-full");
-        btnSend.onclick = async (e: MouseEvent) => {
-            if(txtCommand.value.length == 0) Alert("Please enter command");
-            let url = "/" +( txtCommand.value.split('.').join("/"));
+        btnSend.onclick = async (_e: MouseEvent) => {
+            if (txtCommand.value.length == 0) Alert("Please enter command");
+            let url = "/" + (txtCommand.value.split('.').join("/"));
             console.log("Command url :", url);
             await axios.get(url);
         }

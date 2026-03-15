@@ -3,33 +3,39 @@
     border-left: 4px solid #333333;
     border-right: 1px dotted #333333;
 }
+
 .normal-layer:hover {
     border-color: #333333c0;
     background-color: #33333350;
 }
+
 .normal-layer .edit_btn {
     border-color: #333333;
     background-color: #33333310;
 }
+
 .normal-layer .edit_btn:hover {
     border-color: #333333c0;
     background-color: #33333350;
 }
 
-.editted-layer {
+.edited-layer {
     background-color: #00ff1e10;
     border-left: 4px solid #00ff1e;
     border-right: 1px dotted #00ff1e;
 }
-.editted-layer:hover{
+
+.edited-layer:hover {
     border-color: #00ff1ed0;
     background-color: #00ff1e50;
 }
-.editted-layer .edit_btn{
+
+.edited-layer .edit_btn {
     border-color: #00ff1e;
     background-color: #00ff1e10;
 }
-.editted-layer .edit_btn:hover{
+
+.edited-layer .edit_btn:hover {
     border-color: #00ff1ed0;
     background-color: #00ff1e50;
 }
