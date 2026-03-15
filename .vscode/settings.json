@@ -8,5 +8,14 @@
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "liveServer.settings.root": "public/",
-  "liveServer.settings.port": 5504
+  "liveServer.settings.port": 5504,
+  "cSpell.customDictionaries": {
+    "custom-dictionary-workspace": {
+      "name": "custom-dictionary-workspace",
+      "path": "${workspaceFolder:MyLittlePaint-v2}/.cspell/custom-dictionary-workspace.txt",
+      "addWords": true,
+      "scope": "workspace"
+    }
+  },
+  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib"
 }

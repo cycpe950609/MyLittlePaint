@@ -6,6 +6,7 @@
 .button
 {
     border: 4px solid var(--button-border-color);
+    border-radius: calc(var(--toolbar-width)/4);
     background-color: var(--button-bg-color);
     color: var(--button-font-color);
     width: 100%;
@@ -15,13 +16,13 @@
     justify-content: center;
     justify-items: center;    
 
-    font-family: monospace;
+    /* font-family: monospace; */
 }
 
 .button:hover {
     border: 4px solid rgb(36, 36, 36);
-    background-color: #4d4d4d;
-    color: #909090;
+    background-color: #aaaaaa;
+    color: #202020;
 }
 
 .button-no-style {

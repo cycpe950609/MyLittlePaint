@@ -13,11 +13,7 @@
     --button-border-color : var(--toolbar-border-color);
     --button-font-color : var(--toolbar-font-color);
 }
-html 
-{
-    height: 100%;
-}
-body
+html, body
 {
     background-color: gray;
     width: 100%;
@@ -26,6 +22,7 @@ body
     margin: 0;
     touch-action: none;
     user-select: none;
+    font-family: monospace;
 }
 
 /* Menu */
@@ -180,10 +177,11 @@ body
     height: var(--toolbar-item-size);
     background-size: cover;
     margin: 4px;
-    border: 0;
+    border: 1px solid var(--toolbar-font-color);
+    border-radius: calc(var(--toolbar-width)/4 - 4px);
     position: relative;
     display: inline-block;
-    background-color: rgb(200, 200, 200);
+    background-color: rgb(255, 255, 255);
 }
 .toolbar-item:hover {
     background-color: rgb(222, 222, 222);
@@ -333,6 +331,10 @@ body
     pointer-events: all;
     margin-left: 5px;
     cursor: default;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .status_help_tip
 {
