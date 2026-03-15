@@ -11,7 +11,7 @@
     "lint": "eslint ts/ --ext .ts",
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
-    "build:watch": "webpack --mode development --watch"
+    "build:watch": "webpack serve --mode development"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.1",
@@ -48,6 +48,7 @@
     "eslint": "^8.56.0",
     "file-loader": "^6.2.0",
     "html-loader": "^5.0.0",
+    "html-webpack-plugin": "^5.6.6",
     "prettier": "^3.2.5",
     "remark": "^14.0.0",
     "remark-html": "^16.0.1",
