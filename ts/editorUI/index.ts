@@ -1,13 +1,13 @@
 import EditorUI from "./EditorUI";
-import FunctionInterface from "./interface/function";
-import ModeFunction from "./interface/mode";
-import SidebarInterface from "./interface/sidebar";
-import { CanvasInterface } from "./canvas";
+import type FunctionInterface from "./interface/function";
+import type ModeFunction from "./interface/mode";
+import type SidebarInterface from "./interface/sidebar";
+import { type CanvasInterface } from "./canvas";
 
 
 
 export default EditorUI
-export {
+export type {
     FunctionInterface,
     ModeFunction,
     SidebarInterface,

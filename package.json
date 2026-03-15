@@ -1,17 +1,17 @@
 {
-  "name": "mylittlepaint2",
+  "name": "my_little_paint2",
   "version": "0.0.1-dev",
   "description": "MyLittlePaint",
   "main": "index.js",
   "repository": "git@github.com:cycpe950609/MyLittlePaint-v2.git",
-  "author": "Cycpe950609 <cycpe950609@gmail.com>",
+  "author": "Ting Fang, Tsai <cycpe950609@gmail.com>",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "lint": "eslint ts/ --ext .ts",
-    "build": "webpack --mode production",
-    "build:dev": "webpack --mode development",
-    "build:watch": "webpack serve --mode development"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite serve"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
@@ -26,10 +26,6 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.0",
-    "@babel/plugin-transform-react-jsx": "^7.28.6",
-    "@babel/preset-env": "^7.29.0",
-    "@babel/register": "^7.28.6",
     "@herp-inc/snabbdom-jsx": "^0.22.0",
     "@types/lodash": "^4.17.24",
     "@types/math-expression-evaluator": "^2.0.0",
@@ -38,24 +34,12 @@
     "@types/uuid": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
-    "babel-loader": "^10.1.1",
-    "clean-webpack-plugin": "^4.0.0",
-    "compression-webpack-plugin": "^12.0.0",
-    "copy-webpack-plugin": "^14.0.0",
-    "css-loader": "^7.1.4",
     "csstype": "^3.2.3",
     "eruda": "^3.4.3",
     "eslint": "^10.0.3",
-    "file-loader": "^6.2.0",
-    "html-loader": "^5.1.0",
-    "html-webpack-plugin": "^5.6.6",
     "prettier": "^3.8.1",
-    "style-loader": "^4.0.0",
-    "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",
-    "webpack": "^5.105.4",
-    "webpack-cli": "^7.0.0",
-    "webpack-dev-server": "^5.2.3"
+    "vite": "^7.1.7"
   },
   "packageManager": "yarn@4.13.0"
 }

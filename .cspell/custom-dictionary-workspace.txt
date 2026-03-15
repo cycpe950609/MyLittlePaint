@@ -1,3 +1,19 @@
 # Custom Dictionary Words
+animateion
+buttongroup
+cycpe
 editorui
+gesturable
+Imple
+interactjs
+Konva
+mdfunc
+menubox
+Mexp
+MODEMGR
+OPCVS
+oper
 Snabbdom
+Tsai
+uuidv
+vnode

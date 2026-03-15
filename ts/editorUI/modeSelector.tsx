@@ -1,7 +1,5 @@
-import { Unsubscribe } from "@reduxjs/toolkit";
-import { editorUIData, editorUIActions } from "./data";
-import { DIV, LABEL } from "./util/HTMLElement";
-import Snabbdom from "@herp-inc/snabbdom-jsx";
+import { editorUIData } from "./data";
+import type Snabbdom from "@herp-inc/snabbdom-jsx";
 import { Div, Input, Label } from "./util/Element";
 
 export const bootstrap = async () => {
@@ -19,7 +17,7 @@ export const ModeSelectorComp: Snabbdom.Component<{}> = () => {
                 return <Label className="buttongroup-item"
                     onclick={() => window.editorUI.Mode.changeTo(val.modeName)}
                 >
-                    <Input type="radio" className="button_input" name="modeSelector" defaultChecked={false} disabled={val.enable !== true}/>
+                    <Input type="radio" className="button_input" name="modeSelector" defaultChecked={false} disabled={val.enable !== true} />
                     <Div className="button">
                         <Div>{btnName}</Div>
                     </Div>

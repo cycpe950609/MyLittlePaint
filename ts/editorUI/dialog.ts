@@ -6,20 +6,20 @@ class Dialog {
         //prettier-ignore
         this.dialog = DIV(
             "TD_Background",
-            DIV("Top_Dialog", 
+            DIV("Top_Dialog",
                 [
-                    DIV("TD_Header", 
+                    DIV("TD_Header",
                         [
                             SPAN("TD_Title", title),
                             (() => {
-                                const sp = SPAN("TD_BtnDialogCloss", "X");
-                                sp.addEventListener("click", closing !== undefined ? (e)=> {closing(e); this.close()} : ()=>this.close() );
+                                const sp = SPAN("TD_BtnDialogClose", "X");
+                                sp.addEventListener("click", closing !== undefined ? (e) => { closing(e); this.close() } : () => this.close());
                                 // console.log(sp);
                                 return sp;
                             })()
-                        ]    
+                        ]
                     ),
-                    DIV("TD_Body",body)
+                    DIV("TD_Body", body)
                 ]
             )
         );

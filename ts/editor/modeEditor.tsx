@@ -1,13 +1,12 @@
 import {
-    CanvasBase,
-    CanvasInterface,
     NoOPCVSFunc,
-    PaintEvent,
-    CanvasInterfaceSettings,
+    type CanvasBase,
+    type CanvasInterface,
+    type PaintEvent,
+    type CanvasInterfaceSettings,
 } from "../editorUI/canvas";
 import Dialog from "../editorUI/dialog";
-// import ModeFunction from "../editorUI-ng/interface/mode";
-import { ModeFunction, FunctionInterface } from "../editorUI";
+import type { ModeFunction, FunctionInterface } from "../editorUI";
 import {
     BUTTON,
     DIV,
@@ -22,21 +21,15 @@ import {
     btnSave,
     btnToggleTouch,
     btnUndo,
-    btnUpload
 } from "./menu";
 import { TipComponent } from "../editorUI/statusbar";
 import interact from "interactjs";
-import Interact from "@interactjs/types/index";
 import LayerMgrSidebar, { LayerManager, Layer, LayerInfo } from './layer';
 import SettingPageSidebar from "./setting";
-import { editorUIActions, editorUIData } from "../editorUI/data";
 import HistoryManager from "./historyLogger";
-import { Div } from "../editorUI/util/Element";
-import { VNode } from "snabbdom";
-import { setValueFunctionType, useProvider } from "../editorUI/util/useHook";
-import { NextFunctionState } from "../editorUI/interface/function";
+import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook";
+import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
-import { returnMode } from "../editorUI/mode";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -54,10 +47,10 @@ export class btnCanvas implements FunctionInterface {
 
     private draw_func?: CanvasInterface;
     StartFunction = async (cvs: CanvasBase) => {
-        if(this.draw_func == undefined)
+        if (this.draw_func == undefined)
             this.draw_func = await this.loadModule();
         cvs.Function = this.draw_func;
-        return {isChangeTo: true} as NextFunctionState;
+        return { isChangeTo: true } as NextFunctionState;
     };
 }
 
@@ -82,7 +75,7 @@ export class EditorCanvas implements CanvasBase {
     // private prev_ctx = () => this.LayerManager.Layer.prev;
     // private render_ctx = () => this.LayerManager.Layer.render;
     private render_layer!: Layer;
-    public LayerManager : LayerManager;
+    public LayerManager: LayerManager;
     private draw_func: CanvasInterface = new NoOPCVSFunc();
     private EventFired: boolean = false;
     private isPointOut?: PaintEvent = undefined;
@@ -96,7 +89,7 @@ export class EditorCanvas implements CanvasBase {
         this.width = width;
         this.height = height;
         this.scaleTip = window.editorUI.Statusbar.addTip("", true);
-        this.refreshScaleTip(0,1);
+        this.refreshScaleTip(0, 1);
         this.cnt = DIV("w-full h-full");
         this.LayerManager = new LayerManager(this.cnt, window.innerWidth, window.innerHeight);
         this.render_layer = this.LayerManager.Layer;
@@ -109,14 +102,14 @@ export class EditorCanvas implements CanvasBase {
     }
     update?: ((time: number) => void) | undefined;
 
-    private historyMagr: HistoryManager = new HistoryManager();
+    private historyMgr: HistoryManager = new HistoryManager();
     public undo = () => {// Ctrl-Z
-        let undoLst = this.historyMagr.undo();
-        if(undoLst.length === 0) throw new Error("INTERNEL_ERROR: Undo list is empty");
+        let undoLst = this.historyMgr.undo();
+        if (undoLst.length === 0) throw new Error("INTERNAL_ERROR: Undo list is empty");
         undoLst.forEach((entry) => {
-            if(entry.paintToolName === "noop") return;
+            if (entry.paintToolName === "noop") return;
             let polygon = this.LayerManager.Canvas.find(`.${entry.shapeName}`)
-            if(polygon.length === 0) throw new Error("INTERNEL_ERROR: Shape not found");
+            if (polygon.length === 0) throw new Error("INTERNAL_ERROR: Shape not found");
             polygon.forEach((shape) => {
                 shape.hide();
             })
@@ -124,12 +117,12 @@ export class EditorCanvas implements CanvasBase {
         // editorUIData.dispatch(editorUIActions.sidebar_window.update({id: "LayerMgrSidebar", new_func: null}));
     };
     public redo = () => { // Ctrl-Y
-        let redoLst = this.historyMagr.redo();
-        if(redoLst.length === 0) throw new Error("INTERNEL_ERROR: Redo list is empty");
+        let redoLst = this.historyMgr.redo();
+        if (redoLst.length === 0) throw new Error("INTERNAL_ERROR: Redo list is empty");
         redoLst.forEach((entry) => {
-            if(entry.paintToolName === "noop") return;
+            if (entry.paintToolName === "noop") return;
             let polygon = this.LayerManager.Canvas.find(`.${entry.shapeName}`)
-            if(polygon.length === 0) throw new Error("INTERNEL_ERROR: Shape not found");
+            if (polygon.length === 0) throw new Error("INTERNAL_ERROR: Shape not found");
             polygon.forEach((shape) => {
                 shape.show();
             })
@@ -139,19 +132,19 @@ export class EditorCanvas implements CanvasBase {
     private finishDrawing() {
         // console.log("[DEB] Finish Drawing ...");
         const diff = this.LayerManager.Layer.diff();
-        const neededRemoveShapeLst = this.historyMagr.redoList;//Redo List is a list of HistoryLogEntry<any>[]
+        const neededRemoveShapeLst = this.historyMgr.redoList;//Redo List is a list of HistoryLogEntry<any>[]
         console.log("[DEB] Needed Remove Shape List: ", neededRemoveShapeLst)
         neededRemoveShapeLst.forEach((shapeList) => {
             shapeList.forEach((entry) => {
                 // console.log("[DEB] Needed Remove Shape : ", entry.shapeName)
                 let polygon = this.LayerManager.Canvas.find(`.${entry.shapeName}`)
-                if(polygon.length === 0) throw new Error("INTERNEL_ERROR: Shape not found");
+                if (polygon.length === 0) throw new Error("INTERNAL_ERROR: Shape not found");
                 polygon.forEach((shape) => {
                     shape.destroy();
                 })
             })
         })
-        this.historyMagr.add(diff);
+        this.historyMgr.add(diff);
 
         this.LayerManager.Layer.flush();
         this.EventFired = false;
@@ -170,7 +163,7 @@ export class EditorCanvas implements CanvasBase {
             y: 0
         }
     };
-    private dragMoveListener = (event: Interact.GestureEvent, target: HTMLElement,angleScale: {angle:number, scale:number}) => {
+    private dragMoveListener = (event: Interact.GestureEvent, target: HTMLElement, angleScale: { angle: number, scale: number }) => {
         // console.log("[DEB] dragMoveListener : ",event)
         // keep the dragged position in the data-x/data-y attributes
         this.angleScalePos.pos.x = this.angleScalePos.pos.x + event.dx;
@@ -180,29 +173,29 @@ export class EditorCanvas implements CanvasBase {
         this.rotateTo(angleScale.angle)
         this.scaleTo(angleScale.scale);
         this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y);
-        
-        this.refreshScaleTip(angleScale.angle,angleScale.scale);
+
+        this.refreshScaleTip(angleScale.angle, angleScale.scale);
     }
     private isDrawing: boolean = false;
     private isDrawRotate: boolean = true;
     private layerInfoList: LayerInfo[] = [];
-    private setLayerInfoList: setValueFunctionType = () => {} 
+    private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
         // this.containerVNode = <Div className="w-full h-full" />;
         // let container = this.containerVNode.elm as HTMLDivElement;
         // console.log("[HOK] attachCanvas : ", this.containerVNode)
         console.log("[HOK] Canvas Size ", this.width, this.height);
-        this.backgroundDiv.style.width = `${window.innerWidth*3}px`;
-        this.backgroundDiv.style.height = `${window.innerHeight*3}px`;
-        this.backgroundDiv.style.setProperty("--bgDiv-background-width", `${window.innerWidth*3}px`)
-        this.backgroundDiv.style.setProperty("--bgDiv-background-height", `${window.innerHeight*3}px`)
+        this.backgroundDiv.style.width = `${window.innerWidth * 3}px`;
+        this.backgroundDiv.style.height = `${window.innerHeight * 3}px`;
+        this.backgroundDiv.style.setProperty("--bgDiv-background-width", `${window.innerWidth * 3}px`)
+        this.backgroundDiv.style.setProperty("--bgDiv-background-height", `${window.innerHeight * 3}px`)
         this.backgroundDiv.style.position = "fixed";
         this.backgroundDiv.style.top = `${-window.innerWidth}px`;
         this.backgroundDiv.style.left = `${-window.innerHeight}px`;
-        this.backgroundDiv.style.setProperty("--bgDiv-background-image" , 'url(../img/cvs_bg.png)');
-        this.backgroundDiv.style.setProperty("--bgDiv-background-size" , "32px 32px");
+        this.backgroundDiv.style.setProperty("--bgDiv-background-image", 'url(../img/cvs_bg.png)');
+        this.backgroundDiv.style.setProperty("--bgDiv-background-size", "32px 32px");
         this.backgroundDiv.id = "backgroundDiv";
-        
+
         let interactCVS = interact(this.cnt, {
             styleCursor: false
         });
@@ -211,7 +204,7 @@ export class EditorCanvas implements CanvasBase {
         var startScale = 1;
         let gestureStart = (e: Interact.GestureEvent) => {
             console.log(`[DEB] isDrawing GestureStart ${isDrawing}`)
-            if(isDrawing) return;
+            if (isDrawing) return;
             console.log(
                 `[CVS] Gesture start scale:${e.scale}, angle: ${e.angle}`
             );
@@ -223,18 +216,18 @@ export class EditorCanvas implements CanvasBase {
         }
         let gestureMove = (e: Interact.GestureEvent) => {
             console.log(`[DEB] isDrawing GestureMove ${isDrawing}`)
-            if(isDrawing) return;
+            if (isDrawing) return;
             console.log(
                 `[CVS] Gesture move scale:${e.ds}, angle: ${e.da}`
             );
             angleScale.angle = this.normalizeRotate(e.angle + startAngle);
             angleScale.scale = e.scale * startScale;
-            dragMoveListener(e,this.cnt,angleScale);
+            dragMoveListener(e, this.cnt, angleScale);
             e.preventDefault();
             e.stopPropagation();
         }
         let gestureEnd = (e: Interact.GestureEvent) => {
-            if(isDrawing) return;
+            if (isDrawing) return;
             console.log(
                 `[CVS] Gesture end scale:${e.scale}, angle: ${e.angle}`
             );
@@ -243,17 +236,17 @@ export class EditorCanvas implements CanvasBase {
             e.preventDefault();
             e.stopPropagation();
         }
-        let dragMove = (e: Interact.GestureEvent) => { 
-            if(!isDrawing && this.isPointOut === undefined)
-                dragMoveListener(e,this.cnt,angleScale) 
+        let dragMove = (e: Interact.GestureEvent) => {
+            if (!isDrawing && this.isPointOut === undefined)
+                dragMoveListener(e, this.cnt, angleScale)
         }
         let pointOut = (e: Interact.PointerEvent) => {
-            let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x)/this.angleScalePos.scale;
-            let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y)/this.angleScalePos.scale;
-            let rot_deg = -angleScale.angle/180*Math.PI;
-            let new_x = new_x_wo_rot*Math.cos(rot_deg) - new_y_wo_rot*Math.sin(rot_deg);
-            let new_y = new_x_wo_rot*Math.sin(rot_deg) + new_y_wo_rot*Math.cos(rot_deg);
-            let ev: PaintEvent ={
+            let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
+            let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
+            let rot_deg = -angleScale.angle / 180 * Math.PI;
+            let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
+            let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+            let ev: PaintEvent = {
                 X: new_x,
                 Y: new_y,
                 type: e.pointerType as PaintEvent["type"] || "mouse",
@@ -272,135 +265,133 @@ export class EditorCanvas implements CanvasBase {
         var dragMoveListener = this.dragMoveListener;
         var isDrawing = this.isDrawing;
         interactCVS
-        .gesturable({
-            listeners: {
-                start : gestureStart,
-                move : gestureMove,
-                end : gestureEnd
-            }
-        })
-        .draggable({
-            listeners: { 
-                move: dragMove
-            }
-        })
-        .on("down", (e: Interact.PointerEvent) => {
-            // We MUST need the following line, so that we wont trigger pointleave accidently (WHY?)
-            this.isPointOut = undefined;
-            if (
-                e.pointerType === "touch" &&
-                (window.editorUI.CenterCanvas as EditorCanvas)
-                    .canDrawWithTouch === false
-            ) {
-                // console.log("pointerdown");
-                container.style.touchAction = "auto";
-                isDrawing = false;
-                return;
-            }
-            container.style.touchAction = "none";
-            e.preventDefault();
-            e.stopPropagation();
-
-            let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x)/this.angleScalePos.scale;
-            let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y)/this.angleScalePos.scale;
-            let rot_deg = -angleScale.angle/180*Math.PI;
-            let new_x = new_x_wo_rot*Math.cos(rot_deg) - new_y_wo_rot*Math.sin(rot_deg);
-            let new_y = new_x_wo_rot*Math.sin(rot_deg) + new_y_wo_rot*Math.cos(rot_deg);
-            let mouseEvent: PaintEvent = {
-                X: new_x,
-                Y: new_y,
-                type: "mouse",
-                pressure: 1.0
-            };
-            if(e.button === 0) {
-                if (this.draw_func.PointerDown !== undefined) {
-                    this.EventFired = true;
-                    this.draw_func.PointerDown(mouseEvent);
-                    requestAnimationFrame(this.render);
+            .gesturable({
+                listeners: {
+                    start: gestureStart,
+                    move: gestureMove,
+                    end: gestureEnd
                 }
-            }
-            else if(e.button === 2) {}
-            isDrawing = true;
-            // console.log(`Mouse Down`);
-        })
-        .on("move", (e: Interact.PointerEvent) => {
-            // console.log("pointermove");
-            if (
-                e.pointerType === "touch" &&
-                (window.editorUI.CenterCanvas as EditorCanvas)
-                    .canDrawWithTouch === false
-            )
-            {
-                return 
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            if( e.offsetX < 0 || e.offsetX > this.width ||
-                e.offsetY < 0 || e.offsetY > this.height
-            )
-            { 
-                // pointleave wont triggered when we draw with finger, so we need call it manually
-                pointOut(e);
-            }
-            let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x)/this.angleScalePos.scale;
-            let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y)/this.angleScalePos.scale;
-            let rot_deg = -angleScale.angle/180*Math.PI;
-            let new_x = new_x_wo_rot*Math.cos(rot_deg) - new_y_wo_rot*Math.sin(rot_deg);
-            let new_y = new_x_wo_rot*Math.sin(rot_deg) + new_y_wo_rot*Math.cos(rot_deg);
-            let mouseEvent: PaintEvent = {
-                X: new_x,
-                Y: new_y,
-                type: "mouse",
-                pressure: 1.0
-            };
-            if (this.draw_func.PointerMove !== undefined) {
-                // console.log('Mouse Move');
-                this.draw_func.PointerMove(mouseEvent);
-            }
-        })
-        .on("up", (e: Interact.PointerEvent) => {
-            // console.log("pointerup");
-            if (
-                e.pointerType === "touch" &&
-                (window.editorUI.CenterCanvas as EditorCanvas)
-                    .canDrawWithTouch === false
-            ) {
-                // console.log("pointerup");
+            })
+            .draggable({
+                listeners: {
+                    move: dragMove
+                }
+            })
+            .on("down", (e: Interact.PointerEvent) => {
+                // We MUST need the following line, so that we wont trigger pointLeave accidentally (WHY?)
+                this.isPointOut = undefined;
+                if (
+                    e.pointerType === "touch" &&
+                    (window.editorUI.CenterCanvas as EditorCanvas)
+                        .canDrawWithTouch === false
+                ) {
+                    // console.log("pointerdown");
+                    container.style.touchAction = "auto";
+                    isDrawing = false;
+                    return;
+                }
                 container.style.touchAction = "none";
-                return;
-            }
-            container.style.touchAction = "none";
-            e.preventDefault();
-            e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
 
-            let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x)/this.angleScalePos.scale;
-            let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y)/this.angleScalePos.scale;
-            let rot_deg = -angleScale.angle/180*Math.PI;
-            let new_x = new_x_wo_rot*Math.cos(rot_deg) - new_y_wo_rot*Math.sin(rot_deg);
-            let new_y = new_x_wo_rot*Math.sin(rot_deg) + new_y_wo_rot*Math.cos(rot_deg);
-            let mouseEvent: PaintEvent = {
-                X: new_x,
-                Y: new_y,
-                type: "mouse",
-                pressure: 1.0
-            };
-            if(e.button === 0) {
-                if (this.draw_func.PointerUp !== undefined) {
-                    // console.log("Mouse Up");
-                    this.draw_func.PointerUp(mouseEvent);
+                let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
+                let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
+                let rot_deg = -angleScale.angle / 180 * Math.PI;
+                let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
+                let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+                let mouseEvent: PaintEvent = {
+                    X: new_x,
+                    Y: new_y,
+                    type: "mouse",
+                    pressure: 1.0
+                };
+                if (e.button === 0) {
+                    if (this.draw_func.PointerDown !== undefined) {
+                        this.EventFired = true;
+                        this.draw_func.PointerDown(mouseEvent);
+                        requestAnimationFrame(this.render);
+                    }
                 }
-            }
-            else if(e.button === 2) {
-                if (this.draw_func.RightPointerUp!== undefined) {
-                    // console.log("Mouse Out");
-                    this.draw_func.RightPointerUp(mouseEvent);
+                else if (e.button === 2) { }
+                isDrawing = true;
+                // console.log(`Mouse Down`);
+            })
+            .on("move", (e: Interact.PointerEvent) => {
+                // console.log("pointermove");
+                if (
+                    e.pointerType === "touch" &&
+                    (window.editorUI.CenterCanvas as EditorCanvas)
+                        .canDrawWithTouch === false
+                ) {
+                    return
                 }
-            }
-            isDrawing = false;
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.offsetX < 0 || e.offsetX > this.width ||
+                    e.offsetY < 0 || e.offsetY > this.height
+                ) {
+                    // pointLeave wont triggered when we draw with finger, so we need call it manually
+                    pointOut(e);
+                }
+                let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
+                let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
+                let rot_deg = -angleScale.angle / 180 * Math.PI;
+                let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
+                let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+                let mouseEvent: PaintEvent = {
+                    X: new_x,
+                    Y: new_y,
+                    type: "mouse",
+                    pressure: 1.0
+                };
+                if (this.draw_func.PointerMove !== undefined) {
+                    // console.log('Mouse Move');
+                    this.draw_func.PointerMove(mouseEvent);
+                }
+            })
+            .on("up", (e: Interact.PointerEvent) => {
+                // console.log("pointerup");
+                if (
+                    e.pointerType === "touch" &&
+                    (window.editorUI.CenterCanvas as EditorCanvas)
+                        .canDrawWithTouch === false
+                ) {
+                    // console.log("pointerup");
+                    container.style.touchAction = "none";
+                    return;
+                }
+                container.style.touchAction = "none";
+                e.preventDefault();
+                e.stopPropagation();
 
-        })
-        .on('pointerleave', pointOut);
-        
+                let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
+                let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
+                let rot_deg = -angleScale.angle / 180 * Math.PI;
+                let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
+                let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+                let mouseEvent: PaintEvent = {
+                    X: new_x,
+                    Y: new_y,
+                    type: "mouse",
+                    pressure: 1.0
+                };
+                if (e.button === 0) {
+                    if (this.draw_func.PointerUp !== undefined) {
+                        // console.log("Mouse Up");
+                        this.draw_func.PointerUp(mouseEvent);
+                    }
+                }
+                else if (e.button === 2) {
+                    if (this.draw_func.RightPointerUp !== undefined) {
+                        // console.log("Mouse Out");
+                        this.draw_func.RightPointerUp(mouseEvent);
+                    }
+                }
+                isDrawing = false;
+
+            })
+            .on('pointerleave', pointOut);
+
         container.addEventListener("wheel", this.cvsMouseWheelHandler);
 
         window.addEventListener("keydown", this.docKeydownHandler);
@@ -432,7 +423,7 @@ export class EditorCanvas implements CanvasBase {
     public set Function(func: CanvasInterface) {
         console.log("setFunction", func);
         this.draw_func = func;
-        const browerCursor = [
+        const browserCursor = [
             "alias",
             "all-scroll",
             "auto",
@@ -471,7 +462,7 @@ export class EditorCanvas implements CanvasBase {
         ];
 
         if (func.CursorName === undefined) return;
-        if (browerCursor.includes(func.CursorName)) {
+        if (browserCursor.includes(func.CursorName)) {
             console.log(`CursorName ${func.CursorName} in list`);
             this.cnt.style.cursor = func.CursorName;
         } else {
@@ -481,25 +472,25 @@ export class EditorCanvas implements CanvasBase {
         }
         window.editorUI.forceRerender();
     }
-    resizeCanvas = (e?: UIEvent) => {
-        this.backgroundDiv.style.width = `${window.innerWidth*3}px`;
-        this.backgroundDiv.style.height = `${window.innerHeight*3}px`;
+    resizeCanvas = (_e?: UIEvent) => {
+        this.backgroundDiv.style.width = `${window.innerWidth * 3}px`;
+        this.backgroundDiv.style.height = `${window.innerHeight * 3}px`;
         this.LayerManager.resize(window.innerWidth, window.innerHeight);
     };
-    removeCanvas = () => {};
+    removeCanvas = () => { };
 
     render = () => {
         // [this.layerInfoList, this.setLayerInfoList] = useProvider("editor.layer.info.list", []);
         if (this.EventFired) {
             let angle = this.isDrawRotate ? this.angleScalePos.angle : 0;
-            this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height,angle);
-            if(this.isPointOut !== undefined){
+            this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height, angle);
+            if (this.isPointOut !== undefined) {
                 if (this.draw_func.PointerOut !== undefined) {
                     this.draw_func.PointerOut(this.isPointOut);
                     this.isPointOut = undefined;
                     requestAnimationFrame(this.render);
                 }
-                this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height,angle);
+                this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height, angle);
                 this.isPointOut = undefined;
             }
             if (this.draw_func.CanFinishDrawing) this.finishDrawing();
@@ -615,11 +606,11 @@ export class EditorCanvas implements CanvasBase {
     private scaleTip: TipComponent;
     private normalizeRotate = (rotate: number) => {
         let angle = rotate % 360;
-        if(angle > 0)
-            return angle > 180 ? -360 + angle: angle;
+        if (angle > 0)
+            return angle > 180 ? -360 + angle : angle;
         return angle < -180 ? 360 + angle : angle;
     }
-    private refreshScaleTip = (angle: number,scale: number) => {
+    private refreshScaleTip = (angle: number, scale: number) => {
         this.scaleTip.updateTip(
             "Rotate : " + (angle).toFixed(0) + "°, " +
             "Scale : " + (scale * 100).toFixed(0) + "%"
@@ -633,7 +624,7 @@ export class EditorCanvas implements CanvasBase {
         if (new_scale >= 4) new_scale = 4;
         if (new_scale <= 0.1) new_scale = 0.1;
         this.angleScalePos.scale = new_scale;
-        this.refreshScaleTip(this.angleScalePos.angle,this.angleScalePos.scale);
+        this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
         // console.log("Next scale factor = " + this.angleScalePos.scale);
 
         this.LayerManager.scaleTo(new_scale);
@@ -641,20 +632,20 @@ export class EditorCanvas implements CanvasBase {
     public rotateTo = (rotate: number) => {
         let new_rotate = this.normalizeRotate(rotate);
         this.angleScalePos.angle = new_rotate;
-        this.refreshScaleTip(this.angleScalePos.angle,this.angleScalePos.scale);
+        this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
         // console.log("Next rotate factor = " + this.angleScalePos.scale);
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-rotate",`${new_rotate}deg`);
+        this.backgroundDiv.style.setProperty("--bgDiv-transform-rotate", `${new_rotate}deg`);
         this.LayerManager.rotateTo(new_rotate);
     };
 
-    public moveTo = (moveX: number,moveY: number) => {
+    public moveTo = (moveX: number, moveY: number) => {
         this.angleScalePos.pos.x = moveX;
         this.angleScalePos.pos.y = moveY;
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate",`${-moveX}px ${-moveY}px`);
-        this.LayerManager.moveTo(moveX,moveY);
+        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate", `${-moveX}px ${-moveY}px`);
+        this.LayerManager.moveTo(moveX, moveY);
     };
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
-        
+
         if (this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) {// Zoom in/out
             ev.preventDefault();
             if (ev.deltaY < 0) {
@@ -670,19 +661,19 @@ export class EditorCanvas implements CanvasBase {
         if (!this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { // No Key: Up/Down
             ev.preventDefault();
             if (ev.deltaY < 0) {
-                this.moveTo(this.angleScalePos.pos.x,this.angleScalePos.pos.y + 30);
+                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 30);
             } else if (ev.deltaY > 0) {
-                this.moveTo(this.angleScalePos.pos.x,this.angleScalePos.pos.y - 30);
+                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 30);
             }
-                this.render();
+            this.render();
             return;
         }
         if (!this.isCtlKeyDown && this.isShiftDown && !this.isAltDown) {// Shift: Left/Right
             ev.preventDefault();
             if (ev.deltaY < 0) {
-                this.moveTo(this.angleScalePos.pos.x + 30,this.angleScalePos.pos.y);
+                this.moveTo(this.angleScalePos.pos.x + 30, this.angleScalePos.pos.y);
             } else if (ev.deltaY > 0) {
-                this.moveTo(this.angleScalePos.pos.x - 30,this.angleScalePos.pos.y);
+                this.moveTo(this.angleScalePos.pos.x - 30, this.angleScalePos.pos.y);
             }
             this.render();
             return;
@@ -705,31 +696,26 @@ export class EditorCanvas implements CanvasBase {
         if (ev.key === "Control") { ev.preventDefault(); this.isCtlKeyDown = true; }
         if (ev.key === "Shift") { ev.preventDefault(); this.isShiftDown = true; }
         if (ev.key === "Alt") { ev.preventDefault(); this.isAltDown = true; }
-        if (ev.key === "+" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown)
-        { ev.preventDefault(); this.scaleTo(this.scaleFactor + 0.1);}
-        if (ev.key === "-" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown)
-        { ev.preventDefault(); this.scaleTo(this.scaleFactor - 0.1);}
-        if (ev.key === "0" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown)
-        { ev.preventDefault(); this.scaleTo(1.0);}
-        if (ev.key === "z" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown)
-        { ev.preventDefault(); this.undo();}
-        if (ev.key === "y" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown)
-        { ev.preventDefault(); this.redo();}
+        if (ev.key === "+" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.scaleTo(this.scaleFactor + 0.1); }
+        if (ev.key === "-" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.scaleTo(this.scaleFactor - 0.1); }
+        if (ev.key === "0" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.scaleTo(1.0); }
+        if (ev.key === "z" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.undo(); }
+        if (ev.key === "y" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.redo(); }
     };
     private docKeyupHandler = (ev: KeyboardEvent) => {
         // console.log("docKeyup", ev.key);
-        if (ev.key === "Control") { ev.preventDefault(); this.isCtlKeyDown = false;}
-        if (ev.key === "Shift") { ev.preventDefault(); this.isShiftDown = false;}
-        if (ev.key === "Alt") { ev.preventDefault(); this.isAltDown = false;}
+        if (ev.key === "Control") { ev.preventDefault(); this.isCtlKeyDown = false; }
+        if (ev.key === "Shift") { ev.preventDefault(); this.isShiftDown = false; }
+        if (ev.key === "Alt") { ev.preventDefault(); this.isAltDown = false; }
     };
 
-    public get settings (){
-        if(this.draw_func.Settings === undefined)
+    public get settings() {
+        if (this.draw_func.Settings === undefined)
             return {} as CanvasInterfaceSettings;
         return this.draw_func.Settings;
-    } 
-    public set settings (setting: CanvasInterfaceSettings) {
-        if(this.draw_func.Settings !== undefined)
+    }
+    public set settings(setting: CanvasInterfaceSettings) {
+        if (this.draw_func.Settings !== undefined)
             this.draw_func.Settings = setting;
     }
 }
@@ -745,32 +731,32 @@ class modeEditor implements ModeFunction {
         new btnRedo(),
         new btnClear(),
         // new btnCanvas(new EraserCVSFunc()),
-        new btnCanvas('Eraser','eraser','Eraser', async() => new (await import(/* webpackChunkName: "paint-eraser" */"./eraser")).default()),
+        new btnCanvas('Eraser', 'eraser', 'Eraser', async () => new (await import(/* webpackChunkName: "paint-eraser" */"./eraser")).default()),
     ];
 
     MenuToolbarRight = [
-        new btnResetScale(), 
-        new btnResetRotate(), 
-        new btnToggleTouch(), 
+        new btnResetScale(),
+        new btnResetRotate(),
+        new btnToggleTouch(),
         new btnSave()
     ];
 
     LeftToolbarTop = [
-        new btnCanvas('Brush','brush','Brush',async() =>                new (await import(/* webpackChunkName: "paint-brush" */"./brush")).default() ),
-        new btnCanvas('Line','line','Line',async() =>                   new (await import(/* webpackChunkName: "paint-line" */"./line")).default() ),
-        new btnCanvas('Circle','circle','Circle',async() =>             new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).CircleCVSFunc() ),
-        new btnCanvas('Triangle','triangle','Triangle',async() =>       new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).TriangleCVSFunc() ),
-        new btnCanvas('Rectangle','rectangle','Rectangle',async() =>    new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).RectangleCVSFunc() ),
+        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import(/* webpackChunkName: "paint-brush" */"./brush")).default()),
+        new btnCanvas('Line', 'line', 'Line', async () => new (await import(/* webpackChunkName: "paint-line" */"./line")).default()),
+        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).CircleCVSFunc()),
+        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).TriangleCVSFunc()),
+        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).RectangleCVSFunc()),
         new btnPolygon(),
     ];
-    
+
     RightToolbarTop = [
         new LayerMgrSidebar(),
         new SettingPageSidebar(),
     ];
-    
-    StartMode() {}
-    EndMode() {}
+
+    StartMode() { }
+    EndMode() { }
 }
 
 export default modeEditor;

@@ -1,17 +1,13 @@
 import {
-    CaseReducerActions,
+    type CaseReducerActions,
+    type PayloadAction,
+    type SliceCaseReducers,
     configureStore,
     createSlice,
-    Middleware,
-    PayloadAction,
-    Slice,
-    SliceCaseReducers,
-    Store
 } from "@reduxjs/toolkit";
-import FunctionInterface from "./interface/function";
-import SidebarInterface from "./interface/sidebar";
-import ModeFunction from "./interface/mode";
-import logger from 'redux-logger';
+import type FunctionInterface from "./interface/function";
+import type SidebarInterface from "./interface/sidebar";
+import type ModeFunction from "./interface/mode";
 
 export type ModeInfo = {
     modeName: string,
@@ -20,10 +16,10 @@ export type ModeInfo = {
     btn?: HTMLElement
 }
 
-export type StateType = string | number | boolean | null | undefined | 
-                        Array<string | number | boolean | null | undefined> |
-                        any
-                        ;
+export type StateType = string | number | boolean | null | undefined |
+    Array<string | number | boolean | null | undefined> |
+    any
+    ;
 let stateManagerSlice = createSlice({
     name: "stateManager",
     initialState: {
@@ -36,11 +32,11 @@ let stateManagerSlice = createSlice({
         useState: (state, action: PayloadAction<StateType>) => {
             // if(state.useStateCount === state.data.length && state.firstInit === false)
             //     throw new Error("Called useState is different than last time. It may have some useState in loop");
-            if(state.useStateCount === state.data.length && state.firstInit){ // First called useState
+            if (state.useStateCount === state.data.length && state.firstInit) { // First called useState
                 // console.log("[STA] useState", state);
                 state.data = [...state.data, action.payload]
             }
-            state.action = "state.usestate";
+            state.action = "state.useState";
             state.useStateCount += 1
             return state;
         },
@@ -48,18 +44,18 @@ let stateManagerSlice = createSlice({
         //     // if(state.useStateCount !== state.data.length)
         //     //     throw new Error("RESET: Called useState is different than last time. It may have some useState in loop");
         //     state.firstInit = false;
-        //     state.action = "state.resetcount";
+        //     state.action = "state.resetCount";
         //     state.useStateCount = 0;
         //     return state;
         // },
-        setState: (state, action: PayloadAction<{id: number, val: StateType}>) => {
-            if(action.payload.id >= state.data.length){
+        setState: (state, action: PayloadAction<{ id: number, val: StateType }>) => {
+            if (action.payload.id >= state.data.length) {
                 console.log("[HOK] setState", action.payload.id, state.data.length)
-                throw new Error("INTERNEL ERROR : id of setState is out of bound");
+                throw new Error("INTERNAL ERROR : id of setState is out of bound");
             }
             console.log("[HOK] setState", action.payload.id, action.payload.val)
             state.data[action.payload.id] = action.payload.val;
-            state.action = "state.setstate";
+            state.action = "state.setState";
             return state;
         },
     }
@@ -86,29 +82,29 @@ let dataBinderSlice = createSlice({
         useData: (state, action: PayloadAction<DataBinderType>) => {
             // if(state.useStateCount === state.data.length && state.firstInit === false)
             //     throw new Error("Called useState is different than last time. It may have some useState in loop");
-            if(action.payload.key in state.data && state.data[action.payload.key].isCreated === true)
+            if (action.payload.key in state.data && state.data[action.payload.key].isCreated === true)
                 throw new Error("Multiple useProvider with same namespace");
-            if(!(action.payload.key in state.data)){ // First called useState
+            if (!(action.payload.key in state.data)) { // First called useState
                 state.data[action.payload.key] = {
-                    isCreated: true, 
+                    isCreated: true,
                     val: action.payload.val
                 };
                 console.log("[STA] useData", state.data);
             }
-            if(action.payload.key in state.data) { 
+            if (action.payload.key in state.data) {
                 state.data[action.payload.key].isCreated = true;
             }
             state.action = "data.use.data";
             return state;
         },
         setData: (state, action: PayloadAction<DataBinderType>) => {
-            if(!(action.payload.key in state.data)){
+            if (!(action.payload.key in state.data)) {
                 console.log("[HOK] setData", action.payload.key, state.data)
-                throw new Error("INTERNEL ERROR : key of setData is not found");
+                throw new Error("INTERNAL ERROR : key of setData is not found");
             }
             console.log("[HOK] setData", action.payload.key, action.payload.val)
             state.data[action.payload.key] = {
-                ...state.data[action.payload.key],  
+                ...state.data[action.payload.key],
                 val: action.payload.val
             } as DataBinderDataType;
             state.action = "data.set.data";
@@ -116,6 +112,14 @@ let dataBinderSlice = createSlice({
         },
     }
 })
+
+type ModeSliceType = {
+    root: string,
+    action: string,
+    data: Record<string, ModeInfo>,
+    curMode: string,
+    lastMode: string,
+}
 
 let modeManagerSlice = createSlice({
     name: "modeManager",
@@ -125,9 +129,9 @@ let modeManagerSlice = createSlice({
         data: {},
         curMode: "",
         lastMode: "",
-    },
+    } as ModeSliceType,
     reducers: {
-        rendered: (state, action) => {
+        rendered: (state, _action) => {
             state.action = "";
         },
         enable: (state, action: PayloadAction<string>) => {
@@ -144,6 +148,7 @@ let modeManagerSlice = createSlice({
                 mode.enable = true;
                 state.action = `mode.${modeName}.enable`;
             }
+            return state
         },
         disable: (state, action: PayloadAction<string>) => {
             let modeName = action.payload
@@ -153,6 +158,7 @@ let modeManagerSlice = createSlice({
                 mode.enable = false;
                 state.action = `mode.${modeName}.disable`;
             }
+            return state
         },
         toggle: (state, action: PayloadAction<string>) => {
             let modeName = action.payload
@@ -162,11 +168,13 @@ let modeManagerSlice = createSlice({
                 if (mode.enable === true) editorUIData.dispatch(editorUIActions.mode.disable(modeName));
                 else editorUIData.dispatch(modeManagerSlice.actions.enable(modeName));
             }
+            return state
         },
         add: (state, action: PayloadAction<ModeInfo>) => {
             const name = action.payload.modeName;
             state.data[name] = action.payload;
             state.action = `mode.${action.payload.modeName}.added`;
+            return state
         },
         remove: (state, action: PayloadAction<string>) => {
             let modeName = action.payload
@@ -175,14 +183,16 @@ let modeManagerSlice = createSlice({
                 delete state.data[modeName]
                 state.action = `mode.${modeName}.removed`;
             }
+            return state
         },
         setRoot: (state, action: PayloadAction<string>) => {
             state.root = action.payload;
             state.curMode = action.payload;
+            return state
         },
         changeTo: (state, action: PayloadAction<string>) => {
-            if(state.curMode === action.payload) return;
-            if(!(action.payload in state.data)) return;
+            if (state.curMode === action.payload) return;
+            if (!(action.payload in state.data)) return;
             state.lastMode = state.curMode;
             state.curMode = action.payload;
             state.action = `mode.changed`;
@@ -191,12 +201,12 @@ let modeManagerSlice = createSlice({
     }
 });
 
-export const { 
-    disable: modeDisable, 
-    enable: modeEnable, 
-    toggle: modeToggle, 
-    add: modeAdd, 
-    remove: modeRemove, 
+export const {
+    disable: modeDisable,
+    enable: modeEnable,
+    toggle: modeToggle,
+    add: modeAdd,
+    remove: modeRemove,
     setRoot: modeSetRoot,
     changeTo: modeChangeTo
 } = modeManagerSlice.actions;
@@ -210,7 +220,7 @@ const createToolbarPartSlice = <ButtonInfoType>(name: string) => {
             data: {} as any
         },
         reducers: {
-            rendered: (state, action) => {
+            rendered: (state, _action) => {
                 state.action = "";
             },
             updateAll: (state, action: PayloadAction<ToolbarStateType<ButtonInfoType>>) => {
@@ -235,7 +245,7 @@ const createToolbarPartSlice = <ButtonInfoType>(name: string) => {
                     state.action = `${name}.${action.payload}.delete`;
                 }
             },
-            clear: (state, action: PayloadAction) => {
+            clear: (_state, _action: PayloadAction) => {
                 return {
                     action: `${name}.clear`,
                     data: {}
@@ -319,8 +329,8 @@ export const editorUIData = configureStore({
         getDefaultMiddleware({
             serializableCheck: false
         })
-        // .concat(logger)
-        // .concat(createStateMangementMiddleware())
+    // .concat(logger)
+    // .concat(createStateManagementMiddleware())
 });
 
 // export type AppDispatch = typeof editorUIDataNG.dispatch

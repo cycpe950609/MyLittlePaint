@@ -1,11 +1,11 @@
-import { ToolbarStateType, editorUIData, editorUIActions } from "./data";
-import FunctionInterface from "./interface/function";
-import SidebarInterface from "./interface/sidebar";
+import { type ToolbarStateType, editorUIData, editorUIActions } from "./data";
+import type FunctionInterface from "./interface/function";
+import type SidebarInterface from "./interface/sidebar";
 import {
-    VNode,
+    type VNode,
 } from "snabbdom";
 import { Div, Span } from "./util/Element";
-import Snabbdom from "@herp-inc/snabbdom-jsx";
+import type Snabbdom from "@herp-inc/snabbdom-jsx";
 
 class Sidebar implements FunctionInterface {
     Name: string;
@@ -29,6 +29,7 @@ class Sidebar implements FunctionInterface {
     }
 
     showSidebar() {
+        // @ts-ignore
         let curSideInterface = editorUIData.getState()[this.listName].data[this.interfaceUUID];
         if (curSideInterface.Visible === true) return;
         curSideInterface.Visible = true;
@@ -36,6 +37,7 @@ class Sidebar implements FunctionInterface {
     }
 
     hiddenSidebar() {
+        // @ts-ignore
         let curSideInterface = editorUIData.getState()[this.listName].data[this.interfaceUUID];
         if (curSideInterface.Visible === false) return;
         curSideInterface.Visible = false;
@@ -43,6 +45,7 @@ class Sidebar implements FunctionInterface {
     }
 
     toggleSidebar() {
+        // @ts-ignore
         let curSideInterface = editorUIData.getState()[this.listName].data[this.interfaceUUID];
         let isShowSidebar = !curSideInterface.Visible;
         if (isShowSidebar === true) this.showSidebar();
@@ -58,7 +61,7 @@ class Sidebar implements FunctionInterface {
 
 export default Sidebar;
 
-let renderWindow = (uuid: string, windowName: string):VNode => {
+let renderWindow = (uuid: string, _windowName: string): VNode => {
 
     let sidebarImple = undefined;
     if (uuid in editorUIData.getState()['sidebar_top_'].data)
@@ -104,24 +107,24 @@ const renderSidebarPart = (partList: ToolbarStateType<SidebarInterface>): VNode 
 
 
 export const SidebarComp: Snabbdom.Component<{}> = () => {
-    
+
     let dataTop = editorUIData.getState()[`sidebar_top_`].data;
     let dataTopPerm = editorUIData.getState()[`sidebar_top_perm`].data;
     let dataBottom = editorUIData.getState()[`sidebar_bottom_`].data;
     let dataBottomPerm = editorUIData.getState()[`sidebar_bottom_perm`].data;
 
     // <div class="sidebar" id="editorui-sidebar-windows">
-    let visiableCount = (partList: ToolbarStateType<SidebarInterface>) => {
+    let visibleCount = (partList: ToolbarStateType<SidebarInterface>) => {
         let count = 0;
         Object.keys(partList).forEach((key) => {
             count += partList[key].Visible ? 1 : 0;
         })
         return count;
     }
-    let windowCount = visiableCount(dataTop) +
-        visiableCount(dataBottom) +
-        visiableCount(dataTopPerm) +
-        visiableCount(dataBottomPerm);
+    let windowCount = visibleCount(dataTop) +
+        visibleCount(dataBottom) +
+        visibleCount(dataTopPerm) +
+        visibleCount(dataBottomPerm);
 
     let sidebar = <Div Id="editorui-sidebar-windows" className="sidebar"
         $style={{ pointerEvents: windowCount > 0 ? "all" : "none" }}>

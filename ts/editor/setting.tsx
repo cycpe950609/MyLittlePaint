@@ -1,8 +1,8 @@
-import { VNode } from "snabbdom";
+import { type VNode } from "snabbdom";
 import type Snabbdom from '@herp-inc/snabbdom-jsx';
-import { CanvasInterfaceSettings, CanvasSettingEntry, CanvasSettingType } from "../editorUI/canvas";
+import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType } from "../editorUI/canvas";
 // import EditorUI from "../editorUI-ng/EditorUI";
-import SidebarInterface from "../editorUI/interface/sidebar";
+import type SidebarInterface from "../editorUI/interface/sidebar";
 import { EditorCanvas } from "./modeEditor";
 import { Div, Input, Label, Span, Table, Td, Tr } from "../editorUI/util/Element";
 
@@ -33,7 +33,7 @@ class SettingPageSidebar implements SidebarInterface {
     Name: string = "SettingsPage"; // Tips of ToolButton
     ImgName?: string = "property";
     Tip?: string = "Settings"; // Tip showed on StatusBar
-    HistoryName?: string; // Undefined if dont want to store in redo/undo hostory
+    HistoryName?: string; // Undefined if don't want to store in redo/undo history
     Visible: boolean = false;
     Title: () => string = () => {
         let name = (window.editorUI.CenterCanvas as EditorCanvas).settings.Name;

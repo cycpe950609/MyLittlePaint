@@ -1,15 +1,16 @@
-import FunctionInterface, { NoOPFunc } from './interface/function';
+import type FunctionInterface from './interface/function';
+import { NoOPFunc } from './interface/function';
 import Toolbar, { ToolbarComp, ToolbarPart } from './toolbar';
 // import SidebarInterface from './interface/sidebar';
-import ModeFunction from './interface/mode';
-import { ModeInfo, editorUIActions, editorUIData, modeAdd, modeChangeTo, modeDisable, modeEnable, modeRemove, modeSetRoot, modeToggle } from './data';
-import SidebarInterface from './interface/sidebar';
+import type ModeFunction from './interface/mode';
+import { editorUIData, modeAdd, modeDisable, modeEnable, modeRemove, modeSetRoot, modeToggle } from './data';
+import type SidebarInterface from './interface/sidebar';
 import Sidebar, { SidebarComp } from './sidebar';
-import { CanvasBase, NoOPCanvas } from './canvas';
+import { type CanvasBase, NoOPCanvas } from './canvas';
 import StatusBar, { StatusBarComp } from './statusbar';
 import './util/console';
-import { VNode, classModule, eventListenersModule, init, propsModule, styleModule, toVNode } from 'snabbdom';
-import { Unsubscribe } from "@reduxjs/toolkit";
+import { type VNode, classModule, eventListenersModule, init, propsModule, styleModule, toVNode } from 'snabbdom';
+import { type Unsubscribe } from "@reduxjs/toolkit";
 import { Div } from './util/Element';
 import { MenuboxComp } from './menubox';
 import { ModeSelectorComp } from './modeSelector';
@@ -23,10 +24,10 @@ declare global {
     }
 }
 class ModeManger {
-    private selectorBtn: Map<string, HTMLLabelElement> = new Map<
-        string,
-        HTMLLabelElement
-    >();
+    // private selectorBtn: Map<string, HTMLLabelElement> = new Map<
+    //     string,
+    //     HTMLLabelElement
+    // >();
     private func_mode = "noop";
 
     private funcNoop: FunctionInterface = new NoOPFunc(0);
@@ -73,21 +74,21 @@ class ModeManger {
             this.func.EndFunction(window.editorUI.CenterCanvas);
             // this.mdfunc.CenterCanvas.render();
         }
-        console.log("[DEB] Change to function",next_func);
+        console.log("[DEB] Change to function", next_func);
 
         const ifChangFunc = next_func.StartFunction(window.editorUI.CenterCanvas);
         Promise.resolve(ifChangFunc).then((val) => {
-            console.log("[DEB] Change function",typeof val);
+            console.log("[DEB] Change function", typeof val);
             window.editorUI.CenterCanvas.render();
-            if(typeof val === 'undefined' ) return;
-            if (val.isChangeTo === true){ 
+            if (typeof val === 'undefined') return;
+            if (val.isChangeTo === true) {
                 this.func = next_func
             };
-            if(val.finishSubMode === true) {
+            if (val.finishSubMode === true) {
                 returnMode();
             }
-            if(val.subMode !== undefined) {
-                console.log("[DEB] subMode",val.subMode);
+            if (val.subMode !== undefined) {
+                console.log("[DEB] subMode", val.subMode);
                 changeToSubMode(val.subMode);
             }
         });
@@ -163,6 +164,7 @@ class EditorUI {
 
     private container: HTMLDivElement;
     private lastVNode: VNode;
+    // @ts-ignore
     private unsubscribe: Unsubscribe;
 
     private renderVNode = init([
@@ -181,7 +183,7 @@ class EditorUI {
     );
 
     constructor() {
-        this.Toolbar = new Toolbar<FunctionInterface>("toolbar", "", (listName: string, key: string, func: FunctionInterface) => func);
+        this.Toolbar = new Toolbar<FunctionInterface>("toolbar", "", (_listName: string, _key: string, func: FunctionInterface) => func);
         this.Sidebar = new Toolbar<SidebarInterface>("sidebar", "", (listName: string, key: string, func: SidebarInterface) => { console.log("[EUI] Create sidebar funcInterface"); return new Sidebar(listName, key, func) });
         this.Statusbar = new StatusBar();
         this.Menubar = new Menubar();
@@ -189,6 +191,9 @@ class EditorUI {
         window.addEventListener("resize", (e) => {
             this.cvs.resizeCanvas(e);
         })
+        this.container = document.createElement('div');
+        this.lastVNode = <></>;
+
     }
     private time_to_rerender: boolean = true;
     private should_rerender: boolean = false;
@@ -292,10 +297,9 @@ class EditorUI {
     }
 
     public Mount(container: string | HTMLDivElement) {
-        this.container = document.createElement('div');
         if (typeof container === 'string') {
             let tmp = document.getElementById(container);
-            if (tmp === null) throw new Error("INTERNAL_ERROR: Cannt found container");
+            if (tmp === null) throw new Error("INTERNAL_ERROR: Can't found container");
             this.container = tmp as HTMLDivElement;
         }
         else {
@@ -306,13 +310,13 @@ class EditorUI {
             let stateAction = editorUIData.getState().state.action;
             let dataAction = editorUIData.getState().binder.action;
             if (
-                stateAction !== "state.usestate" ||
+                stateAction !== "state.useState" ||
                 dataAction !== "data.use.data"
             ) {
                 console.log("[EUI] Should Render ", stateAction, dataAction);
                 this.should_rerender = true;
             }
-            
+
             this.render();
         })
         window.requestAnimationFrame(this.timeToRerender)
