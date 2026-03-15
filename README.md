@@ -1,3 +1,6 @@
+# About branch `refactor/upgrade-project-to-vite`
+Upgrade yarn/packages version and change to vite is possible
+
 # MyLittlePaint-v2
 
 
