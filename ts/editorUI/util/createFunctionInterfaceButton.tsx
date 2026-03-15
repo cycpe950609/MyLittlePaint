@@ -17,7 +17,7 @@ const createFunctionInterfaceButton = (
             () => window.editorUI.Mode.changeFunction(func)
         }
         $style={{
-            backgroundImage: "url(img/" + (func.ImgName !== undefined ? func.ImgName : "color_selector") + ".png)"
+            backgroundImage: "url(img/" + (func.ImgName !== undefined ? func.ImgName : "color_selector") + ".svg)"
         }}
     >
         {

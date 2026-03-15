@@ -1,5 +1,7 @@
 # MyLittlePaint-v2
 
+![screen_shot](./img/screenshot.png)
+
 
 A small painting application based on web canvas
 

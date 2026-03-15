@@ -2020,9 +2020,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mylittlepaint2@workspace:.":
+"my_little_paint2@workspace:.":
   version: 0.0.0-use.local
-  resolution: "mylittlepaint2@workspace:."
+  resolution: "my_little_paint2@workspace:."
   dependencies:
     "@herp-inc/snabbdom-jsx": "npm:^0.22.0"
     "@reduxjs/toolkit": "npm:^2.11.2"
