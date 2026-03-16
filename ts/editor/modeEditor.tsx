@@ -16,6 +16,7 @@ import {
 import {
     btnClear,
     btnRedo,
+    btnResetPosititon as btnResetPosition,
     btnResetRotate,
     btnResetScale,
     btnSave,
@@ -464,8 +465,6 @@ export class EditorCanvas implements CanvasBase {
         window.editorUI.forceRerender();
     }
     resizeCanvas = (_e?: UIEvent) => {
-        this.backgroundDiv.style.width = `${window.innerWidth * 3}px`;
-        this.backgroundDiv.style.height = `${window.innerHeight * 3}px`;
         this.LayerManager.resize(window.innerWidth, window.innerHeight);
     };
     removeCanvas = () => { };
@@ -691,6 +690,7 @@ class modeEditor implements ModeFunction {
     ];
 
     MenuToolbarRight = [
+        new btnResetPosition(),
         new btnResetScale(),
         new btnResetRotate(),
         new btnToggleTouch(),

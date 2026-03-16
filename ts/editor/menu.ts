@@ -86,6 +86,18 @@ export class btnResetScale implements FunctionInterface {
     };
 }
 
+export class btnResetPosititon implements FunctionInterface {
+    Name = "btn_reset_pos";
+    ImgName = "resetPos";
+    Tip = "Reset position to (0, 0)";
+
+    constructor() { }
+
+    StartFunction = (cvs: CanvasBase) => {
+        (cvs as EditorCanvas).moveTo(0, 0);
+    };
+}
+
 export class btnResetRotate implements FunctionInterface {
     Name = "btn_reset_rotate";
     ImgName = "resetRotate";
