@@ -16,4 +16,5 @@
   "js/ts.tsdk.path": ".yarn/sdks/typescript/lib",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
+  "liveServer.settings.root": "/dist"
 }
