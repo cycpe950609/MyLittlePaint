@@ -74,7 +74,6 @@ export class EditorCanvas implements CanvasBase {
     // private ctx !:Konva.Layer;
     // private prev_ctx = () => this.LayerManager.Layer.prev;
     // private render_ctx = () => this.LayerManager.Layer.render;
-    private render_layer!: Layer;
     public LayerManager: LayerManager;
     private draw_func: CanvasInterface = new NoOPCVSFunc();
     private EventFired: boolean = false;
@@ -92,7 +91,6 @@ export class EditorCanvas implements CanvasBase {
         this.refreshScaleTip(0, 1);
         this.cnt = DIV("w-full h-full");
         this.LayerManager = new LayerManager(this.cnt, window.innerWidth, window.innerHeight);
-        this.render_layer = this.LayerManager.Layer;
 
         //NOTE : Testing
         this.LayerManager.addLayerAfter();
@@ -163,7 +161,7 @@ export class EditorCanvas implements CanvasBase {
             y: 0
         }
     };
-    private dragMoveListener = (event: Interact.GestureEvent, target: HTMLElement, angleScale: { angle: number, scale: number }) => {
+    private dragMoveListener = (event: Interact.GestureEvent, _target: HTMLElement, angleScale: { angle: number, scale: number }) => {
         // console.log("[DEB] dragMoveListener : ",event)
         // keep the dragged position in the data-x/data-y attributes
         this.angleScalePos.pos.x = this.angleScalePos.pos.x + event.dx;
@@ -178,6 +176,7 @@ export class EditorCanvas implements CanvasBase {
     }
     private isDrawing: boolean = false;
     private isDrawRotate: boolean = true;
+    // @ts-ignore
     private layerInfoList: LayerInfo[] = [];
     private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
@@ -515,33 +514,6 @@ export class EditorCanvas implements CanvasBase {
             }
 
             let img = new Image();
-
-            /*
-            img.onload = () => {
-                this.ctx.clearRect(0, 0, this.width, this.height);
-                this.LayerManager.Layer.prev.clearRect(0, 0, this.width, this.height);
-
-                console.log(img.width);
-                console.log(img.height);
-
-                container.width = img.width;
-                container.height = img.height;
-                this.ctx.drawImage(img, 0, 0, img.width, img.height);
-
-                this.prev_cvs.width = img.width;
-                this.prev_cvs.height = img.height;
-
-                this.backgroundDiv.style.width = `${img.width}px`;
-                this.backgroundDiv.style.height = `${img.height}px`;
-
-                this.width = img.width;
-                this.height = img.height;
-
-                URL.revokeObjectURL(src);
-                dia.close();
-            };
-            */
-
             let src = URL.createObjectURL(fileList[0]);
             img.src = src;
         };
@@ -608,9 +580,9 @@ export class EditorCanvas implements CanvasBase {
             "Scale : " + (scale * 100).toFixed(0) + "%"
         );
     }
-    private isCtlKeyDown: boolean = false;
-    private isShiftDown: boolean = false;
-    private isAltDown: boolean = false;
+    // private isCtlKeyDown: boolean = false;
+    // private isShiftDown: boolean = false;
+    // private isAltDown: boolean = false;
     public scaleTo = (scale: number) => {
         let new_scale = scale;
         if (new_scale >= 4) new_scale = 4;
@@ -638,7 +610,7 @@ export class EditorCanvas implements CanvasBase {
     };
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
 
-        if (this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) {// Zoom in/out
+        if (ev.ctrlKey && !ev.shiftKey && !ev.altKey) {// Zoom in/out
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
@@ -650,7 +622,7 @@ export class EditorCanvas implements CanvasBase {
             this.render();
             return;
         }
-        if (!this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { // No Key: Up/Down
+        if (!ev.ctrlKey && !ev.shiftKey && !ev.altKey) { // No Key: Up/Down
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 30);
@@ -660,7 +632,7 @@ export class EditorCanvas implements CanvasBase {
             this.render();
             return;
         }
-        if (!this.isCtlKeyDown && this.isShiftDown && !this.isAltDown) {// Shift: Left/Right
+        if (!ev.ctrlKey && ev.shiftKey && !ev.altKey) {// Shift: Left/Right
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 this.moveTo(this.angleScalePos.pos.x + 30, this.angleScalePos.pos.y);
@@ -670,7 +642,7 @@ export class EditorCanvas implements CanvasBase {
             this.render();
             return;
         }
-        if (!this.isCtlKeyDown && !this.isShiftDown && this.isAltDown) { // Alt: Rotate Left/Right
+        if (!ev.ctrlKey && !ev.shiftKey && ev.altKey) { // Alt: Rotate Left/Right
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
@@ -685,21 +657,13 @@ export class EditorCanvas implements CanvasBase {
     };
     private docKeydownHandler = (ev: KeyboardEvent) => {
         // console.log("docKeydown", ev.key);
-        if (ev.key === "Control") { ev.preventDefault(); this.isCtlKeyDown = true; }
-        if (ev.key === "Shift") { ev.preventDefault(); this.isShiftDown = true; }
-        if (ev.key === "Alt") { ev.preventDefault(); this.isAltDown = true; }
-        if (ev.key === "+" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.scaleTo(this.scaleFactor + 0.1); }
-        if (ev.key === "-" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.scaleTo(this.scaleFactor - 0.1); }
-        if (ev.key === "0" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.scaleTo(1.0); }
-        if (ev.key === "z" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.undo(); }
-        if (ev.key === "y" && this.isCtlKeyDown && !this.isShiftDown && !this.isAltDown) { ev.preventDefault(); this.redo(); }
+        if (ev.key === "+" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.scaleTo(this.scaleFactor + 0.1); }
+        if (ev.key === "-" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.scaleTo(this.scaleFactor - 0.1); }
+        if (ev.key === "0" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.scaleTo(1.0); }
+        if (ev.key === "z" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.undo(); }
+        if (ev.key === "y" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.redo(); }
     };
-    private docKeyupHandler = (ev: KeyboardEvent) => {
-        // console.log("docKeyup", ev.key);
-        if (ev.key === "Control") { ev.preventDefault(); this.isCtlKeyDown = false; }
-        if (ev.key === "Shift") { ev.preventDefault(); this.isShiftDown = false; }
-        if (ev.key === "Alt") { ev.preventDefault(); this.isAltDown = false; }
-    };
+    private docKeyupHandler = (_ev: KeyboardEvent) => { };
 
     public get settings() {
         if (this.draw_func.Settings === undefined)
