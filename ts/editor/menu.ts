@@ -86,7 +86,7 @@ export class btnResetScale implements FunctionInterface {
     };
 }
 
-export class btnResetPosititon implements FunctionInterface {
+export class btnResetPosition implements FunctionInterface {
     Name = "btn_reset_pos";
     ImgName = "resetPos";
     Tip = "Reset position to (0, 0)";

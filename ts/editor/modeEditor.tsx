@@ -16,7 +16,7 @@ import {
 import {
     btnClear,
     btnRedo,
-    btnResetPosititon as btnResetPosition,
+    btnResetPosition as btnResetPosition,
     btnResetRotate,
     btnResetScale,
     btnSave,
