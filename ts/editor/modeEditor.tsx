@@ -604,7 +604,8 @@ export class EditorCanvas implements CanvasBase {
     public moveTo = (moveX: number, moveY: number) => {
         this.angleScalePos.pos.x = moveX;
         this.angleScalePos.pos.y = moveY;
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate", `${moveX}px ${moveY}px`);
+        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate-x", `${moveX}px`);
+        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate-y", `${moveY}px`);
         this.LayerManager.moveTo(moveX, moveY);
     };
     private cvsMouseWheelHandler = (ev: WheelEvent) => {

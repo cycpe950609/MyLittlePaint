@@ -1,13 +1,12 @@
 #backgroundDiv {
     position: fixed;
 
-    --bgDiv-width: 300vw;
-    --bgDiv-height: 300vh;
+    --bgDiv-width: 284vw;
+    --bgDiv-height: 284vh;
 
-    --bgDiv-transform-origin-x: center;
-    --bgDiv-transform-origin-y: center;
     --bgDiv-transform-rotate: 0deg;
-    --bgDiv-transform-translate: 0px 0px;
+    --bgDiv-transform-translate-x: 0px;
+    --bgDiv-transform-translate-y: 0px;
 
     left: calc(50vw - (var(--bgDiv-width)/2));
     top: calc(50vh - (var(--bgDiv-height)/2));
@@ -29,7 +28,7 @@
     width: var(--bgDiv-width);
     height: var(--bgDiv-height);
 
-    transform-origin: var(--bgDiv-transform-origin-x) var(--bgDiv-transform-origin-y);
-    background-position: var(--bgDiv-transform-translate);
+    transform-origin: calc(var(--bgDiv-transform-translate-x) - (50vw - (var(--bgDiv-width)/2))) calc(var(--bgDiv-transform-translate-y) - (calc(50vh - (var(--bgDiv-height)/2))));
+    background-position: var(--bgDiv-transform-translate-x) var(--bgDiv-transform-translate-y);
     transform: rotate(var(--bgDiv-transform-rotate));
 }
