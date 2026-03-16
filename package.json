@@ -11,7 +11,7 @@
     "lint": "eslint ts/ --ext .ts",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite serve"
+    "serve": "vite serve --host"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",

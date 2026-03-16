@@ -1,12 +1,22 @@
+:root {
+    --propertybox-width: 300px;
+    --propertybox-b-width: 4px;
+}
+
 .sidebar {
-    width: calc(var(--propertybox-width) + 20px);
+
+    --sidebar-occupy-width: calc(var(--toolbar-width) + (5px * 2) + (4px*2));
+
+    width: calc(var(--propertybox-width) + var(--propertybox-b-width)*2);
     height: fit-content;
+    max-width: calc(100vw - var(--sidebar-occupy-width)*2);
     max-height: calc(100vh - var(--menu-height) - var(--statusbar-height) - 40px);
     overflow-y: auto;
     overflow-x: hidden;
 
     position: fixed;
-    right: calc(var(--toolbar-width) + 20px);
+    /*5px: margin to edge, 4px: border*/
+    right: var(--sidebar-occupy-width);
     top: calc(var(--menu-height) + 20px);
     /* bottom: calc(var(--statusbar-height) + 20px); */
     padding: 0;
@@ -28,7 +38,7 @@
 }
 
 .property-bar {
-    width: var(--propertybox-width);
+    width: auto;
     height: fit-content;
 
     background-color: white;

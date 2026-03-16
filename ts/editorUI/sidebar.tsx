@@ -92,7 +92,7 @@ let renderWindow = (uuid: string, _windowName: string): VNode => {
     return sidebar
 }
 const renderSidebarPart = (partList: ToolbarStateType<SidebarInterface>): VNode => {
-    return <Div className="w-fit h-fit">
+    return <Div>
         {
             Object.keys(partList).map((key: string) => {
                 if (partList[key].Visible === false) {

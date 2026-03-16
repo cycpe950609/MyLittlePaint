@@ -1,8 +1,7 @@
 :root {
-    --menu-height: 40px;
+    --menu-height: 30px;
     --statusbar-height: 25px;
     --toolbar-width: 30px;
-    --propertybox-width: 300px;
     --toolbar-item-size: calc(var(--toolbar-width) - 8px);
     --toolbar-border-width: 4px;
     /* Theme */
@@ -33,7 +32,7 @@ body {
     top: 5px;
     right: 5px;
     /* background-color: black; */
-    height: var(--menu-height);
+    height: calc(var(--menu-height) + 2*var(--toolbar-border-width));
 
     /* border-bottom-style: solid;
     border-bottom-width: 2px;
@@ -45,9 +44,8 @@ body {
 }
 
 .menu-item {
-    height: calc(var(--menu-height) - 8px);
-    width: calc(var(--menu-height) - 8px);
-    margin: 4px;
+    height: var(--menu-height);
+    width: var(--menu-height);
     background-size: cover;
 }
 
@@ -71,23 +69,25 @@ body {
 }
 
 .menu-box {
-    width: fit-content;
+    display: flex;
+
     border-style: solid;
     border-color: var(--toolbar-border-color);
     border-radius: calc(var(--menu-height)/4);
     border-width: 4px;
+
     background-color: var(--toolbar-bg-color);
     color: var(--toolbar-font-color);
-    height: 100%;
-    display: flex;
-    flex-wrap: nowrap;
+
+    width: fit-content;
+    height: fit-content;
     pointer-events: all;
+
 }
 
 .menu-box .toolbar-item {
-    height: calc(var(--menu-height) - 10px);
-    width: calc(var(--menu-height) - 10px);
-    margin: 4px;
+    height: calc(var(--menu-height) - 8px);
+    width: calc(var(--menu-height) - 8px);
 }
 
 .menu-box .toolbar-button {
@@ -191,13 +191,16 @@ body {
     /* position-area: right; */
 }
 
-.toolbar-item .toolbar-button:hover {
-    background-color: rgb(222, 222, 222);
-}
 
-/* Show the tooltip text when you mouse over the tooltip container */
-.toolbar-item .toolbar-button:hover+.tooltip-text {
-    visibility: visible;
+@media (hover: hover) {
+    .toolbar-item .toolbar-button:hover {
+        background-color: rgb(222, 222, 222);
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .toolbar-item .toolbar-button:hover+.tooltip-text {
+        visibility: visible;
+    }
 }
 
 /* Tooltip text */
