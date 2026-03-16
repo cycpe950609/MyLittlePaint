@@ -224,7 +224,6 @@ body {
     position-anchor: --toolbar-button-tips;
     left: anchor(right);
     top: anchor(center);
-    position-try-fallbacks: flip-inline;
     transform: translateY(-50%) translateX(calc(var(--toolbar-border-width) + 6px));
 }
 
@@ -245,7 +244,6 @@ body {
     position-anchor: --toolbar-button-tips;
     right: anchor(left);
     top: anchor(center);
-    /* position-try-fallbacks: flip-inline; */
     transform: translateY(-50%) translateX(calc(-1 * (var(--toolbar-border-width) + 6px)));
 }
 
@@ -266,7 +264,6 @@ body {
     position-anchor: --toolbar-button-tips;
     top: anchor(bottom);
     left: anchor(left);
-    position-try-fallbacks: flip-inline;
     transform: translateY(12px);
 }
 
@@ -287,7 +284,6 @@ body {
     position-anchor: --toolbar-button-tips;
     top: anchor(bottom);
     right: anchor(right);
-    position-try-fallbacks: flip-inline;
     transform: translateY(12px);
 }
 
