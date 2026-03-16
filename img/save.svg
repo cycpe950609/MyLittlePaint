@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   sodipodi:docname="save.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="1.5312501"
+     inkscape:cx="112"
+     inkscape:cy="355.91835"
+     inkscape:window-width="1920"
+     inkscape:window-height="972"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="圖層 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="matrix(0.74462358,0,0,0.74462358,65.376364,65.376364)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:67.14802129;stroke-dasharray:none"
+       d="M 58.173094,58.173104 V 453.82689 H 453.82689 l 1e-5,-275.03995 L 324.12915,58.173104 Z"
+       id="path2" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:134.296;stroke-dasharray:none"
+       id="rect2"
+       width="104.3672"
+       height="1.7540706"
+       x="203.81639"
+       y="362.99826" />
+    <rect
+       style="fill:#ffffff;stroke:none;stroke-width:646.702;stroke-dasharray:none"
+       id="rect2-3"
+       width="54.774414"
+       height="77.502686"
+       x="176.60034"
+       y="337.69507" />
+  </g>
+</svg>

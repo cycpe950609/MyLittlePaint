@@ -1,0 +1,28 @@
+#backgroundDiv {
+    position: fixed;
+    --bgDiv-background-image : url(../img/cvs_bg.png);
+    --bgDiv-background-size : 32px 32px;
+    --bgDiv-background-width : 0px;
+    --bgDiv-background-height : 0px;
+    --bgDiv-transform-origin: 50% 50%;
+    --bgDiv-transform-rotate: 0deg;
+    --bgDiv-transform-translate: 0px 0px;
+
+}
+
+#backgroundDiv::before {
+    position: absolute;
+    content: "";
+    background-repeat: repeat;
+    overflow: hidden;
+
+    background-size: var(--bgDiv-background-size);
+    background-image: var(--bgDiv-background-image);
+    width: var(--bgDiv-background-width);
+    height: var(--bgDiv-background-height);
+
+    transform-origin: var(--bgDiv-transform-origin);
+
+    background-position: var(--bgDiv-transform-translate);
+    transform: rotate(var(--bgDiv-transform-rotate));
+}

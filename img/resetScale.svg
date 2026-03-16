@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   sodipodi:docname="resetScale.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="1.5312501"
+     inkscape:cx="111.67346"
+     inkscape:cy="332.40814"
+     inkscape:window-width="1920"
+     inkscape:window-height="972"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true" />
+  <defs
+     id="defs1">
+    <rect
+       x="33.959181"
+       y="225.95917"
+       width="246.20407"
+       height="111.0204"
+       id="rect2" />
+    <rect
+       x="295.83672"
+       y="282.12243"
+       width="180.89795"
+       height="173.71427"
+       id="rect3" />
+  </defs>
+  <g
+     inkscape:label="圖層 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="matrix(0.74462358,0,0,0.74462358,65.376364,65.376364)">
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:20.54212233;stroke-dasharray:none"
+       id="rect1"
+       width="209.85321"
+       height="105.98852"
+       x="4.6610398"
+       y="408.10275" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:34.3928;stroke-dasharray:none"
+       id="rect1-4"
+       width="351.34778"
+       height="177.4518"
+       x="194.62927"
+       y="-16.845428" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:26.88605873;stroke-dasharray:none"
+       d="m 505.11234,284.26006 c 74.09765,145.6857 -16.04993,183.98776 -180.13867,173.94706"
+       id="path1"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:26.88605873;stroke-dasharray:none"
+       d="M 399.67309,523.95333 C 347.90397,489.53347 272.38025,464.40824 374.61491,369.73024"
+       id="path2"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:16.1155px;writing-mode:lr-tb;direction:ltr;fill:none;stroke:#000000;stroke-width:26.88605873;stroke-dasharray:none"
+       x="324.40872"
+       y="310.37616"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="stroke-width:26.88605873;stroke-dasharray:none" /></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(1.3429604,0,0,1.3429604,-69.380128,-82.774266)"
+       id="text1"
+       style="font-size:96px;font-family:Monospace;-inkscape-font-specification:Monospace;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect2);fill:none;stroke:#000000;stroke-width:0;stroke-dasharray:none"><tspan
+         x="33.958984"
+         y="310.89648"
+         id="tspan6"><tspan
+           style="fill:#000000"
+           id="tspan1">100</tspan><tspan
+           style="font-weight:bold"
+           id="tspan5">%</tspan></tspan></text>
+  </g>
+</svg>
