@@ -2,7 +2,7 @@
     position: fixed;
 
     --bgDiv-width: 300vw;
-    --bgDiv-height: 300vw;
+    --bgDiv-height: 300vh;
 
     --bgDiv-transform-origin-x: center;
     --bgDiv-transform-origin-y: center;
