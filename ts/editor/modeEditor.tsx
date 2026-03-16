@@ -31,6 +31,7 @@ import HistoryManager from "./historyLogger";
 import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook";
 import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
+import type { ImageConfig } from "konva/lib/Node";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -541,7 +542,16 @@ export class EditorCanvas implements CanvasBase {
                 link.click();
                 // document.body.removeChild(link);
             }
-            downloadURI(this.LayerManager.Canvas.toDataURL(), txtName.value);
+            const rect = this.LayerManager.Canvas.getClientRect({ skipTransform: false });
+            const cfg: ImageConfig = {
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+                pixelRatio: 1,
+                imageSmoothingEnabled: true,
+            };
+            downloadURI(this.LayerManager.Canvas.toDataURL(cfg), txtName.value);
             dia.close();
         };
         dia.show();
