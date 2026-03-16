@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { type ToolbarStateType, editorUIData, editorUIActions } from "./data";
 import type FunctionInterface from "./interface/function";
-import createFunctionInterfaceButton from "./util/createFunctionInterfaceButton";
+import FunctionInterfaceButton from "./util/FunctionInterfaceButton";
 import type Snabbdom from "@herp-inc/snabbdom-jsx";
 import { Div } from "./util/Element";
 
@@ -113,7 +113,7 @@ const renderToolPart = (type: string, partName: string, partListName: string, pa
     return <Div className={partName}>
         {
             Object.keys(partList).map((key: string) => {
-                return createFunctionInterfaceButton(createFuncList[type](partListName, key, partList[key]));
+                return <FunctionInterfaceButton func={createFuncList[type](partListName, key, partList[key])} />
             })
         }
     </Div>

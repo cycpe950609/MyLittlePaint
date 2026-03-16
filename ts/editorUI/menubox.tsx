@@ -1,6 +1,6 @@
 import { type Unsubscribe } from "@reduxjs/toolkit";
 import { type ToolbarStateType, editorUIData } from "./data";
-import createFunctionInterfaceButton from "./util/createFunctionInterfaceButton";
+import FunctionInterfaceButton from "./util/FunctionInterfaceButton";
 import type Snabbdom from "@herp-inc/snabbdom-jsx";
 import { Div } from "./util/Element";
 
@@ -21,7 +21,7 @@ const renderMenuPart = (partListName: string, partList: ToolbarStateType<any>) =
         {
             Object.keys(partList).map((key: string) => {
                 rendered[partListName] = true;
-                return createFunctionInterfaceButton(partList[key]);
+                return <FunctionInterfaceButton func={partList[key]} />
             })
         }
     </Div>
