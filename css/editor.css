@@ -8,6 +8,9 @@
     --bgDiv-transform-translate-x: 0px;
     --bgDiv-transform-translate-y: 0px;
 
+    --bgDiv-img-size: 64px;
+    --bgDiv-img-scale: 1.0;
+
     left: calc(50vw - (var(--bgDiv-width)/2));
     top: calc(50vh - (var(--bgDiv-height)/2));
 
@@ -22,13 +25,17 @@
     background-repeat: repeat;
     overflow: hidden;
 
-    background-size: 64px 64px;
+    background-size: calc(var(--bgDiv-img-scale) * var(--bgDiv-img-size));
     background-image: url(../img/cvs_bg.png);
 
     width: var(--bgDiv-width);
     height: var(--bgDiv-height);
 
     transform-origin: calc(var(--bgDiv-transform-translate-x) - (50vw - (var(--bgDiv-width)/2))) calc(var(--bgDiv-transform-translate-y) - (calc(50vh - (var(--bgDiv-height)/2))));
-    background-position: var(--bgDiv-transform-translate-x) var(--bgDiv-transform-translate-y);
+
+    /* Position of Canvas' (0,0) in backgroundDiv */
+    --bgDiv-cvs-orig-in-bgDiv-x: calc(var(--bgDiv-width)/2 - 50vw);
+    --bgDiv-cvs-orig-in-bgDiv-y: calc(var(--bgDiv-height)/2 - 50vh);
+    background-position: calc(var(--bgDiv-cvs-orig-in-bgDiv-x) + var(--bgDiv-transform-translate-x)) calc(var(--bgDiv-cvs-orig-in-bgDiv-y) + var(--bgDiv-transform-translate-y));
     transform: rotate(var(--bgDiv-transform-rotate));
 }

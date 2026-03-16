@@ -589,6 +589,7 @@ export class EditorCanvas implements CanvasBase {
         this.angleScalePos.scale = new_scale;
         this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
         // console.log("Next scale factor = " + this.angleScalePos.scale);
+        this.backgroundDiv.style.setProperty("--bgDiv-img-scale", `${new_scale}`);
 
         this.LayerManager.scaleTo(new_scale);
     };
