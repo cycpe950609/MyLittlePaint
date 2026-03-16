@@ -1,8 +1,8 @@
 #backgroundDiv {
     position: fixed;
 
-    --bgDiv-width: 284vw;
-    --bgDiv-height: 284vh;
+    --bgDiv-width: 500vw;
+    --bgDiv-height: 500vh;
 
     --bgDiv-transform-rotate: 0deg;
     --bgDiv-transform-translate-x: 0px;
@@ -10,6 +10,9 @@
 
     --bgDiv-img-size: 64px;
     --bgDiv-img-scale: 1.0;
+
+    /* x0.5 ~ x2.0*/
+    --bgDiv-img-ranged-scale: calc(0.5 + mod(calc(var(--bgDiv-img-scale) - 0.5), 1.5));
 
     left: calc(50vw - (var(--bgDiv-width)/2));
     top: calc(50vh - (var(--bgDiv-height)/2));
@@ -25,7 +28,7 @@
     background-repeat: repeat;
     overflow: hidden;
 
-    background-size: calc(var(--bgDiv-img-scale) * var(--bgDiv-img-size));
+    background-size: calc(var(--bgDiv-img-ranged-scale) * var(--bgDiv-img-size));
     background-image: url(../img/cvs_bg.png);
 
     width: var(--bgDiv-width);

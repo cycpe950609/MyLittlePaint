@@ -625,10 +625,10 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
-                this.scaleTo(this.angleScalePos.scale + 0.1);
+                this.scaleTo(this.angleScalePos.scale + 0.05);
             } else if (ev.deltaY > 0) {
                 // zoom out
-                this.scaleTo(this.angleScalePos.scale - 0.1);
+                this.scaleTo(this.angleScalePos.scale - 0.05);
             }
             this.render();
             return;
@@ -636,9 +636,9 @@ export class EditorCanvas implements CanvasBase {
         if (!ev.ctrlKey && !ev.shiftKey && !ev.altKey) { // No Key: Up/Down
             ev.preventDefault();
             if (ev.deltaY < 0) {
-                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 30);
+                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 15);
             } else if (ev.deltaY > 0) {
-                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 30);
+                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 15);
             }
             this.render();
             return;
@@ -646,9 +646,9 @@ export class EditorCanvas implements CanvasBase {
         if (!ev.ctrlKey && ev.shiftKey && !ev.altKey) {// Shift: Left/Right
             ev.preventDefault();
             if (ev.deltaY < 0) {
-                this.moveTo(this.angleScalePos.pos.x + 30, this.angleScalePos.pos.y);
+                this.moveTo(this.angleScalePos.pos.x + 15, this.angleScalePos.pos.y);
             } else if (ev.deltaY > 0) {
-                this.moveTo(this.angleScalePos.pos.x - 30, this.angleScalePos.pos.y);
+                this.moveTo(this.angleScalePos.pos.x - 15, this.angleScalePos.pos.y);
             }
             this.render();
             return;
