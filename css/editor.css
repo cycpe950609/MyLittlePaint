@@ -1,12 +1,19 @@
 #backgroundDiv {
     position: fixed;
-    --bgDiv-background-image : url(../img/cvs_bg.png);
-    --bgDiv-background-size : 32px 32px;
-    --bgDiv-background-width : 0px;
-    --bgDiv-background-height : 0px;
-    --bgDiv-transform-origin: 50% 50%;
+
+    --bgDiv-width: 300vw;
+    --bgDiv-height: 300vw;
+
+    --bgDiv-transform-origin-x: center;
+    --bgDiv-transform-origin-y: center;
     --bgDiv-transform-rotate: 0deg;
     --bgDiv-transform-translate: 0px 0px;
+
+    left: calc(50vw - (var(--bgDiv-width)/2));
+    top: calc(50vh - (var(--bgDiv-height)/2));
+
+    width: var(--bgDiv-width);
+    height: var(--bgDiv-height);
 
 }
 
@@ -16,13 +23,13 @@
     background-repeat: repeat;
     overflow: hidden;
 
-    background-size: var(--bgDiv-background-size);
-    background-image: var(--bgDiv-background-image);
-    width: var(--bgDiv-background-width);
-    height: var(--bgDiv-background-height);
+    background-size: 64px 64px;
+    background-image: url(../img/cvs_bg.png);
 
-    transform-origin: var(--bgDiv-transform-origin);
+    width: var(--bgDiv-width);
+    height: var(--bgDiv-height);
 
+    transform-origin: var(--bgDiv-transform-origin-x) var(--bgDiv-transform-origin-y);
     background-position: var(--bgDiv-transform-translate);
     transform: rotate(var(--bgDiv-transform-rotate));
 }

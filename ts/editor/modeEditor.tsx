@@ -185,15 +185,7 @@ export class EditorCanvas implements CanvasBase {
         // let container = this.containerVNode.elm as HTMLDivElement;
         // console.log("[HOK] attachCanvas : ", this.containerVNode)
         console.log("[HOK] Canvas Size ", this.width, this.height);
-        this.backgroundDiv.style.width = `${window.innerWidth * 3}px`;
-        this.backgroundDiv.style.height = `${window.innerHeight * 3}px`;
-        this.backgroundDiv.style.setProperty("--bgDiv-background-width", `${window.innerWidth * 3}px`)
-        this.backgroundDiv.style.setProperty("--bgDiv-background-height", `${window.innerHeight * 3}px`)
-        this.backgroundDiv.style.position = "fixed";
-        this.backgroundDiv.style.top = `${-window.innerWidth}px`;
-        this.backgroundDiv.style.left = `${-window.innerHeight}px`;
-        this.backgroundDiv.style.setProperty("--bgDiv-background-image", 'url(../img/cvs_bg.png)');
-        this.backgroundDiv.style.setProperty("--bgDiv-background-size", "32px 32px");
+        // this.backgroundDiv.style.position = "fixed";
         this.backgroundDiv.id = "backgroundDiv";
 
         let interactCVS = interact(this.cnt, {
@@ -641,7 +633,7 @@ export class EditorCanvas implements CanvasBase {
     public moveTo = (moveX: number, moveY: number) => {
         this.angleScalePos.pos.x = moveX;
         this.angleScalePos.pos.y = moveY;
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate", `${-moveX}px ${-moveY}px`);
+        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate", `${moveX}px ${moveY}px`);
         this.LayerManager.moveTo(moveX, moveY);
     };
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
