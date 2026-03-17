@@ -1,3 +1,6 @@
+# About branch `features/store-permanent-data-in-browser`
+Store canvas data in indexedDB to prevent accidentally close
+
 # MyLittlePaint-v2
 
 ![screen_shot](./img/screenshot.png)
