@@ -32,6 +32,7 @@ import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook
 import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
+import type Konva from "konva";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -542,16 +543,17 @@ export class EditorCanvas implements CanvasBase {
                 link.click();
                 // document.body.removeChild(link);
             }
-            const rect = this.LayerManager.Canvas.getClientRect({ skipTransform: false });
+            const cvs = this.LayerManager.Canvas.clone()
+            cvs.getLayers().map((layer: Konva.Layer) => layer.rotation(0).position({ x: 0, y: 0 }))
+            const rect = cvs.getClientRect({ skipTransform: false });
             const cfg: ImageConfig = {
                 x: rect.x,
                 y: rect.y,
                 width: rect.width,
                 height: rect.height,
-                pixelRatio: 1,
                 imageSmoothingEnabled: true,
             };
-            downloadURI(this.LayerManager.Canvas.toDataURL(cfg), txtName.value);
+            downloadURI(cvs.toDataURL(cfg), txtName.value);
             dia.close();
         };
         dia.show();
