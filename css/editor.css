@@ -34,7 +34,7 @@
     width: var(--bgDiv-width);
     height: var(--bgDiv-height);
 
-    transform-origin: calc(var(--bgDiv-transform-translate-x) - (50vw - (var(--bgDiv-width)/2))) calc(var(--bgDiv-transform-translate-y) - (calc(50vh - (var(--bgDiv-height)/2))));
+    transform-origin: calc(mod(var(--bgDiv-transform-translate-x) - (50vw - (var(--bgDiv-width)/2)), var(--bgDiv-width))) calc(mod(var(--bgDiv-transform-translate-y) - (calc(50vh - (var(--bgDiv-height)/2))), var(--bgDiv-height)));
 
     /* Position of Canvas' (0,0) in backgroundDiv */
     --bgDiv-cvs-orig-in-bgDiv-x: calc(var(--bgDiv-width)/2 - 50vw);
