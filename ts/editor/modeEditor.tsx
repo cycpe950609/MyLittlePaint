@@ -725,8 +725,18 @@ class modeEditor implements ModeFunction {
         new SettingPageSidebar(),
     ];
 
-    StartMode() { }
-    EndMode() { }
+    private unload: (event: BeforeUnloadEvent) => void = (event: BeforeUnloadEvent) => {
+        event.preventDefault();
+        // Chrome requires returnValue to be set.
+        event.returnValue = "";
+    }
+
+    StartMode() {
+        window.addEventListener("beforeunload", this.unload, true);
+    }
+    EndMode() {
+        window.removeEventListener("beforeunload", this.unload);
+    }
 }
 
 export default modeEditor;
