@@ -48,7 +48,7 @@ export class PolygonBase extends DrawBase {
     }
     set Settings(setting: CanvasInterfaceSettings) {
         if (setting.Settings === undefined)
-            throw new Error("INTENAL_ERROR: Settings are missing");
+            throw new Error("INTERNAL_ERROR: Settings are missing");
         let refreshWindow = false;
         if (setting.Settings.get("BorderBrush") !== undefined) {
             this.BorderBrush = setting.Settings.get("BorderBrush")?.value;
@@ -76,7 +76,7 @@ export class CircleCVSFunc extends PolygonBase {
     HistoryName = 'polygon-circle';
     ImgName = 'circle';
     Tip = 'Circle';
-    DrawFunction = (Ctx: Konva.Group, width: number, height: number) => {
+    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number) => {
 
         let circle = Ctx.find(`.${this.shapeID}`)
         let polygon = undefined;
@@ -88,6 +88,10 @@ export class CircleCVSFunc extends PolygonBase {
                 name: this.shapeID
             } as CircleConfig);
             Ctx.add(polygon)
+        }
+
+        if (!(polygon instanceof Konva.Circle)) {
+            throw new Error("Polygon should be `Konva.Circle`")
         }
 
 
@@ -138,7 +142,7 @@ export class PathDraw extends PolygonBase {
         }
     }
 
-    DrawFunction = (Ctx: Konva.Group, width: number, height: number, angle: number) => {
+    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number, angle: number) => {
         let shape = Ctx.find(`.${this.shapeID}`)
         let polygon = undefined;
         if (shape.length > 0) {
@@ -149,6 +153,10 @@ export class PathDraw extends PolygonBase {
                 name: this.shapeID
             } as PathConfig);
             Ctx.add(polygon)
+        }
+
+        if (!(polygon instanceof Konva.Path)) {
+            throw new Error("Polygon should be `Konva.Path`")
         }
 
         this.validPath();
@@ -244,13 +252,15 @@ class btnExitDrawing implements FunctionInterface {
     Name: string = "Exit";
     ImgName?: string = "exit";
     Tip = "Finish Drawing";
-    StartFunction = (cvs: CanvasBase) => {
+    StartFunction = (_cvs: CanvasBase) => {
         if (window.editorUI.CenterCanvas.Function !== undefined)
-            if (window.editorUI.CenterCanvas.Function.RightPointerUp !== undefined)
-                window.editorUI.CenterCanvas.Function.RightPointerUp(undefined);
+            if (window.editorUI.CenterCanvas.Function.RightPointerUp !== undefined) {
+                const fake_ev: PaintEvent = { X: -1, Y: -1, type: "mouse", pressure: 0 }
+                window.editorUI.CenterCanvas.Function.RightPointerUp(fake_ev);
+            }
         return {
             isChangeTo: false,
-            finishSubMode: false,//Because we exit subMode at RightPointerUp, we dont need to finish subMode here
+            finishSubMode: false,//Because we exit subMode at RightPointerUp, we don't need to finish subMode here
         } as NextFunctionState;
     };
 }
@@ -297,17 +307,20 @@ export class PolygonCVSFunc extends ClickDrawBase {
     ImgName = 'polygon';
 
 
-    DrawFunction = (Ctx: Konva.Group, width: number, height: number, angle: number) => {
+    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number, angle: number) => {
         let shape = Ctx.find(`.${this.shapeID}`)
         let polygon = undefined;
         if (shape.length > 0) {
-            polygon = shape[0]
+            polygon = shape[0] as Konva.Path
         }
         else {
             polygon = new Konva.Path({
                 name: this.shapeID
             } as PathConfig);
             Ctx.add(polygon)
+        }
+        if (!(polygon instanceof Konva.Path)) {
+            throw new Error("Polygon should be `Konva.Path`")
         }
 
         let radian = (-angle) * Math.PI / 180;
