@@ -734,10 +734,14 @@ class modeEditor implements ModeFunction {
     }
 
     StartMode() {
-        window.addEventListener("beforeunload", this.unload, true);
+        if (process.env.NODE_ENV !== 'development') {
+            window.addEventListener("beforeunload", this.unload, true);
+        }
     }
     EndMode() {
-        window.removeEventListener("beforeunload", this.unload);
+        if (process.env.NODE_ENV !== 'development') {
+            window.removeEventListener("beforeunload", this.unload);
+        }
     }
 }
 
