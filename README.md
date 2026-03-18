@@ -1,5 +1,10 @@
-# About branch `features/store-permanent-data-in-browser`
-Store canvas data in indexedDB to prevent accidentally close
+# About branch `features/interface-of-web-canvas`
+Add a wrapper around canvas (konva.js / pixi.js)
+1. Render data levels:
+   1. Canvas: Similar to Konva's Stage
+   2. Layer: Layer
+   3. Shape: Rectangle, Circle, Path
+2. Convert Line shape to Path
 
 # MyLittlePaint-v2
 
