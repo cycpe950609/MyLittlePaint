@@ -122,11 +122,9 @@ export class PathDraw extends PolygonBase {
         let splittedPath = this.Path.split(" ");
         let len = splittedPath.length;
         if (len <= 4)// at least "M ptX ptY Z"
-            throw new Error("INERNAL_ERROR: Path is too short");
+            throw new Error("INTERNAL_ERROR: Path is too short");
         if (!(splittedPath[0] === "m" || splittedPath[0] === "M"))
-            throw new Error("INERNAL_ERROR: Path should start with M/m");
-        if (!(splittedPath[len - 1] === "z" || splittedPath[len - 1] === "Z"))
-            throw new Error("INERNAL_ERROR: Path should end with Z/z");
+            throw new Error("INTERNAL_ERROR: Path should start with M/m");
         if ((!this.isVar(splittedPath[1])) || (!this.isVar(splittedPath[2])))
             throw new Error("INTERNAL_ERROR: Start point is wrong");
         let idx = 3
@@ -366,7 +364,7 @@ export class PolygonCVSFunc extends ClickDrawBase {
     }
     set Settings(setting: CanvasInterfaceSettings) {
         if (setting.Settings === undefined)
-            throw new Error("INTENAL_ERROR: Settings are missing");
+            throw new Error("INTERNAL_ERROR: Settings are missing");
         let refreshWindow = false;
         if (setting.Settings.get("BorderBrush") !== undefined) {
             this.BorderBrush = setting.Settings.get("BorderBrush")?.value;
