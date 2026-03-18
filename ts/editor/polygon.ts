@@ -216,6 +216,14 @@ export class PathDraw extends PolygonBase {
     }
 }
 
+export class LineCVSFunc extends PathDraw {
+    Name = 'Line';
+    HistoryName = 'line';
+    ImgName = 'line';
+    Tip = 'Line';
+    Path = "M ${startX} ${startY} L ${endX} ${endY}";
+};
+
 export class TriangleCVSFunc extends PathDraw {
     Name = 'Triangle';
     HistoryName = 'polygon-triangle';

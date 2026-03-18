@@ -714,11 +714,11 @@ class modeEditor implements ModeFunction {
     ];
 
     LeftToolbarTop = [
-        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import(/* webpackChunkName: "paint-brush" */"./brush")).default()),
-        new btnCanvas('Line', 'line', 'Line', async () => new (await import(/* webpackChunkName: "paint-line" */"./line")).default()),
-        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).CircleCVSFunc()),
-        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).TriangleCVSFunc()),
-        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).RectangleCVSFunc()),
+        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import("./brush")).default()),
+        new btnCanvas('Line', 'line', 'Line', async () => new (await import("./polygon")).LineCVSFunc()),
+        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import("./polygon")).CircleCVSFunc()),
+        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import("./polygon")).TriangleCVSFunc()),
+        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import("./polygon")).RectangleCVSFunc()),
         new btnPolygon(),
     ];
 
