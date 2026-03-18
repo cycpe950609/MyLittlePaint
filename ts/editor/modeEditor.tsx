@@ -33,6 +33,7 @@ import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
+import { initIDB } from "./internalData";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -183,9 +184,10 @@ export class EditorCanvas implements CanvasBase {
     private layerInfoList: LayerInfo[] = [];
     private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
-        // this.containerVNode = <Div className="w-full h-full" />;
-        // let container = this.containerVNode.elm as HTMLDivElement;
-        // console.log("[HOK] attachCanvas : ", this.containerVNode)
+
+        initIDB();
+
+
         console.log("[HOK] Canvas Size ", this.width, this.height);
         // this.backgroundDiv.style.position = "fixed";
         this.backgroundDiv.id = "backgroundDiv";
