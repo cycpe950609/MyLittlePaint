@@ -1,3 +1,6 @@
+# About branch `features/canvas-based-background`
+Render background chessboard instead of div w/ pseudo element 
+
 # MyLittlePaint-v2
 
 ![screen_shot](./img/screenshot.png)
