@@ -25,7 +25,7 @@ import {
 } from "./menu";
 import { TipComponent } from "../editorUI/statusbar";
 import interact from "interactjs";
-import LayerMgrSidebar, { LayerManager, Layer, LayerInfo } from './layer';
+import LayerMgrSidebar, { LayerManager, LayerInfo } from './layer';
 import SettingPageSidebar from "./setting";
 import HistoryManager from "./historyLogger";
 import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook";
@@ -33,6 +33,7 @@ import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
+import { BackgroundCanvas } from "./backgroundCVS";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -66,11 +67,7 @@ declare global {
 export class EditorCanvas implements CanvasBase {
     name = "EditorCanvas";
 
-    // private scrollDiv: HTMLDivElement = DIV(
-    //     "w-full h-full overflowX-scroll overflowY-scroll relative disable-touch"
-    // );
-    // private scaleElement: HTMLDivElement = DIV("absolute w-fit h-fit transform-center")
-    private backgroundDiv: HTMLDivElement = DIV("absolute disable-mouse");
+    private backgroundCVS: BackgroundCanvas;
     private cnt !: HTMLDivElement;
     // private containerVNode: VNode;
     // private cvs !: Konva.Stage;
@@ -100,6 +97,9 @@ export class EditorCanvas implements CanvasBase {
         this.LayerManager.addLayerAfter();
         this.LayerManager.addLayerAfter();
         this.LayerManager.addLayerAfter();
+
+        this.backgroundCVS = new BackgroundCanvas(64);
+        this.backgroundCVS.resize(width, height);
     }
     update?: ((time: number) => void) | undefined;
 
@@ -183,12 +183,7 @@ export class EditorCanvas implements CanvasBase {
     private layerInfoList: LayerInfo[] = [];
     private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
-        // this.containerVNode = <Div className="w-full h-full" />;
-        // let container = this.containerVNode.elm as HTMLDivElement;
-        // console.log("[HOK] attachCanvas : ", this.containerVNode)
-        console.log("[HOK] Canvas Size ", this.width, this.height);
-        // this.backgroundDiv.style.position = "fixed";
-        this.backgroundDiv.id = "backgroundDiv";
+        this.backgroundCVS.resize(window.innerWidth, window.innerHeight);
 
         let interactCVS = interact(this.cnt, {
             styleCursor: false
@@ -394,7 +389,7 @@ export class EditorCanvas implements CanvasBase {
             e.preventDefault();
         });
 
-        container.appendChild(this.backgroundDiv);
+        container.appendChild(this.backgroundCVS.element);
         container.appendChild(this.cnt);
 
         this.initCanvas();
@@ -467,6 +462,7 @@ export class EditorCanvas implements CanvasBase {
         window.editorUI.forceRerender();
     }
     resizeCanvas = (_e?: UIEvent) => {
+        this.backgroundCVS.resize(window.innerWidth, window.innerHeight);
         this.LayerManager.resize(window.innerWidth, window.innerHeight);
     };
     removeCanvas = () => { };
@@ -489,9 +485,13 @@ export class EditorCanvas implements CanvasBase {
             requestAnimationFrame(this.render);
         }
         this.isPointOut = undefined;
-        // this.ctx.clearRect(0, 0, this.width, this.height);
-        // this.ctx.drawImage(this.render_cvs.element, 0, 0, this.width, this.height);
-        // return this.containerVNode;
+
+        this.backgroundCVS.viewAt(
+            this.angleScalePos.pos.x,
+            this.angleScalePos.pos.y,
+            this.angleScalePos.angle,
+            this.angleScalePos.scale,
+        )
     };
 
     private drawWithTouch = false;
@@ -591,9 +591,7 @@ export class EditorCanvas implements CanvasBase {
             "Scale : " + (scale * 100).toFixed(0) + "%"
         );
     }
-    // private isCtlKeyDown: boolean = false;
-    // private isShiftDown: boolean = false;
-    // private isAltDown: boolean = false;
+
     public scaleTo = (scale: number) => {
         let new_scale = scale;
         if (new_scale >= 4) new_scale = 4;
@@ -601,7 +599,6 @@ export class EditorCanvas implements CanvasBase {
         this.angleScalePos.scale = new_scale;
         this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
         // console.log("Next scale factor = " + this.angleScalePos.scale);
-        this.backgroundDiv.style.setProperty("--bgDiv-img-scale", `${new_scale}`);
 
         this.LayerManager.scaleTo(new_scale);
     };
@@ -610,15 +607,12 @@ export class EditorCanvas implements CanvasBase {
         this.angleScalePos.angle = new_rotate;
         this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
         // console.log("Next rotate factor = " + this.angleScalePos.scale);
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-rotate", `${new_rotate}deg`);
         this.LayerManager.rotateTo(new_rotate);
     };
 
     public moveTo = (moveX: number, moveY: number) => {
         this.angleScalePos.pos.x = moveX;
         this.angleScalePos.pos.y = moveY;
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate-x", `${moveX}px`);
-        this.backgroundDiv.style.setProperty("--bgDiv-transform-translate-y", `${moveY}px`);
         this.LayerManager.moveTo(moveX, moveY);
     };
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
