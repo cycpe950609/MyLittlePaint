@@ -4,6 +4,7 @@ buttongroup
 cycpe
 editorui
 gesturable
+hori
 Imple
 interactjs
 Konva

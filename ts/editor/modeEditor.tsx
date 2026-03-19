@@ -98,7 +98,7 @@ export class EditorCanvas implements CanvasBase {
         this.LayerManager.addLayerAfter();
         this.LayerManager.addLayerAfter();
 
-        this.backgroundCVS = new BackgroundCanvas(64);
+        this.backgroundCVS = new BackgroundCanvas(48);
         this.backgroundCVS.resize(width, height);
     }
     update?: ((time: number) => void) | undefined;
@@ -631,7 +631,7 @@ export class EditorCanvas implements CanvasBase {
         }
         if (!ev.ctrlKey && !ev.shiftKey && !ev.altKey) { // No Key: Up/Down
             ev.preventDefault();
-            if (ev.deltaY < 0) {
+            if (ev.deltaY < 0) { // Wheel up, content Move down
                 this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 15);
             } else if (ev.deltaY > 0) {
                 this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 15);
@@ -641,10 +641,10 @@ export class EditorCanvas implements CanvasBase {
         }
         if (!ev.ctrlKey && ev.shiftKey && !ev.altKey) {// Shift: Left/Right
             ev.preventDefault();
-            if (ev.deltaY < 0) {
-                this.moveTo(this.angleScalePos.pos.x + 15, this.angleScalePos.pos.y);
-            } else if (ev.deltaY > 0) {
+            if (ev.deltaY < 0) { // Wheel up, content Move right
                 this.moveTo(this.angleScalePos.pos.x - 15, this.angleScalePos.pos.y);
+            } else if (ev.deltaY > 0) {
+                this.moveTo(this.angleScalePos.pos.x + 15, this.angleScalePos.pos.y);
             }
             this.render();
             return;
