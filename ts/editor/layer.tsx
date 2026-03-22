@@ -7,6 +7,7 @@ import { type HistoryLogEntry } from "./historyLogger";
 import { EditorCanvas } from "./modeEditor";
 import { Div, Img, Table, Td, Tr } from "../editorUI/util/Element";
 import { useConsumer } from "../editorUI/util/useHook";
+import { addShape } from "./internalData";
 
 export class LayerInfo {
     public Snapshot: string = "";
@@ -191,7 +192,22 @@ export class Layer {
     }
     public flush() {
         // this._isPreview = false;
-        this._prev.children.forEach((item) => {
+        // TODO: Create transaction
+        this._prev.children.forEach((item, iIdx) => {
+            console.log("[DEB] Preview.item", iIdx, item instanceof Konva.Path, item)
+            // Save to internalData
+            if (item instanceof Konva.Circle) {
+                addShape(0, this.ID, "circle", { "radius": item.radius, "center": { "x": item.x, "y": item.y } })
+            }
+            else if (item instanceof Konva.Line) {
+                addShape(0, this.ID, "line", { "points": item.points })
+            }
+            else if (item instanceof Konva.Path) {
+                addShape(0, this.ID, "path", { "path": item.data })
+            }
+            else {
+                console.error("Unsupported type :", typeof item)
+            }
             this._render.add(item);
         })
         this._prev.destroyChildren();

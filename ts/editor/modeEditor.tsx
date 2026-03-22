@@ -184,6 +184,7 @@ export class EditorCanvas implements CanvasBase {
     private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
         this.backgroundCVS.resize(window.innerWidth, window.innerHeight);
+        console.log("[HOK] Canvas Size ", this.width, this.height);
 
         let interactCVS = interact(this.cnt, {
             styleCursor: false
@@ -706,11 +707,11 @@ class modeEditor implements ModeFunction {
     ];
 
     LeftToolbarTop = [
-        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import(/* webpackChunkName: "paint-brush" */"./brush")).default()),
-        new btnCanvas('Line', 'line', 'Line', async () => new (await import(/* webpackChunkName: "paint-line" */"./line")).default()),
-        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).CircleCVSFunc()),
-        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).TriangleCVSFunc()),
-        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import(/* webpackChunkName: "paint-polygon" */"./polygon")).RectangleCVSFunc()),
+        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import("./brush")).default()),
+        new btnCanvas('Line', 'line', 'Line', async () => new (await import("./polygon")).LineCVSFunc()),
+        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import("./polygon")).CircleCVSFunc()),
+        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import("./polygon")).TriangleCVSFunc()),
+        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import("./polygon")).RectangleCVSFunc()),
         new btnPolygon(),
     ];
 
@@ -719,8 +720,22 @@ class modeEditor implements ModeFunction {
         new SettingPageSidebar(),
     ];
 
-    StartMode() { }
-    EndMode() { }
+    private unload: (event: BeforeUnloadEvent) => void = (event: BeforeUnloadEvent) => {
+        event.preventDefault();
+        // Chrome requires returnValue to be set.
+        event.returnValue = "";
+    }
+
+    StartMode() {
+        if (process.env.NODE_ENV !== 'development') {
+            window.addEventListener("beforeunload", this.unload, true);
+        }
+    }
+    EndMode() {
+        if (process.env.NODE_ENV !== 'development') {
+            window.removeEventListener("beforeunload", this.unload);
+        }
+    }
 }
 
 export default modeEditor;

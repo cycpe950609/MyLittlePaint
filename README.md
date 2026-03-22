@@ -1,5 +1,11 @@
-# About branch `features/canvas-based-background`
+# About branch `features/canvas-based-background` and `features/interface-of-web-canvas`
 Render background chessboard instead of div w/ pseudo element 
+Add a wrapper around canvas (konva.js / pixi.js)
+1. Render data levels:
+   1. Canvas: Similar to Konva's Stage
+   2. Layer: Layer
+   3. Shape: Rectangle, Circle, Path
+2. Convert Line shape to Path
 
 # MyLittlePaint-v2
 
