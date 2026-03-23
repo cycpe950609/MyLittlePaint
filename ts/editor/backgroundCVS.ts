@@ -12,6 +12,10 @@ import { degreeToRadian, rotateAround } from "./anycanvas/cvs/coordinate";
 export class BackgroundCanvas {
     private ctx: CanvasRenderingContext2D
     private chessboard_size: number
+    private view_at_center: Point
+    private view_at_rotDegree: number
+    private view_at_scale: number
+
     constructor(chessboard_size: number) {
         const cvs = document.createElement("canvas");
         cvs.style.position = "fixed";
@@ -23,6 +27,9 @@ export class BackgroundCanvas {
         this.ctx = ctx;
 
         this.chessboard_size = chessboard_size;
+        this.view_at_center = { x: 0, y: 0 };
+        this.view_at_rotDegree = 0;
+        this.view_at_scale = 1.0;
     }
 
     get element() {
@@ -32,10 +39,13 @@ export class BackgroundCanvas {
     public resize = (width: number, height: number) => {
         this.ctx.canvas.width = width;
         this.ctx.canvas.height = height;
-        // TODO: Re-render after resize
+        this.viewAt(this.view_at_center, this.view_at_rotDegree, this.view_at_scale);
     }
 
     public viewAt = (center: Point, rotDegree: number, scale: number) => {
+        this.view_at_center = center;
+        this.view_at_rotDegree = rotDegree;
+        this.view_at_scale = scale;
         const cvs_width = this.ctx.canvas.width;
         const cvs_height = this.ctx.canvas.height;
 
@@ -60,21 +70,13 @@ export class BackgroundCanvas {
         while (startY <= renderView.cornerRB.y) {
             let startX = renderView.cornerLT.x;
             while (startX <= renderView.cornerRB.x) {
-                if (this.isUnitVisible(
+                this.drawUnitBlockAt(
                     { x: startX, y: startY }, // cornerLT
                     { width: renderBlockSz, height: renderBlockSz },  // unitSize
                     { width: viewConfig.size.width, height: viewConfig.size.height }, // viewSize
                     rotDegree,
-                    center,
-                )) {
-                    this.drawUnitBlockAt(
-                        { x: startX, y: startY }, // cornerLT
-                        { width: renderBlockSz, height: renderBlockSz },  // unitSize
-                        { width: viewConfig.size.width, height: viewConfig.size.height }, // viewSize
-                        rotDegree,
-                        center
-                    );
-                }
+                    center
+                );
                 startX += renderBlockSz;
             }
             startY += renderBlockSz;
@@ -122,40 +124,6 @@ export class BackgroundCanvas {
             cornerLT: blockLT,
             cornerRB: blockRB,
         }
-    }
-    private isUnitVisible = (corner: Point, unitSize: Size, viewSize: Size, rotDeg: number, center: Point): boolean => {
-        const hori_delta_x = (unitSize.width) * Math.cos(degreeToRadian(-rotDeg));
-        const hori_delta_y = (unitSize.width) * Math.sin(degreeToRadian(-rotDeg));
-        const vert_delta_x = (unitSize.height) * Math.cos(degreeToRadian(-rotDeg - 90));
-        const vert_delta_y = (unitSize.height) * Math.sin(degreeToRadian(-rotDeg - 90));
-
-        const cornerLT: Point = corner;
-        const cornerRT: Point = {
-            x: corner.x + hori_delta_x,
-            y: corner.y - hori_delta_y,
-        }
-        const cornerRB: Point = {
-            x: corner.x + hori_delta_x + vert_delta_x,
-            y: corner.y - hori_delta_y - vert_delta_y,
-        }
-        const cornerLB: Point = {
-            x: corner.x + vert_delta_x,
-            y: corner.y - vert_delta_y,
-        }
-
-        const convertToCVSCoord = (point: Point): Point => {
-            const newPoint = rotateAround(point, center, -rotDeg);
-            newPoint.x += -center.x + viewSize.width / 2;
-            newPoint.y += -center.y + viewSize.height / 2;
-            return newPoint;
-        }
-
-        const isInViewport = (point: Point): boolean => {
-            const cvs_point = convertToCVSCoord(point);
-            return (0 < cvs_point.x && cvs_point.x < viewSize.width) && (0 < cvs_point.y && cvs_point.y < viewSize.height)
-        }
-
-        return isInViewport(cornerLT) || isInViewport(cornerRT) || isInViewport(cornerRB) || isInViewport(cornerLB);
     }
     private drawUnitBlockAt = (cornerLT: Point, unitSize: Size, viewSize: Size, rotDeg: number, center: Point) => {
         const hori_delta_x = (unitSize.width / 2) * Math.cos(degreeToRadian(-rotDeg))
