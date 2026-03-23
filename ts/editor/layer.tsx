@@ -8,6 +8,7 @@ import { EditorCanvas } from "./modeEditor";
 import { Div, Img, Table, Td, Tr } from "../editorUI/util/Element";
 import { useConsumer } from "../editorUI/util/useHook";
 import { addShape } from "./internalData";
+import type { Point } from "./anycanvas/cvs/utils";
 
 export class LayerInfo {
     public Snapshot: string = "";
@@ -107,21 +108,13 @@ export class LayerManager {
         this.cvs.height(height);
     }
     //TODO : Move this outside of LayerManager
-    public moveTo(x: number, y: number): void {
-        // console.log("[CVS] Layer move to", x, y);
+    public viewAt(center: Point, rotDeg: number, scale: number) {
         const cvsW = this.ctx.width()
         const cvsH = this.ctx.height()
-        this.ctx.offset({ x: x, y: y });
+        this.ctx.offset(center);
         this.ctx.position({ x: cvsW / 2, y: cvsH / 2 });
-        // this.ctx.position({ x: x, y: y });
-    }
-    public scaleTo(factor: number): void {
-        // console.log("[CVS] Layer scale to", factor);
-        this.ctx.scale({ x: factor, y: factor });
-    }
-    public rotateTo(angle: number): void {
-        // console.log("[CVS] Layer rotate to", angle);
-        this.ctx.rotation(angle);
+        this.ctx.scale({ x: scale, y: scale });
+        this.ctx.rotation(rotDeg);
     }
 };
 

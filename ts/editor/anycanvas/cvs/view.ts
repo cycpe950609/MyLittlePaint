@@ -13,16 +13,35 @@ import type { Point } from "./utils";
 export class ViewManager {
     private view_center: Point;
     private view_rot_deg: number; // a clockwise rotation is a negative magnitude, a counterclockwise is a positive magnitude
+    private view_scale: number;
 
     // private utility
     private normalizeDegree(degree: number): number {
         return (degree + 360) % 360;
     }
 
-    constructor(center?: Point, rotDeg?: number) {
+    constructor(center?: Point, rotDeg?: number, scale?: number) {
         this.view_center = center || { "x": 0, "y": 0 };
         this.view_rot_deg = rotDeg || 0.0;
+        this.view_scale = scale || 1.0;
     }
+
+    // Absolute value
+    public viewAt(center: Point, rotDeg: number, scale: number) {
+        this.view_center = center;
+        this.view_rot_deg = rotDeg;
+        this.view_scale = scale;
+    }
+    public viewCenterAt(center: Point) {
+        this.view_center = center;
+    }
+    public viewRotDegAt(rotDeg: number) {
+        this.view_rot_deg = this.normalizeDegree(rotDeg);
+    }
+    public viewScaleAt(scale: number) {
+        this.view_scale = scale;
+    }
+
 
     // Move the View along the axis of view
     public viewUp(deltaY: number) {
@@ -50,6 +69,13 @@ export class ViewManager {
     public viewLeft(deltaX: number) {
         // Move View Left, content move right
         this.viewRight(-deltaX);
+    }
+    // Scale
+    public viewZoomIn(scale: number) {
+        this.view_scale += scale;
+    }
+    public viewZoomOut(scale: number) {
+        this.view_scale -= scale;
     }
     // Rotation
     public viewRotate(degree: number) {
@@ -89,6 +115,9 @@ export class ViewManager {
     }
     public get RotationDegree(): number {
         return this.view_rot_deg;
+    }
+    public get Scale(): number {
+        return this.view_scale;
     }
 };
 

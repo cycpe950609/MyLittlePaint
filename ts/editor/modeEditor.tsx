@@ -35,7 +35,7 @@ import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
 import { BackgroundCanvas } from "./backgroundCVS";
 import { ViewManager } from "./anycanvas/cvs/view";
-import { convertViewToCanvas } from "./anycanvas/cvs/coordinate";
+import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -159,29 +159,15 @@ export class EditorCanvas implements CanvasBase {
     }
     private initCanvas = () => {
         this.LayerManager.clear();
-        this.moveTo(0, 0);
-        this.rotateTo(0);
-    };
-    private angleScalePos = {
-        angle: 0,
-        scale: 1,
-        pos: {
-            x: 0,
-            y: 0
-        }
+        this.View.viewAt({ x: 0, y: 0 }, 0, 1.0);
     };
     private dragMoveListener = (event: Interact.GestureEvent, _target: HTMLElement, angleScale: { angle: number, scale: number }) => {
         // console.log("[DEB] dragMoveListener : ",event)
         // keep the dragged position in the data-x/data-y attributes
-        this.angleScalePos.pos.x = this.angleScalePos.pos.x + event.dx;
-        this.angleScalePos.pos.y = this.angleScalePos.pos.y + event.dy;
+        this.View.viewUp(event.dx);
+        this.View.viewRight(event.dy);
 
-        // translate the element
-        this.rotateTo(angleScale.angle)
-        this.scaleTo(angleScale.scale);
-        //TODO: Set to this.View
-        this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y);
-
+        this.render();
         this.refreshScaleTip(angleScale.angle, angleScale.scale);
     }
     private isDrawing: boolean = false;
@@ -207,7 +193,7 @@ export class EditorCanvas implements CanvasBase {
             );
             e.preventDefault();
             e.stopPropagation();
-            startAngle = angleScale.angle - e.angle;
+            startAngle = this.View.RotationDegree - e.angle;
             startScale = e.scale;
             this.cnt.classList.remove("reset");
         }
@@ -217,9 +203,9 @@ export class EditorCanvas implements CanvasBase {
             console.log(
                 `[CVS] Gesture move scale:${e.ds}, angle: ${e.da}`
             );
-            angleScale.angle = this.normalizeRotate(e.angle + startAngle);
-            angleScale.scale = e.scale * startScale;
-            dragMoveListener(e, this.cnt, angleScale);
+            this.View.viewRotDegAt(this.normalizeRotate(e.angle + startAngle));
+            this.View.viewScaleAt(e.scale * startScale);
+            this.dragMoveListener(e, this.cnt, { angle: this.View.RotationDegree, scale: this.View.Scale });
             e.preventDefault();
             e.stopPropagation();
         }
@@ -228,21 +214,21 @@ export class EditorCanvas implements CanvasBase {
             console.log(
                 `[CVS] Gesture end scale:${e.scale}, angle: ${e.angle}`
             );
-            angleScale.angle = this.normalizeRotate(startAngle + e.angle);
-            angleScale.scale = e.scale * startScale;
+            this.View.viewRotDegAt(this.normalizeRotate(e.angle + startAngle));
+            this.View.viewScaleAt(e.scale * startScale);
             e.preventDefault();
             e.stopPropagation();
         }
         let dragMove = (e: Interact.GestureEvent) => {
             if (!isDrawing && this.isPointOut === undefined)
-                dragMoveListener(e, this.cnt, angleScale)
+                this.dragMoveListener(e, this.cnt, { angle: this.View.RotationDegree, scale: this.View.Scale })
         }
         let pointOut = (e: Interact.PointerEvent) => {
-            let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
-            let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
-            let rot_deg = -angleScale.angle / 180 * Math.PI;
-            let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
-            let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+            let new_x_wo_rot = (e.offsetX - this.View.Center.x) / this.View.Scale;
+            let new_y_wo_rot = (e.offsetY - this.View.Center.y) / this.View.Scale;
+            let rot_rad = -degreeToRadian(this.View.RotationDegree);
+            let new_x = new_x_wo_rot * Math.cos(rot_rad) - new_y_wo_rot * Math.sin(rot_rad);
+            let new_y = new_x_wo_rot * Math.sin(rot_rad) + new_y_wo_rot * Math.cos(rot_rad);
             let ev: PaintEvent = {
                 X: new_x,
                 Y: new_y,
@@ -257,9 +243,6 @@ export class EditorCanvas implements CanvasBase {
             return;
         }
 
-        // var scaleElement = this.scaleElement;
-        var angleScale = this.angleScalePos;
-        var dragMoveListener = this.dragMoveListener;
         var isDrawing = this.isDrawing;
         interactCVS
             .gesturable({
@@ -295,7 +278,7 @@ export class EditorCanvas implements CanvasBase {
                 const newPts = convertViewToCanvas({
                     center: this.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
-                    scale: this.angleScalePos.scale,
+                    scale: this.View.Scale,
                     rotDeg: this.View.RotationDegree,
                 }, {
                     "x": e.offsetX,
@@ -339,7 +322,7 @@ export class EditorCanvas implements CanvasBase {
                 const newPts = convertViewToCanvas({
                     center: this.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
-                    scale: this.angleScalePos.scale,
+                    scale: this.View.Scale,
                     rotDeg: this.View.RotationDegree,
                 }, {
                     "x": e.offsetX,
@@ -375,7 +358,7 @@ export class EditorCanvas implements CanvasBase {
                 const newPts = convertViewToCanvas({
                     center: this.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
-                    scale: this.angleScalePos.scale,
+                    scale: this.View.Scale,
                     rotDeg: this.View.RotationDegree,
                 }, {
                     "x": e.offsetX,
@@ -493,7 +476,7 @@ export class EditorCanvas implements CanvasBase {
     render = () => {
         // [this.layerInfoList, this.setLayerInfoList] = useProvider("editor.layer.info.list", []);
         if (this.EventFired) {
-            let angle = this.isDrawRotate ? this.angleScalePos.angle : 0;
+            let angle = this.isDrawRotate ? this.View.RotationDegree : 0;
             this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height, angle);
             if (this.isPointOut !== undefined) {
                 if (this.draw_func.PointerOut !== undefined) {
@@ -510,11 +493,15 @@ export class EditorCanvas implements CanvasBase {
         this.isPointOut = undefined;
 
         this.backgroundCVS.viewAt(
-            this.angleScalePos.pos.x,
-            this.angleScalePos.pos.y,
-            this.angleScalePos.angle,
-            this.angleScalePos.scale,
+            this.View.Center.x,
+            this.View.Center.y,
+            this.View.RotationDegree,
+            this.View.Scale,
         )
+
+        this.LayerManager.viewAt(this.View.Center, this.View.RotationDegree, this.View.Scale);
+        this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
+
     };
 
     private drawWithTouch = false;
@@ -600,7 +587,7 @@ export class EditorCanvas implements CanvasBase {
         dia.show();
     }
     /* Scaling of Canvas */
-    public get scaleFactor() { return this.angleScalePos.scale; }
+    public get scaleFactor() { return this.View.Scale; }
     private scaleTip: TipComponent;
     private normalizeRotate = (rotate: number) => {
         let angle = rotate % 360;
@@ -615,37 +602,15 @@ export class EditorCanvas implements CanvasBase {
         );
     }
 
-    private scaleTo = (scale: number) => {
-        let new_scale = scale;
-        if (new_scale >= 4) new_scale = 4;
-        if (new_scale <= 0.1) new_scale = 0.1;
-        this.angleScalePos.scale = new_scale;
-        this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
-        // console.log("Next scale factor = " + this.angleScalePos.scale);
-
-        this.LayerManager.scaleTo(new_scale);
-    };
-    private rotateTo = (rotate: number) => {
-        let new_rotate = this.normalizeRotate(rotate);
-        this.angleScalePos.angle = new_rotate;
-        this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
-        // console.log("Next rotate factor = " + this.angleScalePos.scale);
-        this.LayerManager.rotateTo(new_rotate);
-    };
-    private moveTo = (moveX: number, moveY: number) => {
-        // this.angleScalePos.pos.x = moveX;
-        // this.angleScalePos.pos.y = moveY;
-        this.LayerManager.moveTo(moveX, moveY);
-    };
 
     public resetScale = () => {
-        this.scaleTo(1.0);
+        this.View.viewScaleAt(0);
     }
     public resetRotate = () => {
-        this.rotateTo(0);
+        this.View.viewRotDegAt(0);
     }
     public resetPosition = () => {
-        this.moveTo(0, 0);
+        this.View.viewCenterAt({ x: 0, y: 0 });
     }
 
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
@@ -654,10 +619,10 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
-                this.scaleTo(this.angleScalePos.scale + 0.05);
+                this.View.viewZoomIn(0.05);
             } else if (ev.deltaY > 0) {
                 // zoom out
-                this.scaleTo(this.angleScalePos.scale - 0.05);
+                this.View.viewZoomOut(0.05);
             }
             this.render();
             return;
@@ -666,12 +631,9 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) { // Wheel up, content Move down
                 this.View.viewUp(15);
-                // this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 15);
             } else if (ev.deltaY > 0) {
                 this.View.viewDown(15);
-                // this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 15);
             }
-            this.moveTo(this.View.Center.x, this.View.Center.y);
             this.render();
             return;
         }
@@ -679,12 +641,9 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) { // Wheel up, content Move right
                 this.View.viewLeft(15);
-                // this.moveTo(this.angleScalePos.pos.x - 15, this.angleScalePos.pos.y);
             } else if (ev.deltaY > 0) {
                 this.View.viewRight(15);
-                // this.moveTo(this.angleScalePos.pos.x + 15, this.angleScalePos.pos.y);
             }
-            this.moveTo(this.View.Center.x, this.View.Center.y);
             this.render();
             return;
         }
@@ -693,25 +652,22 @@ export class EditorCanvas implements CanvasBase {
             if (ev.deltaY < 0) {
                 // ZOOM IN
                 this.View.viewRotate(2);
-                // this.rotateTo(this.angleScalePos.angle + 2);
             } else if (ev.deltaY > 0) {
                 // zoom out
                 this.View.viewRotate(-2);
-                // this.rotateTo(this.angleScalePos.angle - 2);
             }
-            this.moveTo(this.View.Center.x, this.View.Center.y);
-            this.rotateTo(this.View.RotationDegree);
             this.render();
             return;
         }
     };
     private docKeydownHandler = (ev: KeyboardEvent) => {
         // console.log("docKeydown", ev.key);
-        if (ev.key === "+" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.scaleTo(this.scaleFactor + 0.1); }
-        if (ev.key === "-" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.scaleTo(this.scaleFactor - 0.1); }
-        if (ev.key === "0" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.scaleTo(1.0); }
+        if (ev.key === "+" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.View.viewZoomIn(0.1); }
+        if (ev.key === "-" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.View.viewZoomOut(- 0.1); }
+        if (ev.key === "0" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.View.viewScaleAt(1.0); }
         if (ev.key === "z" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.undo(); }
         if (ev.key === "y" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.redo(); }
+        this.render();
     };
     private docKeyupHandler = (_ev: KeyboardEvent) => { };
 
