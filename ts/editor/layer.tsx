@@ -109,7 +109,10 @@ export class LayerManager {
     //TODO : Move this outside of LayerManager
     public moveTo(x: number, y: number): void {
         // console.log("[CVS] Layer move to", x, y);
-        this.ctx.position({ x: x, y: y });
+        const cvsW = this.ctx.width()
+        const cvsH = this.ctx.height()
+        this.ctx.position({ x: -x + cvsW / 2, y: -y + cvsH / 2 });
+        // this.ctx.position({ x: x, y: y });
     }
     public scaleTo(factor: number): void {
         // console.log("[CVS] Layer scale to", factor);

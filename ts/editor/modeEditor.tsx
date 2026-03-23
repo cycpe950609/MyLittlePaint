@@ -34,6 +34,8 @@ import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
 import { BackgroundCanvas } from "./backgroundCVS";
+import { ViewManager } from "./anycanvas/cvs/view";
+import { convertViewToCanvas } from "./anycanvas/cvs/coordinate";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -75,6 +77,7 @@ export class EditorCanvas implements CanvasBase {
     // private prev_ctx = () => this.LayerManager.Layer.prev;
     // private render_ctx = () => this.LayerManager.Layer.render;
     public LayerManager: LayerManager;
+    private View: ViewManager;
     private draw_func: CanvasInterface = new NoOPCVSFunc();
     private EventFired: boolean = false;
     private isPointOut?: PaintEvent = undefined;
@@ -91,6 +94,7 @@ export class EditorCanvas implements CanvasBase {
         this.refreshScaleTip(0, 1);
         this.cnt = DIV("w-full h-full");
         this.LayerManager = new LayerManager(this.cnt, window.innerWidth, window.innerHeight);
+        this.View = new ViewManager();
 
         //NOTE : Testing
         this.LayerManager.addLayerAfter();
@@ -155,6 +159,8 @@ export class EditorCanvas implements CanvasBase {
     }
     private initCanvas = () => {
         this.LayerManager.clear();
+        this.moveTo(0, 0);
+        this.rotateTo(0);
     };
     private angleScalePos = {
         angle: 0,
@@ -173,6 +179,7 @@ export class EditorCanvas implements CanvasBase {
         // translate the element
         this.rotateTo(angleScale.angle)
         this.scaleTo(angleScale.scale);
+        //TODO: Set to this.View
         this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y);
 
         this.refreshScaleTip(angleScale.angle, angleScale.scale);
@@ -284,14 +291,19 @@ export class EditorCanvas implements CanvasBase {
                 e.preventDefault();
                 e.stopPropagation();
 
-                let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
-                let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
-                let rot_deg = -angleScale.angle / 180 * Math.PI;
-                let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
-                let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+                // Convert mouse position to canvas coordinate
+                const newPts = convertViewToCanvas({
+                    center: this.View.Center,
+                    size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
+                    scale: this.angleScalePos.scale,
+                    rotDeg: this.View.RotationDegree,
+                }, {
+                    "x": e.offsetX,
+                    "y": e.offsetY
+                });
                 let mouseEvent: PaintEvent = {
-                    X: new_x,
-                    Y: new_y,
+                    X: newPts.x,
+                    Y: newPts.y,
                     type: "mouse",
                     pressure: 1.0
                 };
@@ -323,14 +335,19 @@ export class EditorCanvas implements CanvasBase {
                     // pointLeave wont triggered when we draw with finger, so we need call it manually
                     pointOut(e);
                 }
-                let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
-                let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
-                let rot_deg = -angleScale.angle / 180 * Math.PI;
-                let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
-                let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+                // Convert mouse position to canvas coordinate
+                const newPts = convertViewToCanvas({
+                    center: this.View.Center,
+                    size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
+                    scale: this.angleScalePos.scale,
+                    rotDeg: this.View.RotationDegree,
+                }, {
+                    "x": e.offsetX,
+                    "y": e.offsetY
+                });
                 let mouseEvent: PaintEvent = {
-                    X: new_x,
-                    Y: new_y,
+                    X: newPts.x,
+                    Y: newPts.y,
                     type: "mouse",
                     pressure: 1.0
                 };
@@ -354,14 +371,19 @@ export class EditorCanvas implements CanvasBase {
                 e.preventDefault();
                 e.stopPropagation();
 
-                let new_x_wo_rot = (e.offsetX - this.angleScalePos.pos.x) / this.angleScalePos.scale;
-                let new_y_wo_rot = (e.offsetY - this.angleScalePos.pos.y) / this.angleScalePos.scale;
-                let rot_deg = -angleScale.angle / 180 * Math.PI;
-                let new_x = new_x_wo_rot * Math.cos(rot_deg) - new_y_wo_rot * Math.sin(rot_deg);
-                let new_y = new_x_wo_rot * Math.sin(rot_deg) + new_y_wo_rot * Math.cos(rot_deg);
+                // Convert mouse position to canvas coordinate
+                const newPts = convertViewToCanvas({
+                    center: this.View.Center,
+                    size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
+                    scale: this.angleScalePos.scale,
+                    rotDeg: this.View.RotationDegree,
+                }, {
+                    "x": e.offsetX,
+                    "y": e.offsetY
+                });
                 let mouseEvent: PaintEvent = {
-                    X: new_x,
-                    Y: new_y,
+                    X: newPts.x,
+                    Y: newPts.y,
                     type: "mouse",
                     pressure: 1.0
                 };
@@ -612,8 +634,8 @@ export class EditorCanvas implements CanvasBase {
     };
 
     public moveTo = (moveX: number, moveY: number) => {
-        this.angleScalePos.pos.x = moveX;
-        this.angleScalePos.pos.y = moveY;
+        // this.angleScalePos.pos.x = moveX;
+        // this.angleScalePos.pos.y = moveY;
         this.LayerManager.moveTo(moveX, moveY);
     };
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
@@ -633,20 +655,27 @@ export class EditorCanvas implements CanvasBase {
         if (!ev.ctrlKey && !ev.shiftKey && !ev.altKey) { // No Key: Up/Down
             ev.preventDefault();
             if (ev.deltaY < 0) { // Wheel up, content Move down
-                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 15);
+                this.View.viewUp(15);
+                // this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y + 15);
             } else if (ev.deltaY > 0) {
-                this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 15);
+                this.View.viewDown(15);
+                // this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 15);
             }
+            console.log("Up/Down", this.View.Center)
+            this.moveTo(this.View.Center.x, this.View.Center.y);
             this.render();
             return;
         }
         if (!ev.ctrlKey && ev.shiftKey && !ev.altKey) {// Shift: Left/Right
             ev.preventDefault();
             if (ev.deltaY < 0) { // Wheel up, content Move right
-                this.moveTo(this.angleScalePos.pos.x - 15, this.angleScalePos.pos.y);
+                this.View.viewLeft(15);
+                // this.moveTo(this.angleScalePos.pos.x - 15, this.angleScalePos.pos.y);
             } else if (ev.deltaY > 0) {
-                this.moveTo(this.angleScalePos.pos.x + 15, this.angleScalePos.pos.y);
+                this.View.viewRight(15);
+                // this.moveTo(this.angleScalePos.pos.x + 15, this.angleScalePos.pos.y);
             }
+            this.moveTo(this.View.Center.x, this.View.Center.y);
             this.render();
             return;
         }
@@ -654,11 +683,15 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
-                this.rotateTo(this.angleScalePos.angle + 2);
+                this.View.viewRotate(2);
+                // this.rotateTo(this.angleScalePos.angle + 2);
             } else if (ev.deltaY > 0) {
                 // zoom out
-                this.rotateTo(this.angleScalePos.angle - 2);
+                this.View.viewRotate(-2);
+                // this.rotateTo(this.angleScalePos.angle - 2);
             }
+            this.moveTo(this.View.Center.x, this.View.Center.y);
+            this.rotateTo(this.View.RotationDegree);
             this.render();
             return;
         }
