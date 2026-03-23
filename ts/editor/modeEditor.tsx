@@ -615,7 +615,7 @@ export class EditorCanvas implements CanvasBase {
         );
     }
 
-    public scaleTo = (scale: number) => {
+    private scaleTo = (scale: number) => {
         let new_scale = scale;
         if (new_scale >= 4) new_scale = 4;
         if (new_scale <= 0.1) new_scale = 0.1;
@@ -625,19 +625,29 @@ export class EditorCanvas implements CanvasBase {
 
         this.LayerManager.scaleTo(new_scale);
     };
-    public rotateTo = (rotate: number) => {
+    private rotateTo = (rotate: number) => {
         let new_rotate = this.normalizeRotate(rotate);
         this.angleScalePos.angle = new_rotate;
         this.refreshScaleTip(this.angleScalePos.angle, this.angleScalePos.scale);
         // console.log("Next rotate factor = " + this.angleScalePos.scale);
         this.LayerManager.rotateTo(new_rotate);
     };
-
-    public moveTo = (moveX: number, moveY: number) => {
+    private moveTo = (moveX: number, moveY: number) => {
         // this.angleScalePos.pos.x = moveX;
         // this.angleScalePos.pos.y = moveY;
         this.LayerManager.moveTo(moveX, moveY);
     };
+
+    public resetScale = () => {
+        this.scaleTo(1.0);
+    }
+    public resetRotate = () => {
+        this.rotateTo(0);
+    }
+    public resetPosition = () => {
+        this.moveTo(0, 0);
+    }
+
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
 
         if (ev.ctrlKey && !ev.shiftKey && !ev.altKey) {// Zoom in/out
@@ -661,7 +671,6 @@ export class EditorCanvas implements CanvasBase {
                 this.View.viewDown(15);
                 // this.moveTo(this.angleScalePos.pos.x, this.angleScalePos.pos.y - 15);
             }
-            console.log("Up/Down", this.View.Center)
             this.moveTo(this.View.Center.x, this.View.Center.y);
             this.render();
             return;
