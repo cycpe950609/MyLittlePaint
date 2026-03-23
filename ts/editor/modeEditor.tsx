@@ -203,7 +203,7 @@ export class EditorCanvas implements CanvasBase {
             console.log(
                 `[CVS] Gesture move scale:${e.ds}, angle: ${e.da}`
             );
-            this.View.viewRotDegAt(this.normalizeRotate(e.angle + startAngle));
+            this.View.viewRotDegAt(e.angle + startAngle);
             this.View.viewScaleAt(e.scale * startScale);
             this.dragMoveListener(e, this.cnt, { angle: this.View.RotationDegree, scale: this.View.Scale });
             e.preventDefault();
@@ -214,7 +214,7 @@ export class EditorCanvas implements CanvasBase {
             console.log(
                 `[CVS] Gesture end scale:${e.scale}, angle: ${e.angle}`
             );
-            this.View.viewRotDegAt(this.normalizeRotate(e.angle + startAngle));
+            this.View.viewRotDegAt(e.angle + startAngle);
             this.View.viewScaleAt(e.scale * startScale);
             e.preventDefault();
             e.stopPropagation();
@@ -587,14 +587,7 @@ export class EditorCanvas implements CanvasBase {
         dia.show();
     }
     /* Scaling of Canvas */
-    public get scaleFactor() { return this.View.Scale; }
     private scaleTip: TipComponent;
-    private normalizeRotate = (rotate: number) => {
-        let angle = rotate % 360;
-        if (angle > 0)
-            return angle > 180 ? -360 + angle : angle;
-        return angle < -180 ? 360 + angle : angle;
-    }
     private refreshScaleTip = (angle: number, scale: number) => {
         this.scaleTip.updateTip(
             "Rotate : " + (angle).toFixed(0) + "°, " +
