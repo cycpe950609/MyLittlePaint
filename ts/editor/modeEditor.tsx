@@ -166,8 +166,6 @@ export class EditorCanvas implements CanvasBase {
         // keep the dragged position in the data-x/data-y attributes
         this.View.viewUp(event.dx);
         this.View.viewRight(event.dy);
-
-        this.render();
         this.refreshScaleTip(angleScale.angle, angleScale.scale);
     }
     private isDrawing: boolean = false;
@@ -493,14 +491,12 @@ export class EditorCanvas implements CanvasBase {
         this.isPointOut = undefined;
 
         this.backgroundCVS.viewAt(
-            this.View.Center.x,
-            this.View.Center.y,
+            this.View.Center,
             this.View.RotationDegree,
             this.View.Scale,
         )
 
         this.LayerManager.viewAt(this.View.Center, this.View.RotationDegree, this.View.Scale);
-        this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
 
     };
 
@@ -589,6 +585,7 @@ export class EditorCanvas implements CanvasBase {
     /* Scaling of Canvas */
     private scaleTip: TipComponent;
     private refreshScaleTip = (angle: number, scale: number) => {
+        // Refresh status tip, this will cause re-render
         this.scaleTip.updateTip(
             "Rotate : " + (angle).toFixed(0) + "°, " +
             "Scale : " + (scale * 100).toFixed(0) + "%"
@@ -597,10 +594,12 @@ export class EditorCanvas implements CanvasBase {
 
 
     public resetScale = () => {
-        this.View.viewScaleAt(0);
+        this.View.viewScaleAt(1.0);
+        this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
     }
     public resetRotate = () => {
         this.View.viewRotDegAt(0);
+        this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
     }
     public resetPosition = () => {
         this.View.viewCenterAt({ x: 0, y: 0 });
@@ -617,7 +616,7 @@ export class EditorCanvas implements CanvasBase {
                 // zoom out
                 this.View.viewZoomOut(0.05);
             }
-            this.render();
+            this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
             return;
         }
         if (!ev.ctrlKey && !ev.shiftKey && !ev.altKey) { // No Key: Up/Down
@@ -649,7 +648,7 @@ export class EditorCanvas implements CanvasBase {
                 // zoom out
                 this.View.viewRotate(-2);
             }
-            this.render();
+            this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
             return;
         }
     };
