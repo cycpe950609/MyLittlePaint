@@ -17,10 +17,6 @@ export class ViewManager {
     // private utility
     private normalizeDegree(degree: number): number {
         return (degree + 360) % 360;
-        // let angle = degree % 360;
-        // if (angle > 0)
-        //     return angle > 180 ? -360 + angle : angle;
-        // return angle < -180 ? 360 + angle : angle;
     }
 
     constructor(center?: Point, rotDeg?: number) {
@@ -31,11 +27,12 @@ export class ViewManager {
     // Move the View along the axis of view
     public viewUp(deltaY: number) {
         // Move View Up, content move down
-        // Coordinate is negative at up direction
         const upDegree = this.normalizeDegree(this.RotationDegree + 90);
         const delta_x = deltaY * Math.cos(degreeToRadian(upDegree));
         const delta_y = deltaY * Math.sin(degreeToRadian(upDegree));
-        this.view_center.x -= delta_x;
+        this.view_center.x += delta_x;
+        // NOTE: For `sin`, `cos`, etc, 90° is vector point upward
+        // NOTE: But canvas Y-Coordinate is negative at up direction
         this.view_center.y -= delta_y;
     }
     public viewDown(deltaY: number) {
@@ -44,10 +41,10 @@ export class ViewManager {
     }
     public viewRight(deltaX: number) {
         // Move View Right, content move left
-        const upDegree = this.normalizeDegree(this.RotationDegree);
-        const delta_x = deltaX * Math.cos(degreeToRadian(upDegree));
-        const delta_y = deltaX * Math.sin(degreeToRadian(upDegree));
-        this.view_center.x -= delta_x;
+        const rightDegree = this.normalizeDegree(this.RotationDegree);
+        const delta_x = deltaX * Math.cos(degreeToRadian(rightDegree));
+        const delta_y = deltaX * Math.sin(degreeToRadian(rightDegree));
+        this.view_center.x += delta_x;
         this.view_center.y -= delta_y;
     }
     public viewLeft(deltaX: number) {
