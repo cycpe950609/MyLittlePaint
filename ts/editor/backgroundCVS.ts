@@ -81,11 +81,6 @@ export class BackgroundCanvas {
             }
             startY += renderBlockSz;
         }
-
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillText(`(${center.x}, ${center.y}) ${rotDegree}° x${scale}`, cvs_width / 2, cvs_height / 2);
-        this.ctx.stroke();
-
     }
     private calcRenderViewport = (config: ViewportConfig, unitWidth: number, unitHeight: number): RenderViewConfig => {
         // Calculate a rectangle that bound the visible part of background canvas
