@@ -78,8 +78,8 @@ export class ViewManager {
         this.view_scale -= scale;
     }
     // Rotation
-    public viewRotate(degree: number) {
-        this.cvsRotate(this.view_center, degree);
+    public viewRotate(degree: number, rot_center?: Point) {
+        this.cvsRotate(rot_center || this.view_center, -degree);
     }
 
     // Move Canvas
@@ -96,7 +96,7 @@ export class ViewManager {
         this.view_center.x -= deltaX;
     }
     public cvsRotate(center: Point, degree: number) {
-        // Rotate `degree` degree clockwise at `center`
+        // Rotate `degree` degree clockwise around `center` (NOTE: `center` may not be viewport's center)
         const vecX = Math.cos(degreeToRadian(this.RotationDegree));
         const vecY = Math.sin(degreeToRadian(this.RotationDegree));
         const start: Point = this.view_center;
@@ -104,9 +104,11 @@ export class ViewManager {
 
         const rotStart = rotateAround(start, center, degree);
         const rotEnd = rotateAround(end, center, degree);
-        this.view_center = rotStart;
         const rad = Math.atan2(rotEnd.y - rotStart.y, rotEnd.x - rotStart.x);
         this.view_rot_deg = this.normalizeDegree(radianToDegree(rad));
+
+        // New Center: canvas rotate counter-clockwise, viewCenter should move clockwise around rotation center
+        this.view_center = rotateAround(this.view_center, center, -degree);
     }
 
     // Results
@@ -120,4 +122,3 @@ export class ViewManager {
         return this.view_scale;
     }
 };
-

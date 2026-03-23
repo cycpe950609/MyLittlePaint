@@ -641,12 +641,21 @@ export class EditorCanvas implements CanvasBase {
         }
         if (!ev.ctrlKey && !ev.shiftKey && ev.altKey) { // Alt: Rotate Left/Right
             ev.preventDefault();
+            const rotCenter = convertViewToCanvas({
+                center: this.View.Center,
+                size: { "width": (ev.target as HTMLCanvasElement).width, "height": (ev.target as HTMLCanvasElement).height },
+                scale: this.View.Scale,
+                rotDeg: this.View.RotationDegree,
+            }, {
+                "x": ev.offsetX,
+                "y": ev.offsetY
+            });
             if (ev.deltaY < 0) {
-                // ZOOM IN
-                this.View.viewRotate(2);
+                // Rotate counter-clockwise
+                this.View.viewRotate(2, rotCenter);
             } else if (ev.deltaY > 0) {
-                // zoom out
-                this.View.viewRotate(-2);
+                // Rotate clockwise
+                this.View.viewRotate(-2, rotCenter);
             }
             this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
             return;
