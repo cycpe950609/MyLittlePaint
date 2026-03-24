@@ -98,6 +98,11 @@ export class Rect extends ClosedShapeBase<Konva.Rect, RectConfig> { }
 
 export interface CircleConfig extends ShapeBaseConfig { }
 export class Circle extends ClosedShapeBase<Konva.Circle, CircleConfig> {
+    protected create_shape(config: CircleConfig): Konva.Circle {
+        return new Konva.Circle({
+            name: config.name
+        } as Konva.CircleConfig)
+    }
     @shapeAttr("radius")
     declare radius: number
 }
