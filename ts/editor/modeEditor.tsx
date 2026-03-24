@@ -30,7 +30,7 @@ import SettingPageSidebar from "./setting";
 import HistoryManager from "./historyLogger";
 import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook";
 import { type NextFunctionState } from "../editorUI/interface/function";
-import { btnPolygon } from "./polygon";
+import { btnPolygon } from "./drawing/polygon";
 import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
 
 
@@ -661,8 +661,7 @@ class modeEditor implements ModeFunction {
         new btnUndo(),
         new btnRedo(),
         new btnClear(),
-        // new btnCanvas(new EraserCVSFunc()),
-        new btnCanvas('Eraser', 'eraser', 'Eraser', async () => new (await import(/* webpackChunkName: "paint-eraser" */"./eraser")).default()),
+        new btnCanvas('Eraser', 'eraser', 'Eraser', async () => new (await import("./drawing/eraser")).default()),
     ];
 
     MenuToolbarRight = [
@@ -674,11 +673,11 @@ class modeEditor implements ModeFunction {
     ];
 
     LeftToolbarTop = [
-        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import("./brush")).default()),
-        new btnCanvas('Line', 'line', 'Line', async () => new (await import("./polygon")).LineCVSFunc()),
-        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import("./polygon")).CircleCVSFunc()),
-        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import("./polygon")).TriangleCVSFunc()),
-        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import("./polygon")).RectangleCVSFunc()),
+        new btnCanvas('Brush', 'brush', 'Brush', async () => new (await import("./drawing/brush")).default()),
+        new btnCanvas('Line', 'line', 'Line', async () => new (await import("./drawing/line")).LineCVSFunc()),
+        new btnCanvas('Circle', 'circle', 'Circle', async () => new (await import("./drawing/circle")).CircleCVSFunc()),
+        new btnCanvas('Triangle', 'triangle', 'Triangle', async () => new (await import("./drawing/triangle")).TriangleCVSFunc()),
+        new btnCanvas('Rectangle', 'rectangle', 'Rectangle', async () => new (await import("./drawing/rectangle")).RectangleCVSFunc()),
         new btnPolygon(),
     ];
 

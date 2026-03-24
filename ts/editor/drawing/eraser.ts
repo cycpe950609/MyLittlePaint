@@ -1,23 +1,27 @@
-import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../editorUI/canvas";
-import { editorUIActions, editorUIData } from "../editorUI/data";
-import { AnyCanvas } from "./anycanvas";
-// import { PaintContext } from "./canvas";
+/**
+ * Created : 2026/03/24
+ * Author  : Ting Fang, Tsai
+ * About:
+ *  Eraser Canvas Function     
+ */
 
+import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../../editorUI/canvas";
+import { editorUIActions, editorUIData } from "../../editorUI/data";
+import { AnyCanvas } from "../anycanvas";
 
-class BrushCVSFunc extends DrawBase {
-
-    Name = 'Brush';
-    HistoryName = 'brush';
-    Tip = 'Brush';
-    ImgName = 'brush';
-    CursorName = 'brush';
-    BrushColor = '#00FF00';// 'rgb(0,255,0)';
+class EraserCVSFunc extends DrawBase {
+    Name = 'Eraser';
+    HistoryName = 'eraser';
+    Tip = 'Eraser';
+    ImgName = 'eraser';
+    CursorName = 'eraser';
     BrushWidth = 10;
+    BrushColor = 'white';
     DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
-        let brush = Ctx.find(this.shapeID)
-        if (brush === undefined) {
-            brush = new AnyCanvas.Shape.Line({
-                name: this.shapeID,
+        let eraser = Ctx.find('prev-brush')
+        if (eraser === undefined) {
+            eraser = new AnyCanvas.Shape.Line({
+                name: "prev-brush",
                 stroke: this.BrushColor,
                 strokeWidth: this.BrushWidth,
                 // round cap for smoother lines
@@ -26,34 +30,29 @@ class BrushCVSFunc extends DrawBase {
                 globalCompositeOperation: this.CompositeOperation,
                 points: [this.LastX, this.LastY, this.LastX, this.LastY]
             });
-            Ctx.add(brush)
+            Ctx.add(eraser)
         }
 
-        if (!(brush instanceof AnyCanvas.Shape.Line))
-            throw new Error(`Unexpected type, expect 'Line', got ${typeof brush}`)
+        if (!(eraser instanceof AnyCanvas.Shape.Line))
+            throw new Error(`Unexpected type, expect 'Line', got ${typeof eraser}`)
+
 
         if (this.ifDrawing) {
             //console.log('Drawing...');
-            let newPoints = brush.points.concat([this.NextX, this.NextY]);
-            brush.points = newPoints;
+            let newPoints = eraser.points.concat([this.NextX, this.NextY]);
+            eraser.points = newPoints;
         }
 
         [this.LastX, this.LastY] = [this.NextX, this.NextY];
     };
-
-    CompositeOperation = <GlobalCompositeOperation>"source-over";
+    CompositeOperation = <GlobalCompositeOperation>"destination-out"
     get Settings() {
         let rtv: CanvasInterfaceSettings = {
-            Name: "Brush",
+            Name: "Eraser",
             Settings: new Map<string, CanvasSettingEntry<any>>([
-                ["BrushColor", {
-                    type: CanvasSettingType.Color,
-                    label: "Brush Color",
-                    value: this.BrushColor
-                }],
                 ["BrushWidth", {
                     type: CanvasSettingType.Number,
-                    label: "Brush Width",
+                    label: "Eraser Width",
                     info: [1, 64], // min,max
                     value: this.BrushWidth
                 }]
@@ -65,10 +64,6 @@ class BrushCVSFunc extends DrawBase {
         if (setting.Settings === undefined)
             throw new Error("INTERNAL_ERROR: Settings are missing");
         let refreshWindow = false;
-        if (setting.Settings.get("BrushColor") !== undefined) {
-            this.BrushColor = setting.Settings.get("BrushColor")?.value;
-            refreshWindow = true;
-        }
         if (setting.Settings.get("BrushWidth") !== undefined) {
             this.BrushWidth = setting.Settings.get("BrushWidth")?.value;
             refreshWindow = true;
@@ -78,4 +73,4 @@ class BrushCVSFunc extends DrawBase {
     }
 };
 
-export default BrushCVSFunc;
+export default EraserCVSFunc;
