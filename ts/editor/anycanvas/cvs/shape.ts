@@ -11,9 +11,9 @@ export const INTERNAL_SHAPE = Symbol("ShapeInternal");
 
 export type ShapeBaseConfig = {
     name: string,
-    stroke: string | CanvasGradient,
-    strokeWidth: number,
-    globalCompositeOperation: GlobalCompositeOperation
+    stroke?: string | CanvasGradient,
+    strokeWidth?: number,
+    globalCompositeOperation?: GlobalCompositeOperation
 }
 export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends ShapeBaseConfig> {
 
@@ -53,6 +53,15 @@ export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends Shape
 
     @shapeAttr("strokeWidth")
     declare strokeWidth: number;
+
+    @shapeAttr("className")
+    declare className: string;
+    
+    @shapeAttr("name")
+    declare name: string;
+
+    @shapeAttr("attrs")
+    declare attrs: any;
 
     // "friend-only" accessor
     [INTERNAL_SHAPE](): Konva.Shape {
