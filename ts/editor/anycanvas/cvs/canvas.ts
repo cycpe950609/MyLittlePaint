@@ -25,11 +25,17 @@ export class CanvasBase {
 
     protected render: Konva.Stage;
     protected ctx: Konva.Layer;
+
+    protected view_changed_handler = () => {
+        this.backgroundCVS.viewAt(this.View.Center, this.View.RotationDegree, this.View.Scale);
+    }
+
     constructor() {
-        this.View = new ViewManager();
-        this.container = document.createElement("div");
         this.backgroundCVS = new BackgroundCanvas(48);
+        this.container = document.createElement("div");
         this.container.appendChild(this.backgroundCVS.element);
+
+        this.View = new ViewManager({ x: 0, y: 0 }, 0, 1.0, this.view_changed_handler);
 
         const render_container = document.createElement("div");
         this.container.appendChild(render_container);

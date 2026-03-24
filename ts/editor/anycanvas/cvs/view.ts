@@ -9,21 +9,23 @@ import { degreeToRadian, radianToDegree, rotateAround } from "./coordinate";
 import type { Point } from "./utils";
 
 
-
+export type ViewChangedHandler = () => void;
 export class ViewManager {
     private view_center: Point;
     private view_rot_deg: number; // a clockwise rotation is a negative magnitude, a counterclockwise is a positive magnitude
     private view_scale: number;
+    private view_changed_handler: ViewChangedHandler;
 
     // private utility
     private normalizeDegree(degree: number): number {
         return (degree + 360) % 360;
     }
 
-    constructor(center?: Point, rotDeg?: number, scale?: number) {
+    constructor(center?: Point, rotDeg?: number, scale?: number, viewChangedCallback?: ViewChangedHandler) {
         this.view_center = center || { "x": 0, "y": 0 };
         this.view_rot_deg = rotDeg || 0.0;
         this.view_scale = scale || 1.0;
+        this.view_changed_handler = viewChangedCallback || (() => { });
     }
 
     // Absolute value
@@ -31,15 +33,18 @@ export class ViewManager {
         this.view_center = center;
         this.view_rot_deg = rotDeg;
         this.view_scale = scale;
+        this.view_changed_handler();
     }
     public viewCenterAt(center: Point) {
         this.view_center = center;
+        this.view_changed_handler();
     }
     public viewRotDegAt(rotDeg: number) {
         this.view_rot_deg = this.normalizeDegree(rotDeg);
     }
     public viewScaleAt(scale: number) {
         this.view_scale = scale;
+        this.view_changed_handler();
     }
 
 
@@ -53,6 +58,7 @@ export class ViewManager {
         // NOTE: For `sin`, `cos`, etc, 90° is vector point upward
         // NOTE: But canvas Y-Coordinate is negative at up direction
         this.view_center.y -= delta_y;
+        this.view_changed_handler();
     }
     public viewDown(deltaY: number) {
         // Move View Down, content move Up
@@ -65,6 +71,7 @@ export class ViewManager {
         const delta_y = deltaX * Math.sin(degreeToRadian(rightDegree));
         this.view_center.x += delta_x;
         this.view_center.y -= delta_y;
+        this.view_changed_handler();
     }
     public viewLeft(deltaX: number) {
         // Move View Left, content move right
@@ -73,9 +80,11 @@ export class ViewManager {
     // Scale
     public viewZoomIn(scale: number) {
         this.view_scale += scale;
+        this.view_changed_handler();
     }
     public viewZoomOut(scale: number) {
         this.view_scale -= scale;
+        this.view_changed_handler();
     }
     // Rotation
     public viewRotate(degree: number, rot_center?: Point) {
@@ -97,6 +106,7 @@ export class ViewManager {
 
         // New Center: canvas rotate counter-clockwise, viewCenter should move clockwise around rotation center
         this.view_center = rotateAround(this.view_center, center, -degree);
+        this.view_changed_handler();
     }
 
     // Results
