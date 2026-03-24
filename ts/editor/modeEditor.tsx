@@ -33,8 +33,6 @@ import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
-// TODO: Remove `BackgroundCanvas`, this should create in AnyCanvas 
-import { BackgroundCanvas } from "./anycanvas/cvs/background";
 import { ViewManager } from "./anycanvas/cvs/view";
 import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
 
@@ -70,7 +68,6 @@ declare global {
 export class EditorCanvas implements CanvasBase {
     name = "EditorCanvas";
 
-    private backgroundCVS: BackgroundCanvas;
     private cnt !: HTMLDivElement;
     // private containerVNode: VNode;
     // private cvs !: Konva.Stage;
@@ -102,9 +99,6 @@ export class EditorCanvas implements CanvasBase {
         this.LayerManager.addLayerAfter();
         this.LayerManager.addLayerAfter();
         this.LayerManager.addLayerAfter();
-
-        this.backgroundCVS = new BackgroundCanvas(48);
-        this.backgroundCVS.resize(width, height);
     }
     update?: ((time: number) => void) | undefined;
 
@@ -175,7 +169,7 @@ export class EditorCanvas implements CanvasBase {
     private layerInfoList: LayerInfo[] = [];
     private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
-        this.backgroundCVS.resize(window.innerWidth, window.innerHeight);
+        this.LayerManager.resize(window.innerWidth, window.innerHeight);
         console.log("[HOK] Canvas Size ", this.width, this.height);
 
         let interactCVS = interact(this.cnt, {
@@ -394,7 +388,7 @@ export class EditorCanvas implements CanvasBase {
             e.preventDefault();
         });
 
-        container.appendChild(this.backgroundCVS.element);
+        container.appendChild(this.LayerManager.Canvas.element);
         container.appendChild(this.cnt);
 
         this.initCanvas();
@@ -467,7 +461,6 @@ export class EditorCanvas implements CanvasBase {
         window.editorUI.forceRerender();
     }
     resizeCanvas = (_e?: UIEvent) => {
-        this.backgroundCVS.resize(window.innerWidth, window.innerHeight);
         this.LayerManager.resize(window.innerWidth, window.innerHeight);
     };
     removeCanvas = () => { };
@@ -490,12 +483,6 @@ export class EditorCanvas implements CanvasBase {
             requestAnimationFrame(this.render);
         }
         this.isPointOut = undefined;
-
-        this.backgroundCVS.viewAt(
-            this.View.Center,
-            this.View.RotationDegree,
-            this.View.Scale,
-        )
 
         this.LayerManager.viewAt(this.View.Center, this.View.RotationDegree, this.View.Scale);
 

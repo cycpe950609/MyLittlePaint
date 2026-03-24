@@ -110,6 +110,7 @@ export class LayerManager {
     }
 
     public viewAt(center: Point, rotDeg: number, scale: number) {
+        // TODO: Remove this, this should manage by `ctx` itself
         this.ctx.viewAt(center, rotDeg, scale);
     }
 };
