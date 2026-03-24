@@ -14,7 +14,8 @@ import { ViewManager } from "./view";
 
 export class CanvasBase {
 
-    protected View: ViewManager;
+    public View: ViewManager;
+
     protected view_height: number = 0;
     protected view_width: number = 0;
 
@@ -46,43 +47,6 @@ export class CanvasBase {
         return rtv;
     };
 
-    // Viewport
-    public viewAt(center: Point, rotDeg: number, scale: number) {
-        this.View.viewAt(center, rotDeg, scale);
-    }
-    public viewCenterAt(center: Point) {
-        this.View.viewCenterAt(center);
-    }
-    public viewRotDegAt(rotDeg: number) {
-        this.View.viewRotDegAt(rotDeg);
-    }
-    public viewScaleAt(scale: number) {
-        this.View.viewScaleAt(scale);
-    }
-    // Move the View along the axis of view
-    public viewUp(deltaY: number) {
-        this.View.viewUp(deltaY);
-    }
-    public viewDown(deltaY: number) {
-        this.View.viewDown(deltaY);
-    }
-    public viewRight(deltaX: number) {
-        this.View.viewRight(deltaX);
-    }
-    public viewLeft(deltaX: number) {
-        this.View.viewLeft(deltaX);
-    }
-    // Scale
-    public viewZoomIn(scale: number) {
-        this.View.viewZoomIn(scale);
-    }
-    public viewZoomOut(scale: number) {
-        this.View.viewZoomOut(scale);
-    }
-    // Rotation
-    public viewRotate(degree: number, rot_center?: Point) {
-        this.View.viewRotate(degree, rot_center);
-    }
 
     public get viewHeight(): number {
         return this.view_height

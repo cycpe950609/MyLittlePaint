@@ -83,19 +83,7 @@ export class ViewManager {
     }
 
     // Move Canvas
-    public cvsUp(deltaY: number) {
-        this.view_center.y -= deltaY;
-    }
-    public cvsDown(deltaY: number) {
-        this.view_center.y += deltaY;
-    }
-    public cvsLeft(deltaX: number) {
-        this.view_center.x += deltaX;
-    }
-    public cvsRight(deltaX: number) {
-        this.view_center.x -= deltaX;
-    }
-    public cvsRotate(center: Point, degree: number) {
+    private cvsRotate(center: Point, degree: number) {
         // Rotate `degree` degree clockwise around `center` (NOTE: `center` may not be viewport's center)
         const vecX = Math.cos(degreeToRadian(this.RotationDegree));
         const vecY = Math.sin(degreeToRadian(this.RotationDegree));
