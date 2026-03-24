@@ -33,7 +33,6 @@ import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
-import { ViewManager } from "./anycanvas/cvs/view";
 import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
 
 
@@ -69,13 +68,7 @@ export class EditorCanvas implements CanvasBase {
     name = "EditorCanvas";
 
     private cnt !: HTMLDivElement;
-    // private containerVNode: VNode;
-    // private cvs !: Konva.Stage;
-    // private ctx !:Konva.Layer;
-    // private prev_ctx = () => this.LayerManager.Layer.prev;
-    // private render_ctx = () => this.LayerManager.Layer.render;
     public LayerManager: LayerManager;
-    private View: ViewManager;
     private draw_func: CanvasInterface = new NoOPCVSFunc();
     private EventFired: boolean = false;
     private isPointOut?: PaintEvent = undefined;
@@ -92,7 +85,6 @@ export class EditorCanvas implements CanvasBase {
         this.refreshScaleTip(0, 1);
         this.cnt = DIV("w-full h-full");
         this.LayerManager = new LayerManager(this.cnt, window.innerWidth, window.innerHeight);
-        this.View = new ViewManager();
 
         //NOTE : Testing
         this.LayerManager.addLayerAfter();
@@ -154,13 +146,13 @@ export class EditorCanvas implements CanvasBase {
     }
     private initCanvas = () => {
         this.LayerManager.clear();
-        this.View.viewAt({ x: 0, y: 0 }, 0, 1.0);
+        this.LayerManager.Canvas.View.viewAt({ x: 0, y: 0 }, 0, 1.0);
     };
     private dragMoveListener = (event: Interact.GestureEvent, _target: HTMLElement, angleScale: { angle: number, scale: number }) => {
         // console.log("[DEB] dragMoveListener : ",event)
         // keep the dragged position in the data-x/data-y attributes
-        this.View.viewUp(event.dx);
-        this.View.viewRight(event.dy);
+        this.LayerManager.Canvas.View.viewUp(event.dx);
+        this.LayerManager.Canvas.View.viewRight(event.dy);
         this.refreshScaleTip(angleScale.angle, angleScale.scale);
     }
     private isDrawing: boolean = false;
@@ -186,7 +178,7 @@ export class EditorCanvas implements CanvasBase {
             );
             e.preventDefault();
             e.stopPropagation();
-            startAngle = this.View.RotationDegree - e.angle;
+            startAngle = this.LayerManager.Canvas.View.RotationDegree - e.angle;
             startScale = e.scale;
             this.cnt.classList.remove("reset");
         }
@@ -196,9 +188,9 @@ export class EditorCanvas implements CanvasBase {
             console.log(
                 `[CVS] Gesture move scale:${e.ds}, angle: ${e.da}`
             );
-            this.View.viewRotDegAt(e.angle + startAngle);
-            this.View.viewScaleAt(e.scale * startScale);
-            this.dragMoveListener(e, this.cnt, { angle: this.View.RotationDegree, scale: this.View.Scale });
+            this.LayerManager.Canvas.View.viewRotDegAt(e.angle + startAngle);
+            this.LayerManager.Canvas.View.viewScaleAt(e.scale * startScale);
+            this.dragMoveListener(e, this.cnt, { angle: this.LayerManager.Canvas.View.RotationDegree, scale: this.LayerManager.Canvas.View.Scale });
             e.preventDefault();
             e.stopPropagation();
         }
@@ -207,19 +199,19 @@ export class EditorCanvas implements CanvasBase {
             console.log(
                 `[CVS] Gesture end scale:${e.scale}, angle: ${e.angle}`
             );
-            this.View.viewRotDegAt(e.angle + startAngle);
-            this.View.viewScaleAt(e.scale * startScale);
+            this.LayerManager.Canvas.View.viewRotDegAt(e.angle + startAngle);
+            this.LayerManager.Canvas.View.viewScaleAt(e.scale * startScale);
             e.preventDefault();
             e.stopPropagation();
         }
         let dragMove = (e: Interact.GestureEvent) => {
             if (!isDrawing && this.isPointOut === undefined)
-                this.dragMoveListener(e, this.cnt, { angle: this.View.RotationDegree, scale: this.View.Scale })
+                this.dragMoveListener(e, this.cnt, { angle: this.LayerManager.Canvas.View.RotationDegree, scale: this.LayerManager.Canvas.View.Scale })
         }
         let pointOut = (e: Interact.PointerEvent) => {
-            let new_x_wo_rot = (e.offsetX - this.View.Center.x) / this.View.Scale;
-            let new_y_wo_rot = (e.offsetY - this.View.Center.y) / this.View.Scale;
-            let rot_rad = -degreeToRadian(this.View.RotationDegree);
+            let new_x_wo_rot = (e.offsetX - this.LayerManager.Canvas.View.Center.x) / this.LayerManager.Canvas.View.Scale;
+            let new_y_wo_rot = (e.offsetY - this.LayerManager.Canvas.View.Center.y) / this.LayerManager.Canvas.View.Scale;
+            let rot_rad = -degreeToRadian(this.LayerManager.Canvas.View.RotationDegree);
             let new_x = new_x_wo_rot * Math.cos(rot_rad) - new_y_wo_rot * Math.sin(rot_rad);
             let new_y = new_x_wo_rot * Math.sin(rot_rad) + new_y_wo_rot * Math.cos(rot_rad);
             let ev: PaintEvent = {
@@ -269,10 +261,10 @@ export class EditorCanvas implements CanvasBase {
 
                 // Convert mouse position to canvas coordinate
                 const newPts = convertViewToCanvas({
-                    center: this.View.Center,
+                    center: this.LayerManager.Canvas.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
-                    scale: this.View.Scale,
-                    rotDeg: this.View.RotationDegree,
+                    scale: this.LayerManager.Canvas.View.Scale,
+                    rotDeg: this.LayerManager.Canvas.View.RotationDegree,
                 }, {
                     "x": e.offsetX,
                     "y": e.offsetY
@@ -313,10 +305,10 @@ export class EditorCanvas implements CanvasBase {
                 }
                 // Convert mouse position to canvas coordinate
                 const newPts = convertViewToCanvas({
-                    center: this.View.Center,
+                    center: this.LayerManager.Canvas.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
-                    scale: this.View.Scale,
-                    rotDeg: this.View.RotationDegree,
+                    scale: this.LayerManager.Canvas.View.Scale,
+                    rotDeg: this.LayerManager.Canvas.View.RotationDegree,
                 }, {
                     "x": e.offsetX,
                     "y": e.offsetY
@@ -349,10 +341,10 @@ export class EditorCanvas implements CanvasBase {
 
                 // Convert mouse position to canvas coordinate
                 const newPts = convertViewToCanvas({
-                    center: this.View.Center,
+                    center: this.LayerManager.Canvas.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
-                    scale: this.View.Scale,
-                    rotDeg: this.View.RotationDegree,
+                    scale: this.LayerManager.Canvas.View.Scale,
+                    rotDeg: this.LayerManager.Canvas.View.RotationDegree,
                 }, {
                     "x": e.offsetX,
                     "y": e.offsetY
@@ -468,7 +460,7 @@ export class EditorCanvas implements CanvasBase {
     render = () => {
         // [this.layerInfoList, this.setLayerInfoList] = useProvider("editor.layer.info.list", []);
         if (this.EventFired) {
-            let angle = this.isDrawRotate ? this.View.RotationDegree : 0;
+            let angle = this.isDrawRotate ? this.LayerManager.Canvas.View.RotationDegree : 0;
             this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height, angle);
             if (this.isPointOut !== undefined) {
                 if (this.draw_func.PointerOut !== undefined) {
@@ -484,7 +476,7 @@ export class EditorCanvas implements CanvasBase {
         }
         this.isPointOut = undefined;
 
-        this.LayerManager.viewAt(this.View.Center, this.View.RotationDegree, this.View.Scale);
+        this.LayerManager.viewAt(this.LayerManager.Canvas.View.Center, this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
 
     };
 
@@ -582,15 +574,15 @@ export class EditorCanvas implements CanvasBase {
 
 
     public resetScale = () => {
-        this.View.viewScaleAt(1.0);
-        this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
+        this.LayerManager.Canvas.View.viewScaleAt(1.0);
+        this.refreshScaleTip(this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
     }
     public resetRotate = () => {
-        this.View.viewRotDegAt(0);
-        this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
+        this.LayerManager.Canvas.View.viewRotDegAt(0);
+        this.refreshScaleTip(this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
     }
     public resetPosition = () => {
-        this.View.viewCenterAt({ x: 0, y: 0 });
+        this.LayerManager.Canvas.View.viewCenterAt({ x: 0, y: 0 });
     }
 
     private cvsMouseWheelHandler = (ev: WheelEvent) => {
@@ -599,20 +591,20 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
-                this.View.viewZoomIn(0.05);
+                this.LayerManager.Canvas.View.viewZoomIn(0.05);
             } else if (ev.deltaY > 0) {
                 // zoom out
-                this.View.viewZoomOut(0.05);
+                this.LayerManager.Canvas.View.viewZoomOut(0.05);
             }
-            this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
+            this.refreshScaleTip(this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
             return;
         }
         if (!ev.ctrlKey && !ev.shiftKey && !ev.altKey) { // No Key: Up/Down
             ev.preventDefault();
             if (ev.deltaY < 0) { // Wheel up, content Move down
-                this.View.viewUp(15);
+                this.LayerManager.Canvas.View.viewUp(15);
             } else if (ev.deltaY > 0) {
-                this.View.viewDown(15);
+                this.LayerManager.Canvas.View.viewDown(15);
             }
             this.render();
             return;
@@ -620,9 +612,9 @@ export class EditorCanvas implements CanvasBase {
         if (!ev.ctrlKey && ev.shiftKey && !ev.altKey) {// Shift: Left/Right
             ev.preventDefault();
             if (ev.deltaY < 0) { // Wheel up, content Move right
-                this.View.viewLeft(15);
+                this.LayerManager.Canvas.View.viewLeft(15);
             } else if (ev.deltaY > 0) {
-                this.View.viewRight(15);
+                this.LayerManager.Canvas.View.viewRight(15);
             }
             this.render();
             return;
@@ -630,30 +622,30 @@ export class EditorCanvas implements CanvasBase {
         if (!ev.ctrlKey && !ev.shiftKey && ev.altKey) { // Alt: Rotate Left/Right
             ev.preventDefault();
             const rotCenter = convertViewToCanvas({
-                center: this.View.Center,
+                center: this.LayerManager.Canvas.View.Center,
                 size: { "width": (ev.target as HTMLCanvasElement).width, "height": (ev.target as HTMLCanvasElement).height },
-                scale: this.View.Scale,
-                rotDeg: this.View.RotationDegree,
+                scale: this.LayerManager.Canvas.View.Scale,
+                rotDeg: this.LayerManager.Canvas.View.RotationDegree,
             }, {
                 "x": ev.offsetX,
                 "y": ev.offsetY
             });
             if (ev.deltaY < 0) {
                 // Rotate counter-clockwise
-                this.View.viewRotate(2, rotCenter);
+                this.LayerManager.Canvas.View.viewRotate(2, rotCenter);
             } else if (ev.deltaY > 0) {
                 // Rotate clockwise
-                this.View.viewRotate(-2, rotCenter);
+                this.LayerManager.Canvas.View.viewRotate(-2, rotCenter);
             }
-            this.refreshScaleTip(this.View.RotationDegree, this.View.Scale);
+            this.refreshScaleTip(this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
             return;
         }
     };
     private docKeydownHandler = (ev: KeyboardEvent) => {
         // console.log("docKeydown", ev.key);
-        if (ev.key === "+" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.View.viewZoomIn(0.1); }
-        if (ev.key === "-" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.View.viewZoomOut(- 0.1); }
-        if (ev.key === "0" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.View.viewScaleAt(1.0); }
+        if (ev.key === "+" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.LayerManager.Canvas.View.viewZoomIn(0.1); }
+        if (ev.key === "-" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.LayerManager.Canvas.View.viewZoomOut(- 0.1); }
+        if (ev.key === "0" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.LayerManager.Canvas.View.viewScaleAt(1.0); }
         if (ev.key === "z" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.undo(); }
         if (ev.key === "y" && ev.ctrlKey && !ev.shiftKey && !ev.altKey) { ev.preventDefault(); this.redo(); }
         this.render();
