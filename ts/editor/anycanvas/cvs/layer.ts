@@ -1,0 +1,34 @@
+/**
+ * Created : 2026/03/22
+ * Author  : Ting Fang, Tsai
+ * About:
+ *  Layer
+ */
+
+import Konva from "konva";
+import { createShape, INTERNAL_SHAPE, type ShapeBase } from "./shape";
+
+export class Layer {
+    private render: Konva.Group
+
+    constructor(id: string) {
+        this.render = new Konva.Group({
+            name: `render_${id}`,
+        } as Konva.GroupConfig);
+    }
+    public add(shape: ShapeBase<any, any>) {
+        const konva_node = shape[INTERNAL_SHAPE]()
+        this.render.add(konva_node)
+    }
+    public find(id: string): ShapeBase<any, any> | undefined {
+        const shape = this.render.find(`.${id}`)
+        if (shape === undefined)
+            return undefined
+        if (shape.length !== 1)
+            throw new Error(`Unexpected shape found, should only 1 shape, got '${shape.length}'.`)
+        const polygon = shape[0]
+        if (!(polygon instanceof Konva.Shape))
+            throw new Error(`Unexpected type, should be Konva.Shape, got '${typeof polygon}'`)
+        return createShape(polygon)
+    }
+};
