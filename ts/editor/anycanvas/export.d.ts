@@ -6,7 +6,7 @@
  */
 
 // type namespace
-export namespace AnyCanvas {
+export declare namespace AnyCanvas {
     // CVS
     type WebCanvas = import("./canvas").WebCanvas;
     type InfiniteCanvas = import("./infinite").InfiniteCanvas;

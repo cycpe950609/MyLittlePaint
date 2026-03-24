@@ -4,7 +4,7 @@
  * About:
  *  Circle Canvas Function     
  */
-import { AnyCanvas } from "../anycanvas";
+import AnyCanvas from "../anycanvas";
 import { PolygonBase } from "./base";
 
 

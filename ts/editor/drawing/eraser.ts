@@ -7,7 +7,7 @@
 
 import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../../editorUI/canvas";
 import { editorUIActions, editorUIData } from "../../editorUI/data";
-import { AnyCanvas } from "../anycanvas";
+import AnyCanvas from "../anycanvas";
 
 class EraserCVSFunc extends DrawBase {
     Name = 'Eraser';

@@ -1,7 +1,7 @@
 import { CanvasSettingType, DrawBase, type CanvasInterfaceSettings, type CanvasSettingEntry } from "../../editorUI/canvas";
 import { editorUIActions, editorUIData } from "../../editorUI/data";
 import Mexp from "math-expression-evaluator";
-import { AnyCanvas } from "../anycanvas";
+import AnyCanvas from "../anycanvas";
 
 export class PolygonBase extends DrawBase {
     CursorName = 'crosshair';

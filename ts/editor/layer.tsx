@@ -6,7 +6,7 @@ import { Div, Img, Table, Td, Tr } from "../editorUI/util/Element";
 import { useConsumer } from "../editorUI/util/useHook";
 // import { addShape } from "./internalData";
 import type { Point } from "./anycanvas/cvs/utils";
-import { AnyCanvas } from "./anycanvas";
+import AnyCanvas from "./anycanvas";
 
 export class LayerInfo {
     public Snapshot: string = "";
@@ -126,6 +126,7 @@ export class Layer {
         this._name = name;
         this._render = new AnyCanvas.Layer(`render_${id}`);
         this._prev = new AnyCanvas.Layer(`prev_${id}`);
+
     }
     public get ID() {
         return this._id;

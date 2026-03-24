@@ -13,7 +13,7 @@ import { type SubModeFunction } from "../../editorUI/interface/mode";
 import { returnMode } from "../../editorUI/mode";
 import SettingPageSidebar from "../setting";
 import { btnResetRotate, btnResetScale, btnToggleTouch } from "../menu";
-import { AnyCanvas } from "../anycanvas";
+import AnyCanvas from "../anycanvas";
 
 class btnExitDrawing implements FunctionInterface {
     Name: string = "Exit";
