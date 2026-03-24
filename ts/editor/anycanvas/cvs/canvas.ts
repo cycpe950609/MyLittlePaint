@@ -7,7 +7,7 @@
 
 import Konva from "konva";
 import { BackgroundCanvas } from "./background";
-import type { Layer } from "./layer";
+import { INTERNAL_LAYER, type Layer } from "./layer";
 import type { ShapeBase } from "./shape";
 import type { Point } from "./utils";
 import { ViewManager } from "./view";
@@ -24,7 +24,7 @@ export class CanvasBase {
     protected backgroundCVS: BackgroundCanvas;
 
     protected render: Konva.Stage;
-
+    protected ctx: Konva.Layer;
     constructor() {
         this.View = new ViewManager();
         this.container = document.createElement("div");
@@ -32,6 +32,8 @@ export class CanvasBase {
         this.container.appendChild(this.backgroundCVS.element);
 
         this.render = new Konva.Stage({ container: this.container } as Konva.StageConfig);
+        this.ctx = new Konva.Layer();
+        this.render.add(this.ctx);
     }
 
     public get element(): HTMLDivElement {
@@ -43,7 +45,7 @@ export class CanvasBase {
     }
 
     public add(layer: Layer) {
-
+        this.ctx.add(layer[INTERNAL_LAYER]())
     }
 
     public find(id: string): ShapeBase<any, any>[] {

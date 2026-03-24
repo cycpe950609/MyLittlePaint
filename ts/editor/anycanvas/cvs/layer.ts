@@ -8,6 +8,8 @@
 import Konva from "konva";
 import { createShape, INTERNAL_SHAPE, type ShapeBase } from "./shape";
 
+export const INTERNAL_LAYER = Symbol("LayerInternal");
+
 export class Layer {
     private render: Konva.Group;
     private layer_z_index: number = 0;
@@ -60,5 +62,9 @@ export class Layer {
         })();
     }
 
+    // "friend-only" accessor
+    [INTERNAL_LAYER](): Konva.Group {
+        return this.render;
+    }
 
 };
