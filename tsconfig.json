@@ -25,6 +25,8 @@
     "noUncheckedSideEffectImports": true,
     // For snabbdom
     "jsx": "react-jsx",
-    "jsxImportSource": "@herp-inc/snabbdom-jsx"
+    "jsxImportSource": "@herp-inc/snabbdom-jsx",
+    //
+    "experimentalDecorators": true,
   }
 }

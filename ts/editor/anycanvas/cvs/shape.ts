@@ -50,27 +50,47 @@ export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends Shape
     }
 }
 
+export function shapeAttr(key: string) {
+    // Create get/set using decorator
+    return function (target: any, propertyKey: string) {
+        Object.defineProperty(target, propertyKey, {
+            get() {
+                return this.shape.getAttr(key);
+            },
+            set(value: any) {
+                this.shape.setAttr(key, value);
+            },
+        });
+    };
+}
+
 export interface LineConfig extends ShapeBaseConfig { }
 export class Line extends ShapeBase<Konva.Line, LineConfig> {
     constructor(config?: LineConfig) {
         super(config);
     }
 
-    public get points(): number[] {
-        // TODO: Get points
-        return []
-    }
-    public set points(points: number[]) {
-        // TODO: Set points
-    }
+    @shapeAttr("points")
+    declare points: number[];
+
 }
 
 export class ClosedShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends ShapeBaseConfig> extends ShapeBase<KonvaShape, ShapeConfig> {
-    public set x(x: number) { this.shape.setAttr("x", x); }
-    public set y(y: number) { this.shape.setAttr("y", y); }
-    public set fill(fill: string | CanvasGradient) { this.shape.setAttr("fill", fill); }
-    public set stroke(stroke: string | CanvasGradient) { this.shape.setAttr("stroke", stroke); }
-    public set strokeWidth(strokeWidth: number) { this.shape.setAttr("strokeWidth", strokeWidth); }
+
+    @shapeAttr("x")
+    declare x: number;
+
+    @shapeAttr("y")
+    declare y: number;
+
+    @shapeAttr("fill")
+    declare fill: string | CanvasGradient;
+
+    @shapeAttr("stroke")
+    declare stroke: string | CanvasGradient;
+
+    @shapeAttr("strokeWidth")
+    declare strokeWidth: number;
 };
 
 export interface RectConfig extends ShapeBaseConfig { }
@@ -78,7 +98,8 @@ export class Rect extends ClosedShapeBase<Konva.Rect, RectConfig> { }
 
 export interface CircleConfig extends ShapeBaseConfig { }
 export class Circle extends ClosedShapeBase<Konva.Circle, CircleConfig> {
-    public set radius(_radius: number) { }
+    @shapeAttr("radius")
+    declare radius: number
 }
 
 export interface EllipseConfig extends ShapeBaseConfig { }
@@ -91,9 +112,8 @@ export class Path extends ClosedShapeBase<Konva.Path, PathConfig> {
             name: config.name
         } as Konva.PathConfig)
     }
-    public set pathData(path: string) {
-        this.shape.setAttr("data", path)
-    }
+    @shapeAttr("data")
+    declare pathData: string;
 }
 
 export interface TextConfig extends ShapeBaseConfig { }
