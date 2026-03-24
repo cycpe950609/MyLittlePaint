@@ -10,7 +10,10 @@ import Konva from "konva";
 export const INTERNAL_SHAPE = Symbol("ShapeInternal");
 
 export type ShapeBaseConfig = {
-    name: string
+    name: string,
+    stroke: string | CanvasGradient,
+    strokeWidth: number,
+    globalCompositeOperation: GlobalCompositeOperation
 }
 export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends ShapeBaseConfig> {
 
@@ -44,6 +47,13 @@ export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends Shape
         return instance;
     }
 
+    // General attributes
+    @shapeAttr("stroke")
+    declare stroke: string | CanvasGradient;
+
+    @shapeAttr("strokeWidth")
+    declare strokeWidth: number;
+
     // "friend-only" accessor
     [INTERNAL_SHAPE](): Konva.Shape {
         return this.shape;
@@ -64,10 +74,24 @@ export function shapeAttr(key: string) {
     };
 }
 
-export interface LineConfig extends ShapeBaseConfig { }
+export type LineJoin = 'round' | 'bevel' | 'miter';
+export type LineCap = 'butt' | 'round' | 'square';
+export interface LineConfig extends ShapeBaseConfig {
+    lineCap: LineCap,
+    lineJoin: LineJoin,
+    points: number[]
+}
 export class Line extends ShapeBase<Konva.Line, LineConfig> {
-    constructor(config?: LineConfig) {
-        super(config);
+    protected create_shape(config: LineConfig): Konva.Line {
+        return new Konva.Line({
+            name: config.name,
+            stroke: config.stroke,
+            strokeWidth: config.strokeWidth,
+            lineCap: config.lineCap,
+            lineJoin: config.lineJoin,
+            globalCompositeOperation: config.globalCompositeOperation,
+            points: config.points,
+        } as Konva.LineConfig)
     }
 
     @shapeAttr("points")
@@ -86,11 +110,7 @@ export class ClosedShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends
     @shapeAttr("fill")
     declare fill: string | CanvasGradient;
 
-    @shapeAttr("stroke")
-    declare stroke: string | CanvasGradient;
 
-    @shapeAttr("strokeWidth")
-    declare strokeWidth: number;
 };
 
 export interface RectConfig extends ShapeBaseConfig { }
