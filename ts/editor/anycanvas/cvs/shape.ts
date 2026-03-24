@@ -56,7 +56,7 @@ export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends Shape
 
     @shapeAttr("className")
     declare className: string;
-    
+
     @shapeAttr("name")
     declare name: string;
 
@@ -129,7 +129,10 @@ export interface CircleConfig extends ShapeBaseConfig { }
 export class Circle extends ClosedShapeBase<Konva.Circle, CircleConfig> {
     protected create_shape(config: CircleConfig): Konva.Circle {
         return new Konva.Circle({
-            name: config.name
+            name: config.name,
+            stroke: config.stroke,
+            strokeWidth: config.strokeWidth,
+            globalCompositeOperation: config.globalCompositeOperation,
         } as Konva.CircleConfig)
     }
     @shapeAttr("radius")
@@ -143,7 +146,10 @@ export interface PathConfig extends ShapeBaseConfig { }
 export class Path extends ClosedShapeBase<Konva.Path, PathConfig> {
     protected create_shape(config: PathConfig): Konva.Path {
         return new Konva.Path({
-            name: config.name
+            name: config.name,
+            stroke: config.stroke,
+            strokeWidth: config.strokeWidth,
+            globalCompositeOperation: config.globalCompositeOperation,
         } as Konva.PathConfig)
     }
     @shapeAttr("data")
