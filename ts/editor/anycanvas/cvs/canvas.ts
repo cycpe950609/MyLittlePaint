@@ -115,6 +115,7 @@ export class CanvasBase {
         this.render.height(height);
         this.backgroundCVS.viewHeight = height;
         this.view_height = height;
+        this.view_changed_handler();
     }
 
     public get viewWidth(): number {
@@ -124,6 +125,7 @@ export class CanvasBase {
         this.render.width(width)
         this.backgroundCVS.viewWidth = width;
         this.view_width = width;
+        this.view_changed_handler();
     }
 
 };
