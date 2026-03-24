@@ -49,6 +49,7 @@ export class Layer {
     }
     public set zIndex(zIdx: number) {
         this.layer_z_index = zIdx;
+        this.render.zIndex(zIdx);
     }
 
     public get children(): Generator<ShapeBase<any, any>> {
