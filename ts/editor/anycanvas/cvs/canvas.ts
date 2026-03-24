@@ -94,7 +94,7 @@ export class CanvasBase {
             height: rect.height,
             imageSmoothingEnabled: true,
         };
-        return this.render.toDataURL(cfg);
+        return cvs.toDataURL(cfg);
     }
 
     public get viewSize(): Size {
