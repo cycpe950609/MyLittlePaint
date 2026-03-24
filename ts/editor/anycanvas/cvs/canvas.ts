@@ -5,12 +5,13 @@
  *  BaseClass of Canvas  
  */
 
+import Konva from "konva";
 import { BackgroundCanvas } from "./background";
 import type { Layer } from "./layer";
 import type { ShapeBase } from "./shape";
 import type { Point } from "./utils";
 import { ViewManager } from "./view";
-
+import type { ImageConfig } from "konva/lib/Node";
 
 export class CanvasBase {
 
@@ -22,11 +23,15 @@ export class CanvasBase {
     protected container: HTMLDivElement;
     protected backgroundCVS: BackgroundCanvas;
 
+    protected render: Konva.Stage;
+
     constructor() {
         this.View = new ViewManager();
         this.container = document.createElement("div");
         this.backgroundCVS = new BackgroundCanvas(48);
         this.container.appendChild(this.backgroundCVS.element);
+
+        this.render = new Konva.Stage({ container: this.container } as Konva.StageConfig);
     }
 
     public get element(): HTMLDivElement {
@@ -46,12 +51,25 @@ export class CanvasBase {
         // TODO: find `id` iteratively through all Layers
         return rtv;
     };
-
+    public toDataURL(): string {
+        const cvs = this.render.clone()
+        cvs.getLayers().map((layer: Konva.Layer) => layer.rotation(0).position({ x: 0, y: 0 }))
+        const rect = cvs.getClientRect({ skipTransform: false });
+        const cfg: ImageConfig = {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+            imageSmoothingEnabled: true,
+        };
+        return this.render.toDataURL(cfg);
+    }
 
     public get viewHeight(): number {
         return this.view_height
     }
     public set viewHeight(height: number) {
+        this.render.height(height)
         this.view_height = height;
     }
 
@@ -59,7 +77,9 @@ export class CanvasBase {
         return this.view_width;
     }
     public set viewWidth(width: number) {
+        this.render.width(width)
         this.view_width = width;
     }
 
 };
+

@@ -31,8 +31,6 @@ import HistoryManager from "./historyLogger";
 import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook";
 import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
-import type { ImageConfig } from "konva/lib/Node";
-import type Konva from "konva";
 import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
 
 
@@ -529,17 +527,7 @@ export class EditorCanvas implements CanvasBase {
                 link.click();
                 // document.body.removeChild(link);
             }
-            const cvs = this.LayerManager.Canvas.clone()
-            cvs.getLayers().map((layer: Konva.Layer) => layer.rotation(0).position({ x: 0, y: 0 }))
-            const rect = cvs.getClientRect({ skipTransform: false });
-            const cfg: ImageConfig = {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height,
-                imageSmoothingEnabled: true,
-            };
-            downloadURI(cvs.toDataURL(cfg), txtName.value);
+            downloadURI(this.LayerManager.Canvas.toDataURL(), txtName.value);
             dia.close();
         };
         dia.show();
