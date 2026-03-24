@@ -22,6 +22,16 @@ export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends Shape
         throw new Error("ShapeBase.create_shape")
     }
 
+    public show() {
+        this.shape.show();
+    }
+    public hide() {
+        this.shape.hide();
+    }
+    public clear() {
+        this.shape.destroy()
+    }
+
     static create<TS extends Konva.Shape, TC extends ShapeBaseConfig>(
         this: new (config?: TC) => ShapeBase<TS, TC>,
         shape: TS

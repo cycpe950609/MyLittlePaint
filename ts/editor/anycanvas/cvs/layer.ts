@@ -9,7 +9,8 @@ import Konva from "konva";
 import { createShape, INTERNAL_SHAPE, type ShapeBase } from "./shape";
 
 export class Layer {
-    private render: Konva.Group
+    private render: Konva.Group;
+    private layer_z_index: number = 0;
 
     constructor(id: string) {
         this.render = new Konva.Group({
@@ -31,4 +32,33 @@ export class Layer {
             throw new Error(`Unexpected type, should be Konva.Shape, got '${typeof polygon}'`)
         return createShape(polygon)
     }
+    public clear(): void {
+        this.render.destroyChildren();
+    }
+
+    public toDataURL(): string {
+        return this.render.toDataURL();
+    }
+
+    // Properties
+
+    public get zIndex(): number {
+        return this.layer_z_index;
+    }
+    public set zIndex(zIdx: number) {
+        this.layer_z_index = zIdx;
+    }
+
+    public get children(): Generator<ShapeBase<any, any>> {
+        const self = this;
+        return (function* () {
+            for (const child of self.render.children) {
+                if (!(child instanceof Konva.Shape))
+                    throw new Error(`Unexpect type, should be 'Konva.Shape', got '${typeof child}'`)
+                yield createShape(child);
+            }
+        })();
+    }
+
+
 };

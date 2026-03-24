@@ -1,14 +1,12 @@
-import Konva from "konva";
-import { type GroupConfig } from "konva/lib/Group";
-// import { KonvaEventListener } from "konva/lib/Node";
 import { v4 as uuidv4 } from "uuid";
 import type SidebarInterface from '../editorUI/interface/sidebar'
 import { type HistoryLogEntry } from "./historyLogger";
 import { EditorCanvas } from "./modeEditor";
 import { Div, Img, Table, Td, Tr } from "../editorUI/util/Element";
 import { useConsumer } from "../editorUI/util/useHook";
-import { addShape } from "./internalData";
+// import { addShape } from "./internalData";
 import type { Point } from "./anycanvas/cvs/utils";
+import { AnyCanvas } from "./anycanvas";
 
 export class LayerInfo {
     public Snapshot: string = "";
@@ -20,19 +18,22 @@ export class LayerManager {
     private layerList = new Map<string, Layer>();
     private defaultLayer: string;
 
-    private cvs !: Konva.Stage;
-    private ctx: Konva.Layer;
+    private ctx !: AnyCanvas.InfiniteCanvas;
+    // private ctx: Konva.Layer;
 
     private id2zIndex: Map<string, number> = new Map<string, number>(); //
 
-    constructor(container: HTMLDivElement, width: number, height: number) {
-        this.cvs = new Konva.Stage({
-            container: container,   // id of container <div>
-            width: width,
-            height: height,
-        } as Konva.StageConfig);
-        this.ctx = new Konva.Layer();
-        this.cvs.add(this.ctx);
+    constructor(container: HTMLDivElement, _width: number, _height: number) {
+        // this.cvs = new Konva.Stage({
+        //     container: container,   // id of container <div>
+        //     width: width,
+        //     height: height,
+        // } as Konva.StageConfig);
+        // this.ctx = new Konva.Layer();
+        // this.cvs.add(this.ctx);
+
+        this.ctx = new AnyCanvas.InfiniteCanvas()
+        container.appendChild(this.ctx.element);
 
         this.defaultLayer = this.addLayer();
         this.id2zIndex.set(this.defaultLayer, 0);
@@ -74,8 +75,8 @@ export class LayerManager {
         // editorUIData.dispatch(editorUIActions.sidebar_window.update({ id: "LayerMgrSidebar", new_func: null }));
     }
 
-    public get Canvas(): Konva.Stage {
-        return this.cvs;
+    public get Canvas(): AnyCanvas.InfiniteCanvas {
+        return this.ctx;
     }
 
     public get Layer(): Layer {
@@ -104,36 +105,26 @@ export class LayerManager {
     };
 
     public resize(width: number, height: number): void {
-        this.cvs.width(width);
-        this.cvs.height(height);
+        this.ctx.viewWidth = width;
+        this.ctx.viewHeight = height;
     }
-    //TODO : Move this outside of LayerManager
+
     public viewAt(center: Point, rotDeg: number, scale: number) {
-        const cvsW = this.ctx.width()
-        const cvsH = this.ctx.height()
-        this.ctx.offset(center);
-        this.ctx.position({ x: cvsW / 2, y: cvsH / 2 });
-        this.ctx.scale({ x: scale, y: scale });
-        this.ctx.rotation(rotDeg);
+        this.ctx.viewAt(center, rotDeg, scale);
     }
 };
 
 export class Layer {
-    private _render: Konva.Group;
-    private _prev: Konva.Group;
+    private _render: AnyCanvas.Layer;
+    private _prev: AnyCanvas.Layer;
 
     private _id: string;
     private _name: string;
     constructor(id: string, name: string) {
         this._id = id;
         this._name = name;
-        this._render = new Konva.Group({
-            name: `render_${id}`,
-        } as GroupConfig);
-        this._prev = new Konva.Group({
-            name: `prev_${id}`,
-        } as GroupConfig);
-
+        this._render = new AnyCanvas.Layer(`render_${id}`);
+        this._prev = new AnyCanvas.Layer(`prev_${id}`);
     }
     public get ID() {
         return this._id;
@@ -143,11 +134,11 @@ export class Layer {
     }
 
     public get zIndex() {
-        return (this._render.zIndex as unknown as number) / 2;
+        return this._render.zIndex / 2;
     }
     public set zIndex(zIndex: number) {
-        this._render.setZIndex(zIndex * 2);
-        this._prev.setZIndex(zIndex * 2 + 1);
+        this._render.zIndex = zIndex * 2;
+        this._prev.zIndex = zIndex * 2 + 1;
     };
 
     public content() {
@@ -155,9 +146,9 @@ export class Layer {
     }
     public merge(layer: Layer) {
         // this._isPreview = false;
-        layer.content().forEach((item) => {
+        for (const item of layer._render.children) {
             this._render.add(item);
-        })
+        }
     }
     private _previewImage: string = "";
     // private _isPreview: boolean = false;
@@ -174,49 +165,48 @@ export class Layer {
     public diff(): HistoryLogEntry<any>[] {
         let rtv: HistoryLogEntry<any>[] = [];
 
-        this._prev.children.forEach((item) => {
+        for (const item of this._prev.children) {
             const newLog: HistoryLogEntry<any> = {
                 layerID: this._id,
                 paintToolName: item.className,
-                shapeName: item.name(),
+                shapeName: item.name,
                 data: item.attrs
             }
             console.log("[DEB] Diff : ", newLog);
             rtv.push(newLog);
-        })
+        }
 
         return rtv;
     }
     public flush() {
         // this._isPreview = false;
         // TODO: Create transaction
-        this._prev.children.forEach((item, iIdx) => {
-            console.log("[DEB] Preview.item", iIdx, item instanceof Konva.Path, item)
+        for (const item of this._prev.children) {
+            // console.log("[DEB] Preview.item", iIdx, item instanceof Konva.Path, item)
             // Save to internalData
-            if (item instanceof Konva.Circle) {
-                addShape(0, this.ID, "circle", { "radius": item.radius, "center": { "x": item.x, "y": item.y } })
-            }
-            else if (item instanceof Konva.Line) {
-                addShape(0, this.ID, "line", { "points": item.points })
-            }
-            else if (item instanceof Konva.Path) {
-                addShape(0, this.ID, "path", { "path": item.data })
-            }
-            else {
-                console.error("Unsupported type :", typeof item)
-            }
+            // if (item instanceof Konva.Circle) {
+            //     addShape(0, this.ID, "circle", { "radius": item.radius, "center": { "x": item.x, "y": item.y } })
+            // }
+            // else if (item instanceof Konva.Line) {
+            //     addShape(0, this.ID, "line", { "points": item.points })
+            // }
+            // else if (item instanceof Konva.Path) {
+            //     addShape(0, this.ID, "path", { "path": item.data })
+            // }
+            // else {
+            //     console.error("Unsupported type :", typeof item)
+            // }
             this._render.add(item);
-        })
-        this._prev.destroyChildren();
-        // editorUIData.dispatch(editorUIActions.sidebar_window.update({ id: "LayerMgrSidebar", new_func: null }));
+        }
+        this._prev.clear();
     }
     public add(item: any) {
         // this._isPreview = false;
         this._render.add(item);
     }
     public clear() {
-        this._prev.destroyChildren();
-        this._render.destroyChildren();
+        this._prev.clear();
+        this._render.clear();
         // this._isPreview = false;
     }
 

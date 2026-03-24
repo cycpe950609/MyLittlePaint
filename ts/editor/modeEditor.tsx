@@ -114,7 +114,7 @@ export class EditorCanvas implements CanvasBase {
         if (undoLst.length === 0) throw new Error("INTERNAL_ERROR: Undo list is empty");
         undoLst.forEach((entry) => {
             if (entry.paintToolName === "noop") return;
-            let polygon = this.LayerManager.Canvas.find(`.${entry.shapeName}`)
+            let polygon = this.LayerManager.Canvas.find(entry.shapeName)
             if (polygon.length === 0) throw new Error("INTERNAL_ERROR: Shape not found");
             polygon.forEach((shape) => {
                 shape.hide();
@@ -127,7 +127,7 @@ export class EditorCanvas implements CanvasBase {
         if (redoLst.length === 0) throw new Error("INTERNAL_ERROR: Redo list is empty");
         redoLst.forEach((entry) => {
             if (entry.paintToolName === "noop") return;
-            let polygon = this.LayerManager.Canvas.find(`.${entry.shapeName}`)
+            let polygon = this.LayerManager.Canvas.find(entry.shapeName)
             if (polygon.length === 0) throw new Error("INTERNAL_ERROR: Shape not found");
             polygon.forEach((shape) => {
                 shape.show();
@@ -143,10 +143,10 @@ export class EditorCanvas implements CanvasBase {
         neededRemoveShapeLst.forEach((shapeList) => {
             shapeList.forEach((entry) => {
                 // console.log("[DEB] Needed Remove Shape : ", entry.shapeName)
-                let polygon = this.LayerManager.Canvas.find(`.${entry.shapeName}`)
+                let polygon = this.LayerManager.Canvas.find(entry.shapeName)
                 if (polygon.length === 0) throw new Error("INTERNAL_ERROR: Shape not found");
                 polygon.forEach((shape) => {
-                    shape.destroy();
+                    shape.clear();
                 })
             })
         })
