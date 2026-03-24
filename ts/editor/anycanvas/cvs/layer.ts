@@ -25,8 +25,8 @@ export class Layer {
     }
     public find(id: string): ShapeBase<any, any> | undefined {
         const shape = this.render.find(`.${id}`)
-        if (shape === undefined)
-            return undefined
+        if (shape === undefined) return undefined
+        if (shape.length === 0) return undefined
         if (shape.length !== 1)
             throw new Error(`Unexpected shape found, should only 1 shape, got '${shape.length}'.`)
         const polygon = shape[0]

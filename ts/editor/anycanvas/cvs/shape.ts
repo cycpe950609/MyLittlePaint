@@ -9,7 +9,9 @@ import Konva from "konva";
 
 export const INTERNAL_SHAPE = Symbol("ShapeInternal");
 
-export type ShapeBaseConfig = {}
+export type ShapeBaseConfig = {
+    name: string
+}
 export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends ShapeBaseConfig> {
 
     protected shape!: KonvaShape;
@@ -19,7 +21,7 @@ export class ShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends Shape
     }
 
     protected create_shape(_config: ShapeConfig): KonvaShape {
-        throw new Error("ShapeBase.create_shape")
+        throw new Error(`${typeof this}.create_shape`)
     }
 
     public show() {
@@ -64,11 +66,11 @@ export class Line extends ShapeBase<Konva.Line, LineConfig> {
 }
 
 export class ClosedShapeBase<KonvaShape extends Konva.Shape, ShapeConfig extends ShapeBaseConfig> extends ShapeBase<KonvaShape, ShapeConfig> {
-    public set x(_x: number) { }
-    public set y(_y: number) { }
-    public set fill(_fill: string | CanvasGradient) { }
-    public set stroke(_stroke: string | CanvasGradient) { }
-    public set strokeWidth(_strokeWidth: number) { }
+    public set x(x: number) { this.shape.setAttr("x", x); }
+    public set y(y: number) { this.shape.setAttr("y", y); }
+    public set fill(fill: string | CanvasGradient) { this.shape.setAttr("fill", fill); }
+    public set stroke(stroke: string | CanvasGradient) { this.shape.setAttr("stroke", stroke); }
+    public set strokeWidth(strokeWidth: number) { this.shape.setAttr("strokeWidth", strokeWidth); }
 };
 
 export interface RectConfig extends ShapeBaseConfig { }
@@ -84,7 +86,14 @@ export class Ellipse extends ClosedShapeBase<Konva.Ellipse, EllipseConfig> { }
 
 export interface PathConfig extends ShapeBaseConfig { }
 export class Path extends ClosedShapeBase<Konva.Path, PathConfig> {
-    public set pathData(path: string) { }
+    protected create_shape(config: PathConfig): Konva.Path {
+        return new Konva.Path({
+            name: config.name
+        } as Konva.PathConfig)
+    }
+    public set pathData(path: string) {
+        this.shape.setAttr("data", path)
+    }
 }
 
 export interface TextConfig extends ShapeBaseConfig { }

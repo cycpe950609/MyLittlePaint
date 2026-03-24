@@ -27,7 +27,15 @@ export class CanvasBase {
     protected ctx: Konva.Layer;
 
     protected view_changed_handler = () => {
+        // background
         this.backgroundCVS.viewAt(this.View.Center, this.View.RotationDegree, this.View.Scale);
+        // konva canvas
+        const cvsW = this.ctx.width()
+        const cvsH = this.ctx.height()
+        this.ctx.offset(this.View.Center);
+        this.ctx.position({ x: cvsW / 2, y: cvsH / 2 });
+        this.ctx.scale({ x: this.View.Scale, y: this.View.Scale });
+        this.ctx.rotation(this.View.RotationDegree);
     }
 
     constructor() {
