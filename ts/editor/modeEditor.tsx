@@ -378,7 +378,6 @@ export class EditorCanvas implements CanvasBase {
             e.preventDefault();
         });
 
-        container.appendChild(this.LayerManager.Canvas.element);
         container.appendChild(this.cnt);
 
         this.initCanvas();

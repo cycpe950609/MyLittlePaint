@@ -36,9 +36,31 @@ export class BackgroundCanvas {
         return this.ctx.canvas;
     }
 
-    public resize = (width: number, height: number) => {
-        this.ctx.canvas.width = width;
+    public get viewSize(): Size {
+        return {
+            width: this.viewWidth,
+            height: this.viewHeight,
+        }
+    }
+    public set viewSize(size: Size) {
+        this.ctx.canvas.width = size.width;
+        this.ctx.canvas.height = size.height;
+        this.viewAt(this.view_at_center, this.view_at_rotDegree, this.view_at_scale);
+    }
+
+    public get viewHeight(): number {
+        return this.ctx.canvas.height
+    }
+    public set viewHeight(height: number) {
         this.ctx.canvas.height = height;
+        this.viewAt(this.view_at_center, this.view_at_rotDegree, this.view_at_scale);
+    }
+
+    public get viewWidth(): number {
+        return this.ctx.canvas.width;
+    }
+    public set viewWidth(width: number) {
+        this.ctx.canvas.width = width;
         this.viewAt(this.view_at_center, this.view_at_rotDegree, this.view_at_scale);
     }
 

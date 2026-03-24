@@ -23,7 +23,7 @@ export class LayerManager {
 
     private id2zIndex: Map<string, number> = new Map<string, number>(); //
 
-    constructor(container: HTMLDivElement, _width: number, _height: number) {
+    constructor(container: HTMLDivElement, width: number, height: number) {
         // this.cvs = new Konva.Stage({
         //     container: container,   // id of container <div>
         //     width: width,
@@ -33,6 +33,7 @@ export class LayerManager {
         // this.cvs.add(this.ctx);
 
         this.ctx = new AnyCanvas.InfiniteCanvas()
+        this.ctx.viewSize = { width: width, height: height };
         container.appendChild(this.ctx.element);
 
         this.defaultLayer = this.addLayer();
@@ -105,8 +106,7 @@ export class LayerManager {
     };
 
     public resize(width: number, height: number): void {
-        this.ctx.viewWidth = width;
-        this.ctx.viewHeight = height;
+        this.ctx.viewSize = { width: width, height: height };
     }
 
     public viewAt(center: Point, rotDeg: number, scale: number) {

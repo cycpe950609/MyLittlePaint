@@ -9,7 +9,7 @@ import Konva from "konva";
 import { BackgroundCanvas } from "./background";
 import { INTERNAL_LAYER, type Layer } from "./layer";
 import type { ShapeBase } from "./shape";
-import type { Point } from "./utils";
+import type { Point, Size } from "./utils";
 import { ViewManager } from "./view";
 import type { ImageConfig } from "konva/lib/Node";
 
@@ -31,7 +31,10 @@ export class CanvasBase {
         this.backgroundCVS = new BackgroundCanvas(48);
         this.container.appendChild(this.backgroundCVS.element);
 
-        this.render = new Konva.Stage({ container: this.container } as Konva.StageConfig);
+        const render_container = document.createElement("div");
+        this.container.appendChild(render_container);
+        this.render = new Konva.Stage({ container: render_container } as Konva.StageConfig);
+
         this.ctx = new Konva.Layer();
         this.render.add(this.ctx);
     }
@@ -67,11 +70,23 @@ export class CanvasBase {
         return this.render.toDataURL(cfg);
     }
 
+    public get viewSize(): Size {
+        return {
+            width: this.viewWidth,
+            height: this.viewHeight,
+        }
+    }
+    public set viewSize(size: Size) {
+        this.viewWidth = size.width;
+        this.viewHeight = size.height;
+    }
+
     public get viewHeight(): number {
         return this.view_height
     }
     public set viewHeight(height: number) {
-        this.render.height(height)
+        this.render.height(height);
+        this.backgroundCVS.viewHeight = height;
         this.view_height = height;
     }
 
@@ -80,6 +95,7 @@ export class CanvasBase {
     }
     public set viewWidth(width: number) {
         this.render.width(width)
+        this.backgroundCVS.viewWidth = width;
         this.view_width = width;
     }
 
