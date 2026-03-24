@@ -33,7 +33,8 @@ import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./polygon";
 import type { ImageConfig } from "konva/lib/Node";
 import type Konva from "konva";
-import { BackgroundCanvas } from "./backgroundCVS";
+// TODO: Remove `BackgroundCanvas`, this should create in AnyCanvas 
+import { BackgroundCanvas } from "./anycanvas/cvs/background";
 import { ViewManager } from "./anycanvas/cvs/view";
 import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
 

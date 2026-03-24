@@ -6,8 +6,8 @@
  */
 
 import { max, min } from "lodash";
-import type { Point, Size } from "./anycanvas/cvs/utils";
-import { degreeToRadian, rotateAround } from "./anycanvas/cvs/coordinate";
+import type { Point, Size } from "./utils";
+import { degreeToRadian, rotateAround } from "./coordinate";
 
 export class BackgroundCanvas {
     private ctx: CanvasRenderingContext2D
