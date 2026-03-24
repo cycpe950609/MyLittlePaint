@@ -1,5 +1,5 @@
-import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
+import type { AnyCanvas } from "../editor/anycanvas";
 
 export type PaintEvent = {
     X: number;
@@ -22,7 +22,7 @@ export interface CanvasInterface {
     RightPointerDown?: (e: PaintEvent) => void;
     RightPointerUp?: (e: PaintEvent) => void;
     DrawFunction: (
-        ctx: Konva.Group,
+        ctx: AnyCanvas.Layer,
         width: number,
         height: number,
         rotate: number,
@@ -101,7 +101,7 @@ export class DrawBase implements CanvasInterface {
         // return [newX + this.LastX, newY + this.LastY];
         return [newX, newY];
     }
-    public DrawFunction(_ctx: Konva.Group, _width: number, _height: number, _rotate: number) { };
+    public DrawFunction(_ctx: AnyCanvas.Layer, _width: number, _height: number, _rotate: number) { };
     public CompositeOperation: GlobalCompositeOperation = "source-over" as GlobalCompositeOperation;
     public set Settings(_setting: CanvasInterfaceSettings) { };
     public get Settings() { return {} as CanvasInterfaceSettings; };
@@ -121,7 +121,6 @@ export class ClickDrawBase implements CanvasInterface {
     protected isPointOut = false
     protected shapeID!: string;
     protected points: [number, number][] = [];
-    protected courtName!: string;
 
     public PointerDown(e: PaintEvent) {
         if (this._canFinishDrawing == true) { // First click
@@ -175,7 +174,7 @@ export class ClickDrawBase implements CanvasInterface {
         // return [newX + this.LastX, newY + this.LastY];
         return [newX, newY];
     }
-    public DrawFunction(_ctx: Konva.Group, _width: number, _height: number, _rotate: number) { };
+    public DrawFunction(_ctx: AnyCanvas.Layer, _width: number, _height: number, _rotate: number) { };
     public CompositeOperation: GlobalCompositeOperation = "source-over";
     public set Settings(_setting: CanvasInterfaceSettings) { };
     public get Settings() { return {} as CanvasInterfaceSettings; };

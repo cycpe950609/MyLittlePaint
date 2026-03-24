@@ -1,6 +1,3 @@
-import Konva from "konva";
-import { type CircleConfig } from "konva/lib/shapes/Circle";
-import { type PathConfig } from "konva/lib/shapes/Path";
 import { type CanvasBase, type CanvasInterfaceSettings, type CanvasSettingEntry, type PaintEvent, CanvasSettingType, ClickDrawBase, NoOPCVSFunc } from "../editorUI/canvas";
 import { editorUIActions, editorUIData } from "../editorUI/data";
 import { type FunctionInterface } from "../editorUI";
@@ -10,28 +7,25 @@ import { returnMode } from "../editorUI/mode";
 import SettingPageSidebar from "./setting";
 import { btnResetRotate, btnResetScale, btnToggleTouch } from "./menu";
 import { PathBase, PolygonBase } from "./canvas/shape/base";
+import { AnyCanvas } from "./anycanvas";
 
 export class CircleCVSFunc extends PolygonBase {
     Name = 'Circle';
     HistoryName = 'polygon-circle';
     ImgName = 'circle';
     Tip = 'Circle';
-    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number) => {
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
 
-        let circle = Ctx.find(`.${this.shapeID}`)
-        let polygon = undefined;
-        if (circle.length > 0) {
-            polygon = circle[0]
-        }
-        else {
-            polygon = new Konva.Circle({
+        let circle = Ctx.find(this.shapeID)
+        if (circle === undefined) {
+            circle = new AnyCanvas.Shape.Circle({
                 name: this.shapeID
-            } as CircleConfig);
-            Ctx.add(polygon)
+            });
+            Ctx.add(circle)
         }
 
-        if (!(polygon instanceof Konva.Circle)) {
-            throw new Error("Polygon should be `Konva.Circle`")
+        if (!(circle instanceof AnyCanvas.Shape.Circle)) {
+            throw new Error("Polygon should be `Circle`")
         }
 
 
@@ -43,12 +37,12 @@ export class CircleCVSFunc extends PolygonBase {
             let dy = this.NextY - this.LastY;
             let dst = Math.sqrt(dx * dx + dy * dy);
 
-            polygon.setAttr('x', this.LastX)
-            polygon.setAttr('y', this.LastY)
-            polygon.setAttr('radius', dst)
-            polygon.setAttr("fill", this.CanFilled ? this.ContentColor : 'transparent')
-            polygon.setAttr("stroke", this.BorderBrush)
-            polygon.setAttr("strokeWidth", this.BorderWidth)
+            circle.x = this.LastX;
+            circle.y = this.LastY;
+            circle.radius = dst;
+            circle.fill = this.CanFilled ? this.ContentColor : 'transparent';
+            circle.stroke = this.BorderBrush;
+            circle.strokeWidth = this.BorderWidth;
         }
     };
 }
@@ -137,20 +131,16 @@ export class PolygonCVSFunc extends ClickDrawBase {
     ImgName = 'polygon';
 
 
-    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number, angle: number) => {
-        let shape = Ctx.find(`.${this.shapeID}`)
-        let polygon = undefined;
-        if (shape.length > 0) {
-            polygon = shape[0] as Konva.Path
-        }
-        else {
-            polygon = new Konva.Path({
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number, angle: number) => {
+        let shape = Ctx.find(this.shapeID)
+        if (shape === undefined) {
+            shape = new AnyCanvas.Shape.Path({
                 name: this.shapeID
-            } as PathConfig);
-            Ctx.add(polygon)
+            });
+            Ctx.add(shape)
         }
-        if (!(polygon instanceof Konva.Path)) {
-            throw new Error("Polygon should be `Konva.Path`")
+        if (!(shape instanceof AnyCanvas.Shape.Path)) {
+            throw new Error("Polygon should be `Path`")
         }
 
         let radian = (-angle) * Math.PI / 180;
@@ -170,13 +160,12 @@ export class PolygonCVSFunc extends ClickDrawBase {
         if (this.ifDrawing && !this.isPointOut)// Only preview need render point of pointer
             drawPath += `L ${newNextPt[0]} ${newNextPt[1]} `;
         drawPath += "Z";
-        polygon.setAttr('x', this.LastX);
-        polygon.setAttr('y', this.LastY);
-        polygon.setAttr('data', drawPath);
-        polygon.setAttr("fill", this.CanFilled ? this.ContentColor : 'transparent');
-        polygon.setAttr("stroke", this.BorderBrush)
-        polygon.setAttr("strokeWidth", this.BorderWidth)
-        polygon.setAttr("courtName", this.courtName);
+        shape.x = this.LastX;
+        shape.y = this.LastY;
+        shape.pathData = drawPath;
+        shape.fill = this.CanFilled ? this.ContentColor : 'transparent';
+        shape.stroke = this.BorderBrush
+        shape.strokeWidth = this.BorderWidth
     };
 
     public RightPointerUp(e: PaintEvent): void {

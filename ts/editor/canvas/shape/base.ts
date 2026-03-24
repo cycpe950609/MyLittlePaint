@@ -1,8 +1,7 @@
-import Konva from "konva";
 import { CanvasSettingType, DrawBase, type CanvasInterfaceSettings, type CanvasSettingEntry } from "../../../editorUI/canvas";
 import { editorUIActions, editorUIData } from "../../../editorUI/data";
-import type { PathConfig } from "konva/lib/shapes/Path";
 import Mexp from "math-expression-evaluator";
+import { AnyCanvas } from "../../anycanvas";
 
 export class PolygonBase extends DrawBase {
     CursorName = 'crosshair';
@@ -94,21 +93,17 @@ export class PathBase extends PolygonBase {
         }
     }
 
-    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number, angle: number) => {
-        let shape = Ctx.find(`.${this.shapeID}`)
-        let polygon = undefined;
-        if (shape.length > 0) {
-            polygon = shape[0]
-        }
-        else {
-            polygon = new Konva.Path({
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number, angle: number) => {
+        let path = Ctx.find(this.shapeID)
+        if (path === undefined) {
+            path = new AnyCanvas.Shape.Path({
                 name: this.shapeID
-            } as PathConfig);
-            Ctx.add(polygon)
+            });
+            Ctx.add(path)
         }
 
-        if (!(polygon instanceof Konva.Path)) {
-            throw new Error("Polygon should be `Konva.Path`")
+        if (!(path instanceof AnyCanvas.Shape.Path)) {
+            throw new Error("Polygon should be `Path`")
         }
 
         this.validPath();
@@ -166,12 +161,12 @@ export class PathBase extends PolygonBase {
                 }
             }
 
-            polygon.setAttr('x', this.LastX);
-            polygon.setAttr('y', this.LastY);
-            polygon.setAttr('data', drawPath);
-            polygon.setAttr("fill", this.CanFilled ? this.ContentColor : 'transparent');
-            polygon.setAttr("stroke", this.BorderBrush)
-            polygon.setAttr("strokeWidth", this.BorderWidth)
+            path.x = this.LastX;
+            path.y = this.LastY;
+            path.pathData = drawPath;
+            path.fill = this.CanFilled ? this.ContentColor : 'transparent';
+            path.stroke = this.BorderBrush
+            path.strokeWidth = this.BorderWidth
         }
     }
 
