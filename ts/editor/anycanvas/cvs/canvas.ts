@@ -8,7 +8,7 @@
 import Konva from "konva";
 import { BackgroundCanvas } from "./background";
 import { INTERNAL_LAYER, type Layer } from "./layer";
-import type { ShapeBase } from "./shape";
+import { createShape, type ShapeBase } from "./shape";
 import type { Point, Size } from "./utils";
 import { ViewManager } from "./view";
 import type { ImageConfig } from "konva/lib/Node";
@@ -66,8 +66,21 @@ export class CanvasBase {
     }
 
     public find(id: string): ShapeBase<any, any>[] {
-        let rtv: ShapeBase<any, any>[] = []
-        // TODO: find `id` iteratively through all Layers
+        const rtv: ShapeBase<any, any>[] = [];
+        const selector = `.${id}`;
+        const layers = this.ctx.children;
+        for (let i = 0; i < layers.length; i++) {
+            const layer = layers[i];
+            if (!(layer instanceof Konva.Group)) continue;
+            const found = layer.find(selector);
+            if (found.length === 0) continue;
+            for (let j = 0; j < found.length; j++) {
+                const node = found[j];
+                if (!(node instanceof Konva.Shape))
+                    throw new Error(`Unexpected type, should be Konva.Shape, got '${typeof node}'`);
+                rtv.push(createShape(node));
+            }
+        }
         return rtv;
     };
     public toDataURL(): string {
@@ -114,4 +127,3 @@ export class CanvasBase {
     }
 
 };
-
