@@ -1,0 +1,1 @@
+import{P as e}from"./base-u58hVZC1.js";import"./HTMLElement-C-AnktP5.js";import"./index-BXTDgKwB.js";import"./modeEditor-BYvKOhR2.js";class m extends e{Name="Triangle";HistoryName="polygon-triangle";ImgName="triangle";Tip="Triangle";Path="M ${endX} ${endY} L ${startX} ${endY} L ${endX/2} ${startY} Z"}export{m as TriangleCVSFunc};

@@ -1,0 +1,1 @@
+import{P as t}from"./base-u58hVZC1.js";import"./HTMLElement-C-AnktP5.js";import"./index-BXTDgKwB.js";import"./modeEditor-BYvKOhR2.js";class m extends t{Name="Rectangle";HistoryName="polygon-rectangle";ImgName="rectangle";Tip="Rectangle";Path="M ${startX} ${startY} L ${endX} ${startY} L ${endX} ${endY} L ${startX} ${endY} Z"}export{m as RectangleCVSFunc};
