@@ -17,7 +17,7 @@ export class LayerManager {
     private layerList = new Map<string, Layer>();
     private defaultLayer: string;
 
-    private ctx !: AnyCanvas.InfiniteCanvas;
+    private ctx !: AnyCanvas.CanvasBase;
     // private ctx: Konva.Layer;
 
     private id2zIndex: Map<string, number> = new Map<string, number>(); //
@@ -31,7 +31,9 @@ export class LayerManager {
         // this.ctx = new Konva.Layer();
         // this.cvs.add(this.ctx);
 
-        this.ctx = new AnyCanvas.InfiniteCanvas()
+        this.ctx = new AnyCanvas.WebCanvas({ width: 800, height: 400 });
+        // this.ctx = new AnyCanvas.InfiniteCanvas()
+
         this.ctx.viewSize = { width: width, height: height };
         container.appendChild(this.ctx.element);
 
@@ -75,7 +77,7 @@ export class LayerManager {
         // editorUIData.dispatch(editorUIActions.sidebar_window.update({ id: "LayerMgrSidebar", new_func: null }));
     }
 
-    public get Canvas(): AnyCanvas.InfiniteCanvas {
+    public get Canvas(): AnyCanvas.CanvasBase {
         return this.ctx;
     }
 

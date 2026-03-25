@@ -5,14 +5,8 @@
  *  Coordinate conversion     
  */
 
-import { type Point, type Size } from "./utils";
-
-export type ViewportConfig = {
-    center: Point;
-    size: Size;
-    scale: number;
-    rotDeg: number;
-}
+import type { ViewportConfig } from "./background";
+import { type Point } from "./utils";
 
 export const degreeToRadian = (degree: number): number => {
     return degree / 180 * Math.PI;

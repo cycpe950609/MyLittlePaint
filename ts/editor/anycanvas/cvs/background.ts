@@ -6,17 +6,16 @@
  */
 
 import { max, min } from "lodash";
+import { rotateAround } from "./coordinate";
 import type { Point, Size } from "./utils";
-import { degreeToRadian, movePointFromCenter, rotateAround } from "./coordinate";
 
-export class BackgroundCanvas {
-    private ctx: CanvasRenderingContext2D
-    private chessboard_size: number
+export class BackCVSBase {
+    protected ctx: CanvasRenderingContext2D
     private view_at_center: Point
     private view_at_rotDegree: number
     private view_at_scale: number
 
-    constructor(chessboard_size: number) {
+    constructor() {
         const cvs = document.createElement("canvas");
         cvs.style.position = "fixed";
         cvs.style.left = "0";
@@ -26,7 +25,6 @@ export class BackgroundCanvas {
         if (ctx === null) throw new Error("INTERNAL_ERROR: Context not exist");
         this.ctx = ctx;
 
-        this.chessboard_size = chessboard_size;
         this.view_at_center = { x: 0, y: 0 };
         this.view_at_rotDegree = 0;
         this.view_at_scale = 1.0;
@@ -71,10 +69,6 @@ export class BackgroundCanvas {
         const cvs_width = this.ctx.canvas.width;
         const cvs_height = this.ctx.canvas.height;
 
-
-        this.ctx.fillStyle = 'white';
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
         const viewConfig: ViewportConfig = {
             center: center,
             size: {
@@ -84,16 +78,17 @@ export class BackgroundCanvas {
             scale: scale,
             rotDeg: rotDegree,
         }
-        const renderView = this.calcRenderViewport(viewConfig, this.chessboard_size, this.chessboard_size)
+        const renderView = this.calcRenderViewport(viewConfig)
 
         this.renderBackground(
             viewConfig,
             renderView,
-            { width: this.chessboard_size, height: this.chessboard_size },  // unitSize
         )
 
     }
-    private calcRenderViewport = (config: ViewportConfig, unitWidth: number, unitHeight: number): RenderViewConfig => {
+
+    protected calcRenderViewport(config: ViewportConfig): RenderViewConfig {
+
         // Calculate a rectangle that bound the visible part of background canvas
         // STEP 1: Rotate a viewport which center is origin (0,0)
         /// NOTE: Y-axis is positive upward 
@@ -117,85 +112,25 @@ export class BackgroundCanvas {
             y: max([vecRotatedLT.y, vecRotatedRT.y, vecRotatedLB.y, vecRotatedRB.y]) + config.center.y,
         }
 
-        const blockLT: Point = { // Corner of the Left-Top unit
-            x: (Math.floor(renderLT.x / unitWidth) + 0) * unitWidth,
-            y: (Math.floor(renderLT.y / unitHeight) + 0) * unitHeight,
-        }
-        const blockRB: Point = { // Corner of the Right-Bottom unit
-            x: (Math.floor(renderRB.x / unitWidth) + 1) * unitWidth,
-            y: (Math.floor(renderRB.y / unitHeight) + 1) * unitHeight,
-        }
-
         return {
-            cornerLT: blockLT,
-            cornerRB: blockRB,
+            cornerLT: renderLT,
+            cornerRB: renderRB,
         }
     }
-    private renderBackground = (viewConfig: ViewportConfig, renderConfig: RenderViewConfig, unitSize: Size) => {
-        const scale = viewConfig.scale;
-        // scale = render_scale x ranged_scale
-        const ranged_scale = (Math.pow(2, (Math.floor(Math.log2(scale)))))
-
-        let startY = renderConfig.cornerLT.y;
-        while (startY <= renderConfig.cornerRB.y) {
-            let startX = renderConfig.cornerLT.x;
-            while (startX <= renderConfig.cornerRB.x) {
-                this.drawUnitBlockAt(
-                    movePointFromCenter(
-                        { x: startX, y: startY }, // point
-                        viewConfig.center,
-                        viewConfig.scale,
-                    ), // cornerLT
-                    viewConfig.center,
-                    viewConfig.size, // viewSize
-                    viewConfig.rotDeg,
-                    { width: unitSize.width * scale / ranged_scale, height: unitSize.height * scale / ranged_scale },  // unitSize
-                );
-                startX += this.chessboard_size / ranged_scale;
-            }
-            startY += this.chessboard_size / ranged_scale;
-        }
+    protected renderBackground(_viewConfig: ViewportConfig, _renderConfig: RenderViewConfig): void {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
-    private drawUnitBlockAt = (cornerLT: Point, center: Point, viewSize: Size, rotDeg: number, unitSize: Size) => {
-        const hori_delta_x = (unitSize.width / 2) * Math.cos(degreeToRadian(-rotDeg))
-        const hori_delta_y = (unitSize.width / 2) * Math.sin(degreeToRadian(-rotDeg))
-        const vert_delta_x = (unitSize.height / 2) * Math.cos(degreeToRadian(-rotDeg - 90))
-        const vert_delta_y = (unitSize.height / 2) * Math.sin(degreeToRadian(-rotDeg - 90))
 
-        const drawBlock = (cornerLTX: number, cornerLTY: number, color: string) => {
-            this.ctx.fillStyle = color;
-            this.ctx.beginPath();
-            this.ctx.moveTo(cornerLTX, cornerLTY);
-            this.ctx.lineTo(cornerLTX + hori_delta_x, cornerLTY - hori_delta_y);
-            this.ctx.lineTo(cornerLTX + hori_delta_x + vert_delta_x, cornerLTY - hori_delta_y - vert_delta_y);
-            this.ctx.lineTo(cornerLTX + vert_delta_x, cornerLTY - vert_delta_y);
-            this.ctx.closePath();
-            this.ctx.fill();
-        }
-
-        let corner = rotateAround(cornerLT, center, -rotDeg);
-        // Move `center` to `(viewSize.width/2, viewSize.height/2)`
-        corner.x += -center.x + viewSize.width / 2;
-        corner.y += -center.y + viewSize.height / 2;
-
-        const BLACK_BLOCK_COLOR: string = 'grey'
-        const WHITE_BLOCK_COLOR: string = 'lightgrey'
-
-        drawBlock(corner.x, corner.y, BLACK_BLOCK_COLOR);
-        drawBlock(corner.x + hori_delta_x, corner.y - hori_delta_y, WHITE_BLOCK_COLOR);
-        drawBlock(corner.x + vert_delta_x, corner.y - vert_delta_y, WHITE_BLOCK_COLOR);
-        drawBlock(corner.x + hori_delta_x + vert_delta_x, corner.y - hori_delta_y - vert_delta_y, BLACK_BLOCK_COLOR);
-    }
 }
 
-type ViewportConfig = {
-    center: Point,
-    size: Size,
+export type ViewportConfig = {
+    center: Point;
+    size: Size;
     scale: number;
     rotDeg: number;
 }
 
-type RenderViewConfig = {
+export type RenderViewConfig = {
     cornerLT: Point,
     cornerRB: Point,
 }

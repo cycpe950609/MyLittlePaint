@@ -32,6 +32,7 @@ export const AnyCanvas = {
 // Types-only namespace to enable `AnyCanvas.Layer` / `AnyCanvas.Shape.Line` in type positions.
 export namespace AnyCanvas {
     // CVS
+    export type CanvasBase = import("./cvs/canvas").CanvasBase;
     export type WebCanvas = import("./canvas").WebCanvas;
     export type InfiniteCanvas = import("./infinite").InfiniteCanvas;
     // Layer
@@ -57,7 +58,6 @@ export namespace AnyCanvas {
     export namespace Util {
         export type Point = import("./cvs/utils").Point;
         export type Size = import("./cvs/utils").Size;
-        export type ViewportConfig = import("./cvs/coordinate").ViewportConfig;
         export type degreeToRadian = typeof import("./cvs/coordinate").degreeToRadian;
         export type radianToDegree = typeof import("./cvs/coordinate").radianToDegree;
         export type rotateAround = typeof import("./cvs/coordinate").rotateAround;

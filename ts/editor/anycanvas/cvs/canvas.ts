@@ -6,7 +6,7 @@
  */
 
 import Konva from "konva";
-import { BackgroundCanvas } from "./background";
+import { BackCVSBase } from "./background";
 import { INTERNAL_LAYER, type Layer } from "./layer";
 import { createShape, type ShapeBase } from "./shape";
 import type { Point, Size } from "./utils";
@@ -21,7 +21,7 @@ export class CanvasBase {
     protected view_width: number = 0;
 
     protected container: HTMLDivElement;
-    protected backgroundCVS: BackgroundCanvas;
+    protected backgroundCVS: BackCVSBase;
 
     protected render: Konva.Stage;
     protected ctx: Konva.Layer;
@@ -38,8 +38,8 @@ export class CanvasBase {
         this.ctx.rotation(this.View.RotationDegree);
     }
 
-    constructor() {
-        this.backgroundCVS = new BackgroundCanvas(96);
+    constructor(backgroundCVS: BackCVSBase) {
+        this.backgroundCVS = backgroundCVS;
         this.container = document.createElement("div");
         this.container.appendChild(this.backgroundCVS.element);
 
@@ -83,18 +83,9 @@ export class CanvasBase {
         }
         return rtv;
     };
+
     public toDataURL(): string {
-        const cvs = this.render.clone()
-        cvs.getLayers().map((layer: Konva.Layer) => layer.rotation(0).position({ x: 0, y: 0 }))
-        const rect = cvs.getClientRect({ skipTransform: false });
-        const cfg: ImageConfig = {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height,
-            imageSmoothingEnabled: true,
-        };
-        return cvs.toDataURL(cfg);
+        throw new Error(`${typeof this}.toDataURL not implemented`);
     }
 
     public get viewSize(): Size {
