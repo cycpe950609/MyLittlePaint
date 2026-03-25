@@ -74,8 +74,6 @@ export class BackgroundCanvas {
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-        const renderBlockSz = this.chessboard_size * scale
-
         const viewConfig: ViewportConfig = {
             center: center,
             size: {
@@ -85,33 +83,23 @@ export class BackgroundCanvas {
             scale: scale,
             rotDeg: rotDegree,
         }
-        const renderView = this.calcRenderViewport(viewConfig, renderBlockSz, renderBlockSz)
+        const renderView = this.calcRenderViewport(viewConfig, this.chessboard_size, this.chessboard_size)
 
-        this.ctx.fillStyle = 'gray';
-        let startY = renderView.cornerLT.y;
-        while (startY <= renderView.cornerRB.y) {
-            let startX = renderView.cornerLT.x;
-            while (startX <= renderView.cornerRB.x) {
-                this.drawUnitBlockAt(
-                    { x: startX, y: startY }, // cornerLT
-                    { width: renderBlockSz, height: renderBlockSz },  // unitSize
-                    { width: viewConfig.size.width, height: viewConfig.size.height }, // viewSize
-                    rotDegree,
-                    center
-                );
-                startX += renderBlockSz;
-            }
-            startY += renderBlockSz;
-        }
+        this.renderBackground(
+            viewConfig,
+            renderView,
+            { width: this.chessboard_size, height: this.chessboard_size },  // unitSize
+        )
+
     }
     private calcRenderViewport = (config: ViewportConfig, unitWidth: number, unitHeight: number): RenderViewConfig => {
         // Calculate a rectangle that bound the visible part of background canvas
         // STEP 1: Rotate a viewport which center is origin (0,0)
         /// NOTE: Y-axis is positive upward 
-        const vecLT = { x: -config.size.width / 2, y: -config.size.height / 2 };
-        const vecRT = { x: +config.size.width / 2, y: -config.size.height / 2 };
-        const vecLB = { x: -config.size.width / 2, y: +config.size.height / 2 };
-        const vecRB = { x: +config.size.width / 2, y: +config.size.height / 2 };
+        const vecLT = { x: -config.size.width / config.scale / 2, y: -config.size.height / config.scale / 2 };
+        const vecRT = { x: +config.size.width / config.scale / 2, y: -config.size.height / config.scale / 2 };
+        const vecLB = { x: -config.size.width / config.scale / 2, y: +config.size.height / config.scale / 2 };
+        const vecRB = { x: +config.size.width / config.scale / 2, y: +config.size.height / config.scale / 2 };
 
         const vecRotatedLT = rotateAround(vecLT, { x: 0, y: 0 }, -config.rotDeg);
         const vecRotatedRT = rotateAround(vecRT, { x: 0, y: 0 }, -config.rotDeg);
@@ -142,11 +130,48 @@ export class BackgroundCanvas {
             cornerRB: blockRB,
         }
     }
-    private drawUnitBlockAt = (cornerLT: Point, unitSize: Size, viewSize: Size, rotDeg: number, center: Point) => {
-        const hori_delta_x = (unitSize.width / 2) * Math.cos(degreeToRadian(-rotDeg))
-        const hori_delta_y = (unitSize.width / 2) * Math.sin(degreeToRadian(-rotDeg))
-        const vert_delta_x = (unitSize.height / 2) * Math.cos(degreeToRadian(-rotDeg - 90))
-        const vert_delta_y = (unitSize.height / 2) * Math.sin(degreeToRadian(-rotDeg - 90))
+    private renderBackground = (viewConfig: ViewportConfig, renderConfig: RenderViewConfig, unitSize: Size) => {
+
+        const extendPointFromCenter = (point: Point, center: Point, scale: number): Point => {
+            const vectorCenterToPoint: Point = {
+                x: point.x - center.x,
+                y: point.y - center.y,
+            }
+            const vectorScaled: Point = {
+                x: vectorCenterToPoint.x * scale,
+                y: vectorCenterToPoint.y * scale,
+            }
+            const extendedPoint: Point = {
+                x: center.x + vectorScaled.x,
+                y: center.y + vectorScaled.y,
+            }
+            return extendedPoint;
+        }
+
+
+        let startY = renderConfig.cornerLT.y;
+        while (startY <= renderConfig.cornerRB.y) {
+            let startX = renderConfig.cornerLT.x;
+            while (startX <= renderConfig.cornerRB.x) {
+                this.drawUnitBlockAt(
+                    extendPointFromCenter(
+                        { x: startX, y: startY }, // point
+                        viewConfig.center,
+                        viewConfig.scale,
+                    ), // cornerLT
+                    viewConfig, // config
+                    { width: unitSize.width, height: unitSize.height },  // unitSize
+                );
+                startX += this.chessboard_size;
+            }
+            startY += this.chessboard_size;
+        }
+    }
+    private drawUnitBlockAt = (cornerLT: Point, config: ViewportConfig, unitSize: Size) => {
+        const hori_delta_x = (unitSize.width * config.scale / 2) * Math.cos(degreeToRadian(-config.rotDeg))
+        const hori_delta_y = (unitSize.width * config.scale / 2) * Math.sin(degreeToRadian(-config.rotDeg))
+        const vert_delta_x = (unitSize.height * config.scale / 2) * Math.cos(degreeToRadian(-config.rotDeg - 90))
+        const vert_delta_y = (unitSize.height * config.scale / 2) * Math.sin(degreeToRadian(-config.rotDeg - 90))
 
         const drawBlock = (cornerLTX: number, cornerLTY: number, color: string) => {
             this.ctx.fillStyle = color;
@@ -159,10 +184,10 @@ export class BackgroundCanvas {
             this.ctx.fill();
         }
 
-        let corner = rotateAround(cornerLT, center, -rotDeg);
+        let corner = rotateAround(cornerLT, config.center, -config.rotDeg);
         // Move `center` to `(viewSize.width/2, viewSize.height/2)`
-        corner.x += -center.x + viewSize.width / 2;
-        corner.y += -center.y + viewSize.height / 2;
+        corner.x += -config.center.x + config.size.width / 2;
+        corner.y += -config.center.y + config.size.height / 2;
 
         const BLACK_BLOCK_COLOR: string = 'grey'
         const WHITE_BLOCK_COLOR: string = 'lightgrey'
