@@ -8,7 +8,7 @@
 
 import { BackCVSBase, type RenderViewConfig, type ViewportConfig } from "./cvs/background";
 import { CanvasBase } from "./cvs/canvas";
-import { degreeToRadian, movePointFromCenter, rotateAround } from "./cvs/coordinate";
+import { degreeToRadian, movePointFromCenter } from "./cvs/coordinate";
 import type { Point, Size } from "./cvs/utils";
 import type Konva from "konva";
 import type { ImageConfig } from "konva/lib/Node";
@@ -46,6 +46,15 @@ export class InfiniteBackground extends BackCVSBase {
         }
     }
     protected renderBackground(viewConfig: ViewportConfig, renderConfig: RenderViewConfig) {
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        super.renderBackground(viewConfig, renderConfig)
+
+        this.ctx.save();
+        this.ctx.translate(viewConfig.size.width / 2, viewConfig.size.height / 2);
+        this.ctx.rotate(degreeToRadian(viewConfig.rotDeg));
+        // this.ctx.scale(viewConfig.scale, viewConfig.scale);
+        this.ctx.translate(-viewConfig.center.x, -viewConfig.center.y);
+
         const unitSize: Size = {
             width: this.chessboard_size,
             height: this.chessboard_size,
@@ -65,45 +74,38 @@ export class InfiniteBackground extends BackCVSBase {
                         viewConfig.center,
                         viewConfig.scale,
                     ), // cornerLT
-                    viewConfig.center,
-                    viewConfig.size, // viewSize
-                    viewConfig.rotDeg,
                     { width: unitSize.width * scale / ranged_scale, height: unitSize.height * scale / ranged_scale },  // unitSize
                 );
                 startX += this.chessboard_size / ranged_scale;
             }
             startY += this.chessboard_size / ranged_scale;
         }
+
+        this.ctx.restore();
     }
-    private drawUnitBlockAt(cornerLT: Point, center: Point, viewSize: Size, rotDeg: number, unitSize: Size) {
-        const hori_delta_x = (unitSize.width / 2) * Math.cos(degreeToRadian(-rotDeg))
-        const hori_delta_y = (unitSize.width / 2) * Math.sin(degreeToRadian(-rotDeg))
-        const vert_delta_x = (unitSize.height / 2) * Math.cos(degreeToRadian(-rotDeg - 90))
-        const vert_delta_y = (unitSize.height / 2) * Math.sin(degreeToRadian(-rotDeg - 90))
+
+    protected drawUnitBlockAt(cornerLT: Point, unitSize: Size) {
+        const hori_delta_x = (unitSize.width / 2)
+        const vert_delta_y = (unitSize.height / 2)
 
         const drawBlock = (cornerLTX: number, cornerLTY: number, color: string) => {
             this.ctx.fillStyle = color;
             this.ctx.beginPath();
             this.ctx.moveTo(cornerLTX, cornerLTY);
-            this.ctx.lineTo(cornerLTX + hori_delta_x, cornerLTY - hori_delta_y);
-            this.ctx.lineTo(cornerLTX + hori_delta_x + vert_delta_x, cornerLTY - hori_delta_y - vert_delta_y);
-            this.ctx.lineTo(cornerLTX + vert_delta_x, cornerLTY - vert_delta_y);
+            this.ctx.lineTo(cornerLTX + hori_delta_x, cornerLTY);
+            this.ctx.lineTo(cornerLTX + hori_delta_x, cornerLTY - vert_delta_y);
+            this.ctx.lineTo(cornerLTX, cornerLTY - vert_delta_y);
             this.ctx.closePath();
             this.ctx.fill();
         }
 
-        let corner = rotateAround(cornerLT, center, -rotDeg);
-        // Move `center` to `(viewSize.width/2, viewSize.height/2)`
-        corner.x += -center.x + viewSize.width / 2;
-        corner.y += -center.y + viewSize.height / 2;
-
         const BLACK_BLOCK_COLOR: string = 'grey'
         const WHITE_BLOCK_COLOR: string = 'lightgrey'
 
-        drawBlock(corner.x, corner.y, BLACK_BLOCK_COLOR);
-        drawBlock(corner.x + hori_delta_x, corner.y - hori_delta_y, WHITE_BLOCK_COLOR);
-        drawBlock(corner.x + vert_delta_x, corner.y - vert_delta_y, WHITE_BLOCK_COLOR);
-        drawBlock(corner.x + hori_delta_x + vert_delta_x, corner.y - hori_delta_y - vert_delta_y, BLACK_BLOCK_COLOR);
+        drawBlock(cornerLT.x, cornerLT.y, BLACK_BLOCK_COLOR);
+        drawBlock(cornerLT.x + hori_delta_x, cornerLT.y, WHITE_BLOCK_COLOR);
+        drawBlock(cornerLT.x, cornerLT.y - vert_delta_y, WHITE_BLOCK_COLOR);
+        drawBlock(cornerLT.x + hori_delta_x, cornerLT.y - vert_delta_y, BLACK_BLOCK_COLOR);
     }
 }
 
