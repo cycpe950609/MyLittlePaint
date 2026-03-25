@@ -6,5 +6,4 @@
  */
 
 import { AnyCanvas } from "./export";
-// export { type AnyCanvas };
 export default AnyCanvas;

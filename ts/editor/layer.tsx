@@ -5,7 +5,6 @@ import { EditorCanvas } from "./modeEditor";
 import { Div, Img, Table, Td, Tr } from "../editorUI/util/Element";
 import { useConsumer } from "../editorUI/util/useHook";
 // import { addShape } from "./internalData";
-import type { Point } from "./anycanvas/cvs/utils";
 import AnyCanvas from "./anycanvas";
 
 export class LayerInfo {
@@ -109,7 +108,7 @@ export class LayerManager {
         this.ctx.viewSize = { width: width, height: height };
     }
 
-    public viewAt(center: Point, rotDeg: number, scale: number) {
+    public viewAt(center: AnyCanvas.Util.Point, rotDeg: number, scale: number) {
         // TODO: Remove this, this should manage by `ctx` itself
         this.ctx.View.viewAt(center, rotDeg, scale);
     }

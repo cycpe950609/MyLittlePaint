@@ -31,7 +31,7 @@ import HistoryManager from "./historyLogger";
 import { type setValueFunctionType, useProvider } from "../editorUI/util/useHook";
 import { type NextFunctionState } from "../editorUI/interface/function";
 import { btnPolygon } from "./drawing/polygon";
-import { convertViewToCanvas, degreeToRadian } from "./anycanvas/cvs/coordinate";
+import AnyCanvas from "./anycanvas";
 
 
 export class btnCanvas implements FunctionInterface {
@@ -209,7 +209,7 @@ export class EditorCanvas implements CanvasBase {
         let pointOut = (e: Interact.PointerEvent) => {
             let new_x_wo_rot = (e.offsetX - this.LayerManager.Canvas.View.Center.x) / this.LayerManager.Canvas.View.Scale;
             let new_y_wo_rot = (e.offsetY - this.LayerManager.Canvas.View.Center.y) / this.LayerManager.Canvas.View.Scale;
-            let rot_rad = -degreeToRadian(this.LayerManager.Canvas.View.RotationDegree);
+            let rot_rad = -AnyCanvas.Util.degreeToRadian(this.LayerManager.Canvas.View.RotationDegree);
             let new_x = new_x_wo_rot * Math.cos(rot_rad) - new_y_wo_rot * Math.sin(rot_rad);
             let new_y = new_x_wo_rot * Math.sin(rot_rad) + new_y_wo_rot * Math.cos(rot_rad);
             let ev: PaintEvent = {
@@ -258,7 +258,7 @@ export class EditorCanvas implements CanvasBase {
                 e.stopPropagation();
 
                 // Convert mouse position to canvas coordinate
-                const newPts = convertViewToCanvas({
+                const newPts = AnyCanvas.Util.convertViewToCanvas({
                     center: this.LayerManager.Canvas.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
                     scale: this.LayerManager.Canvas.View.Scale,
@@ -302,7 +302,7 @@ export class EditorCanvas implements CanvasBase {
                     pointOut(e);
                 }
                 // Convert mouse position to canvas coordinate
-                const newPts = convertViewToCanvas({
+                const newPts = AnyCanvas.Util.convertViewToCanvas({
                     center: this.LayerManager.Canvas.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
                     scale: this.LayerManager.Canvas.View.Scale,
@@ -338,7 +338,7 @@ export class EditorCanvas implements CanvasBase {
                 e.stopPropagation();
 
                 // Convert mouse position to canvas coordinate
-                const newPts = convertViewToCanvas({
+                const newPts = AnyCanvas.Util.convertViewToCanvas({
                     center: this.LayerManager.Canvas.View.Center,
                     size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
                     scale: this.LayerManager.Canvas.View.Scale,
@@ -608,7 +608,7 @@ export class EditorCanvas implements CanvasBase {
         }
         if (!ev.ctrlKey && !ev.shiftKey && ev.altKey) { // Alt: Rotate Left/Right
             ev.preventDefault();
-            const rotCenter = convertViewToCanvas({
+            const rotCenter = AnyCanvas.Util.convertViewToCanvas({
                 center: this.LayerManager.Canvas.View.Center,
                 size: { "width": (ev.target as HTMLCanvasElement).width, "height": (ev.target as HTMLCanvasElement).height },
                 scale: this.LayerManager.Canvas.View.Scale,
