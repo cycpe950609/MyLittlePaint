@@ -74,7 +74,7 @@ export class PolygonCVSFunc extends ClickDrawBase {
     ImgName = 'polygon';
 
 
-    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number, angle: number) => {
+    DrawFunction = (Ctx: AnyCanvas.Layer, rotate: number) => {
         let shape = Ctx.find(this.shapeID)
         if (shape === undefined) {
             shape = new AnyCanvas.Shape.Path({
@@ -86,7 +86,7 @@ export class PolygonCVSFunc extends ClickDrawBase {
             throw new Error("Polygon should be `Path`")
         }
 
-        let radian = (-angle) * Math.PI / 180;
+        let radian = (-rotate) * Math.PI / 180;
         let newDelta = this.rotatedDelta(radian);
         let new_dx = newDelta[0];
         let new_dy = newDelta[1];

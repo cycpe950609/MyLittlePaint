@@ -19,7 +19,7 @@ class BrushCVSFunc extends DrawBase {
     CursorName = 'brush';
     BrushColor = '#00FF00';// 'rgb(0,255,0)';
     BrushWidth = 10;
-    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
+    DrawFunction = (Ctx: AnyCanvas.Layer, _rotate: number) => {
         let brush = Ctx.find(this.shapeID)
         if (brush === undefined) {
             brush = new AnyCanvas.Shape.Line({

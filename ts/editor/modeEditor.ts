@@ -71,14 +71,9 @@ export class EditorCanvas implements CanvasBase {
     private EventFired: boolean = false;
     private isPointOut?: PaintEvent = undefined;
 
-    private width: number;
-    private height: number;
-
     public isUpdate: boolean = false;
 
-    constructor(width: number, height: number) {
-        this.width = width;
-        this.height = height;
+    constructor() {
         this.scaleTip = window.editorUI.Statusbar.addTip("", true);
         this.refreshScaleTip(0, 1);
         this.cnt = DIV("w-full h-full");
@@ -149,8 +144,8 @@ export class EditorCanvas implements CanvasBase {
     private dragMoveListener = (event: Interact.GestureEvent, _target: HTMLElement, angleScale: { angle: number, scale: number }) => {
         // console.log("[DEB] dragMoveListener : ",event)
         // keep the dragged position in the data-x/data-y attributes
-        this.LayerManager.Canvas.View.viewUp(event.dx);
-        this.LayerManager.Canvas.View.viewRight(event.dy);
+        this.LayerManager.Canvas.View.viewUp(event.dy);
+        this.LayerManager.Canvas.View.viewLeft(event.dx);
         this.refreshScaleTip(angleScale.angle, angleScale.scale);
     }
     private isDrawing: boolean = false;
@@ -160,7 +155,6 @@ export class EditorCanvas implements CanvasBase {
     private setLayerInfoList: setValueFunctionType = () => { }
     attachCanvas(container: HTMLDivElement) {
         this.LayerManager.resize(window.innerWidth, window.innerHeight);
-        console.log("[HOK] Canvas Size ", this.width, this.height);
 
         let interactCVS = interact(this.cnt, {
             styleCursor: false
@@ -260,7 +254,10 @@ export class EditorCanvas implements CanvasBase {
                 // Convert mouse position to canvas coordinate
                 const newPts = AnyCanvas.Util.convertViewToCanvas({
                     center: this.LayerManager.Canvas.View.Center,
-                    size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
+                    size: {
+                        "width": (e.target as HTMLCanvasElement).getBoundingClientRect().width,
+                        "height": (e.target as HTMLCanvasElement).getBoundingClientRect().height
+                    },
                     scale: this.LayerManager.Canvas.View.Scale,
                     rotDeg: this.LayerManager.Canvas.View.RotationDegree,
                 }, {
@@ -295,16 +292,13 @@ export class EditorCanvas implements CanvasBase {
                 }
                 e.preventDefault();
                 e.stopPropagation();
-                if (e.offsetX < 0 || e.offsetX > this.width ||
-                    e.offsetY < 0 || e.offsetY > this.height
-                ) {
-                    // pointLeave wont triggered when we draw with finger, so we need call it manually
-                    pointOut(e);
-                }
                 // Convert mouse position to canvas coordinate
                 const newPts = AnyCanvas.Util.convertViewToCanvas({
                     center: this.LayerManager.Canvas.View.Center,
-                    size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
+                    size: {
+                        "width": (e.target as HTMLCanvasElement).getBoundingClientRect().width,
+                        "height": (e.target as HTMLCanvasElement).getBoundingClientRect().height
+                    },
                     scale: this.LayerManager.Canvas.View.Scale,
                     rotDeg: this.LayerManager.Canvas.View.RotationDegree,
                 }, {
@@ -340,7 +334,10 @@ export class EditorCanvas implements CanvasBase {
                 // Convert mouse position to canvas coordinate
                 const newPts = AnyCanvas.Util.convertViewToCanvas({
                     center: this.LayerManager.Canvas.View.Center,
-                    size: { "width": (e.target as HTMLCanvasElement).width, "height": (e.target as HTMLCanvasElement).height },
+                    size: {
+                        "width": (e.target as HTMLCanvasElement).getBoundingClientRect().width,
+                        "height": (e.target as HTMLCanvasElement).getBoundingClientRect().height
+                    },
                     scale: this.LayerManager.Canvas.View.Scale,
                     rotDeg: this.LayerManager.Canvas.View.RotationDegree,
                 }, {
@@ -458,14 +455,14 @@ export class EditorCanvas implements CanvasBase {
         // [this.layerInfoList, this.setLayerInfoList] = useProvider("editor.layer.info.list", []);
         if (this.EventFired) {
             let angle = this.isDrawRotate ? this.LayerManager.Canvas.View.RotationDegree : 0;
-            this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height, angle);
+            this.draw_func.DrawFunction(this.LayerManager.Layer.prev, angle);
             if (this.isPointOut !== undefined) {
                 if (this.draw_func.PointerOut !== undefined) {
                     this.draw_func.PointerOut(this.isPointOut);
                     this.isPointOut = undefined;
                     requestAnimationFrame(this.render);
                 }
-                this.draw_func.DrawFunction(this.LayerManager.Layer.prev, this.width, this.height, angle);
+                this.draw_func.DrawFunction(this.LayerManager.Layer.prev, angle);
                 this.isPointOut = undefined;
             }
             if (this.draw_func.CanFinishDrawing) this.finishDrawing();
@@ -661,7 +658,7 @@ export class EditorCanvas implements CanvasBase {
 class modeEditor implements ModeFunction {
     Enable = true;
 
-    CenterCanvas = new EditorCanvas(1920, 1080);
+    CenterCanvas = new EditorCanvas();
 
     MenuToolbarLeft = [
         // new btnUpload(),
