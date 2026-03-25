@@ -1,9 +1,11 @@
 # Custom Dictionary Words
 animateion
+anycanvas
 buttongroup
 cycpe
 editorui
 gesturable
+hori
 Imple
 interactjs
 Konva
@@ -13,6 +15,7 @@ Mexp
 MODEMGR
 OPCVS
 oper
+preced
 propertybox
 Snabbdom
 Tsai

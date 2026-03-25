@@ -1,8 +1,14 @@
-import Konva from "konva";
-import { Line, type LineConfig } from "konva/lib/shapes/Line";
-import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../editorUI/canvas";
-import { editorUIActions, editorUIData } from "../editorUI/data";
-// import { PaintContext } from "./canvas";
+/**
+ * Created : 2026/03/24
+ * Author  : Ting Fang, Tsai
+ * About:
+ *  Brush Canvas Function     
+ */
+
+import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../../editorUI/canvas";
+import { editorUIActions, editorUIData } from "../../editorUI/data";
+import AnyCanvas from "../anycanvas";
+
 
 class BrushCVSFunc extends DrawBase {
 
@@ -13,14 +19,10 @@ class BrushCVSFunc extends DrawBase {
     CursorName = 'brush';
     BrushColor = '#00FF00';// 'rgb(0,255,0)';
     BrushWidth = 10;
-    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number) => {
-        let brush = Ctx.find(`.${this.shapeID}`)
-        let polygon = undefined;
-        if (brush.length > 0) {
-            polygon = brush[0]
-        }
-        else {
-            polygon = new Konva.Line({
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
+        let brush = Ctx.find(this.shapeID)
+        if (brush === undefined) {
+            brush = new AnyCanvas.Shape.Line({
                 name: this.shapeID,
                 stroke: this.BrushColor,
                 strokeWidth: this.BrushWidth,
@@ -29,14 +31,17 @@ class BrushCVSFunc extends DrawBase {
                 lineJoin: 'round',
                 globalCompositeOperation: this.CompositeOperation,
                 points: [this.LastX, this.LastY, this.LastX, this.LastY]
-            } as LineConfig);
-            Ctx.add(polygon)
+            });
+            Ctx.add(brush)
         }
+
+        if (!(brush instanceof AnyCanvas.Shape.Line))
+            throw new Error(`Unexpected type, expect 'Line', got ${typeof brush}`)
 
         if (this.ifDrawing) {
             //console.log('Drawing...');
-            let newPoints = (<Line>polygon).points().concat([this.NextX, this.NextY]);
-            (<Line>polygon).points(newPoints);
+            let newPoints = brush.points.concat([this.NextX, this.NextY]);
+            brush.points = newPoints;
         }
 
         [this.LastX, this.LastY] = [this.NextX, this.NextY];

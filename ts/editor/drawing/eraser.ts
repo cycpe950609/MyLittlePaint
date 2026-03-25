@@ -1,8 +1,13 @@
-import Konva from "konva";
-import { Line, type LineConfig } from "konva/lib/shapes/Line";
-import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../editorUI/canvas";
-import { editorUIActions, editorUIData } from "../editorUI/data";
-// import { PaintContext } from "./canvas";
+/**
+ * Created : 2026/03/24
+ * Author  : Ting Fang, Tsai
+ * About:
+ *  Eraser Canvas Function     
+ */
+
+import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType, DrawBase } from "../../editorUI/canvas";
+import { editorUIActions, editorUIData } from "../../editorUI/data";
+import AnyCanvas from "../anycanvas";
 
 class EraserCVSFunc extends DrawBase {
     Name = 'Eraser';
@@ -12,14 +17,10 @@ class EraserCVSFunc extends DrawBase {
     CursorName = 'eraser';
     BrushWidth = 10;
     BrushColor = 'white';
-    DrawFunction = (Ctx: Konva.Group, _width: number, _height: number) => {
-        let brush = Ctx.find('.prev-brush')
-        let polygon = undefined;
-        if (brush.length > 0) {
-            polygon = brush[0]
-        }
-        else {
-            polygon = new Konva.Line({
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
+        let eraser = Ctx.find('prev-brush')
+        if (eraser === undefined) {
+            eraser = new AnyCanvas.Shape.Line({
                 name: "prev-brush",
                 stroke: this.BrushColor,
                 strokeWidth: this.BrushWidth,
@@ -28,14 +29,18 @@ class EraserCVSFunc extends DrawBase {
                 lineJoin: 'round',
                 globalCompositeOperation: this.CompositeOperation,
                 points: [this.LastX, this.LastY, this.LastX, this.LastY]
-            } as LineConfig);
-            Ctx.add(polygon)
+            });
+            Ctx.add(eraser)
         }
+
+        if (!(eraser instanceof AnyCanvas.Shape.Line))
+            throw new Error(`Unexpected type, expect 'Line', got ${typeof eraser}`)
+
 
         if (this.ifDrawing) {
             //console.log('Drawing...');
-            let newPoints = (<Line>polygon).points().concat([this.NextX, this.NextY]);
-            (<Line>polygon).points(newPoints);
+            let newPoints = eraser.points.concat([this.NextX, this.NextY]);
+            eraser.points = newPoints;
         }
 
         [this.LastX, this.LastY] = [this.NextX, this.NextY];

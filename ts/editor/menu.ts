@@ -82,7 +82,7 @@ export class btnResetScale implements FunctionInterface {
     constructor() { }
 
     StartFunction = (cvs: CanvasBase) => {
-        (cvs as EditorCanvas).scaleTo(1);
+        (cvs as EditorCanvas).resetScale();
     };
 }
 
@@ -94,7 +94,7 @@ export class btnResetPosition implements FunctionInterface {
     constructor() { }
 
     StartFunction = (cvs: CanvasBase) => {
-        (cvs as EditorCanvas).moveTo(0, 0);
+        (cvs as EditorCanvas).resetPosition();
     };
 }
 
@@ -106,6 +106,6 @@ export class btnResetRotate implements FunctionInterface {
     constructor() { }
 
     StartFunction = (cvs: CanvasBase) => {
-        (cvs as EditorCanvas).rotateTo(0);
+        (cvs as EditorCanvas).resetRotate();
     };
 }
