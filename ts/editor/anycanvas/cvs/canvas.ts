@@ -39,7 +39,7 @@ export class CanvasBase {
     }
 
     constructor() {
-        this.backgroundCVS = new BackgroundCanvas(48);
+        this.backgroundCVS = new BackgroundCanvas(96);
         this.container = document.createElement("div");
         this.container.appendChild(this.backgroundCVS.element);
 

@@ -578,10 +578,10 @@ export class EditorCanvas implements CanvasBase {
             ev.preventDefault();
             if (ev.deltaY < 0) {
                 // ZOOM IN
-                this.LayerManager.Canvas.View.viewZoomIn(0.05);
+                this.LayerManager.Canvas.View.viewZoomIn(0.05, 8.0);
             } else if (ev.deltaY > 0) {
                 // zoom out
-                this.LayerManager.Canvas.View.viewZoomOut(0.05);
+                this.LayerManager.Canvas.View.viewZoomOut(0.05, 0.5);
             }
             this.refreshScaleTip(this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
             return;

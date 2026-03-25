@@ -78,12 +78,14 @@ export class ViewManager {
         this.viewRight(-deltaX);
     }
     // Scale
-    public viewZoomIn(scale: number) {
+    public viewZoomIn(scale: number, maxScale?: number) {
         this.view_scale += scale;
+        if (maxScale) this.view_scale = (this.view_scale > maxScale) ? maxScale : this.view_scale;
         this.view_changed_handler();
     }
-    public viewZoomOut(scale: number) {
+    public viewZoomOut(scale: number, minScale?: number) {
         this.view_scale -= scale;
+        if (minScale) this.view_scale = (this.view_scale < minScale) ? minScale : this.view_scale;
         this.view_changed_handler();
     }
     // Rotation

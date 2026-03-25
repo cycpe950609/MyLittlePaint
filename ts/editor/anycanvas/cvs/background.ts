@@ -71,6 +71,8 @@ export class BackgroundCanvas {
         const cvs_width = this.ctx.canvas.width;
         const cvs_height = this.ctx.canvas.height;
 
+        const ranged_scale = (scale) / (Math.pow(2, (Math.floor(Math.log2(scale)))))
+
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
@@ -80,7 +82,7 @@ export class BackgroundCanvas {
                 width: cvs_width,
                 height: cvs_height,
             },
-            scale: scale,
+            scale: ranged_scale,
             rotDeg: rotDegree,
         }
         const renderView = this.calcRenderViewport(viewConfig, this.chessboard_size, this.chessboard_size)
