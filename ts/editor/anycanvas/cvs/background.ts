@@ -71,7 +71,6 @@ export class BackgroundCanvas {
         const cvs_width = this.ctx.canvas.width;
         const cvs_height = this.ctx.canvas.height;
 
-        const ranged_scale = (scale) / (Math.pow(2, (Math.floor(Math.log2(scale)))))
 
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
@@ -82,7 +81,7 @@ export class BackgroundCanvas {
                 width: cvs_width,
                 height: cvs_height,
             },
-            scale: ranged_scale,
+            scale: scale,
             rotDeg: rotDegree,
         }
         const renderView = this.calcRenderViewport(viewConfig, this.chessboard_size, this.chessboard_size)
@@ -150,6 +149,9 @@ export class BackgroundCanvas {
             return extendedPoint;
         }
 
+        const scale = viewConfig.scale;
+        // scale = render_scale x ranged_scale
+        const ranged_scale = (Math.pow(2, (Math.floor(Math.log2(scale)))))
 
         let startY = renderConfig.cornerLT.y;
         while (startY <= renderConfig.cornerRB.y) {
@@ -161,19 +163,21 @@ export class BackgroundCanvas {
                         viewConfig.center,
                         viewConfig.scale,
                     ), // cornerLT
-                    viewConfig, // config
-                    { width: unitSize.width, height: unitSize.height },  // unitSize
+                    viewConfig.center,
+                    viewConfig.size, // viewSize
+                    viewConfig.rotDeg,
+                    { width: unitSize.width * scale / ranged_scale, height: unitSize.height * scale / ranged_scale },  // unitSize
                 );
-                startX += this.chessboard_size;
+                startX += this.chessboard_size / ranged_scale;
             }
-            startY += this.chessboard_size;
+            startY += this.chessboard_size / ranged_scale;
         }
     }
-    private drawUnitBlockAt = (cornerLT: Point, config: ViewportConfig, unitSize: Size) => {
-        const hori_delta_x = (unitSize.width * config.scale / 2) * Math.cos(degreeToRadian(-config.rotDeg))
-        const hori_delta_y = (unitSize.width * config.scale / 2) * Math.sin(degreeToRadian(-config.rotDeg))
-        const vert_delta_x = (unitSize.height * config.scale / 2) * Math.cos(degreeToRadian(-config.rotDeg - 90))
-        const vert_delta_y = (unitSize.height * config.scale / 2) * Math.sin(degreeToRadian(-config.rotDeg - 90))
+    private drawUnitBlockAt = (cornerLT: Point, center: Point, viewSize: Size, rotDeg: number, unitSize: Size) => {
+        const hori_delta_x = (unitSize.width / 2) * Math.cos(degreeToRadian(-rotDeg))
+        const hori_delta_y = (unitSize.width / 2) * Math.sin(degreeToRadian(-rotDeg))
+        const vert_delta_x = (unitSize.height / 2) * Math.cos(degreeToRadian(-rotDeg - 90))
+        const vert_delta_y = (unitSize.height / 2) * Math.sin(degreeToRadian(-rotDeg - 90))
 
         const drawBlock = (cornerLTX: number, cornerLTY: number, color: string) => {
             this.ctx.fillStyle = color;
@@ -186,10 +190,10 @@ export class BackgroundCanvas {
             this.ctx.fill();
         }
 
-        let corner = rotateAround(cornerLT, config.center, -config.rotDeg);
+        let corner = rotateAround(cornerLT, center, -rotDeg);
         // Move `center` to `(viewSize.width/2, viewSize.height/2)`
-        corner.x += -config.center.x + config.size.width / 2;
-        corner.y += -config.center.y + config.size.height / 2;
+        corner.x += -center.x + viewSize.width / 2;
+        corner.y += -center.y + viewSize.height / 2;
 
         const BLACK_BLOCK_COLOR: string = 'grey'
         const WHITE_BLOCK_COLOR: string = 'lightgrey'
