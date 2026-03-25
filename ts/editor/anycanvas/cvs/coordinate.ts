@@ -46,3 +46,19 @@ export const convertViewToCanvas = (viewCfg: ViewportConfig, viewPoint: Point): 
     let new_y = new_delta_y + viewCfg.center.y;
     return { "x": new_x, "y": new_y }
 }
+
+export const movePointFromCenter = (point: Point, center: Point, scale: number): Point => {
+    const vectorCenterToPoint: Point = {
+        x: point.x - center.x,
+        y: point.y - center.y,
+    }
+    const vectorScaled: Point = {
+        x: vectorCenterToPoint.x * scale,
+        y: vectorCenterToPoint.y * scale,
+    }
+    const movedPoint: Point = {
+        x: center.x + vectorScaled.x,
+        y: center.y + vectorScaled.y,
+    }
+    return movedPoint;
+}

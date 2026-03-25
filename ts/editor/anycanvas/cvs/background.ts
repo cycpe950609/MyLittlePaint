@@ -7,7 +7,7 @@
 
 import { max, min } from "lodash";
 import type { Point, Size } from "./utils";
-import { degreeToRadian, rotateAround } from "./coordinate";
+import { degreeToRadian, movePointFromCenter, rotateAround } from "./coordinate";
 
 export class BackgroundCanvas {
     private ctx: CanvasRenderingContext2D
@@ -132,23 +132,6 @@ export class BackgroundCanvas {
         }
     }
     private renderBackground = (viewConfig: ViewportConfig, renderConfig: RenderViewConfig, unitSize: Size) => {
-
-        const extendPointFromCenter = (point: Point, center: Point, scale: number): Point => {
-            const vectorCenterToPoint: Point = {
-                x: point.x - center.x,
-                y: point.y - center.y,
-            }
-            const vectorScaled: Point = {
-                x: vectorCenterToPoint.x * scale,
-                y: vectorCenterToPoint.y * scale,
-            }
-            const extendedPoint: Point = {
-                x: center.x + vectorScaled.x,
-                y: center.y + vectorScaled.y,
-            }
-            return extendedPoint;
-        }
-
         const scale = viewConfig.scale;
         // scale = render_scale x ranged_scale
         const ranged_scale = (Math.pow(2, (Math.floor(Math.log2(scale)))))
@@ -158,7 +141,7 @@ export class BackgroundCanvas {
             let startX = renderConfig.cornerLT.x;
             while (startX <= renderConfig.cornerRB.x) {
                 this.drawUnitBlockAt(
-                    extendPointFromCenter(
+                    movePointFromCenter(
                         { x: startX, y: startY }, // point
                         viewConfig.center,
                         viewConfig.scale,

@@ -5,7 +5,7 @@
  *  Viewport   
  */
 
-import { degreeToRadian, radianToDegree, rotateAround } from "./coordinate";
+import { degreeToRadian, movePointFromCenter, radianToDegree, rotateAround } from "./coordinate";
 import type { Point } from "./utils";
 
 
@@ -78,14 +78,32 @@ export class ViewManager {
         this.viewRight(-deltaX);
     }
     // Scale
-    public viewZoomIn(scale: number, maxScale?: number) {
+    public viewZoomIn(scale: number, maxScale?: number, scaleCenter?: Point) {
+        const orig_scale = this.view_scale;
         this.view_scale += scale;
         if (maxScale) this.view_scale = (this.view_scale > maxScale) ? maxScale : this.view_scale;
+        if (scaleCenter) {
+            const new_scale = this.view_scale;
+            this.view_center = movePointFromCenter(
+                this.view_center, // point
+                scaleCenter, // center
+                orig_scale / new_scale, // scale
+            )
+        }
         this.view_changed_handler();
     }
-    public viewZoomOut(scale: number, minScale?: number) {
+    public viewZoomOut(scale: number, minScale?: number, scaleCenter?: Point) {
+        const orig_scale = this.view_scale;
         this.view_scale -= scale;
         if (minScale) this.view_scale = (this.view_scale < minScale) ? minScale : this.view_scale;
+        if (scaleCenter) {
+            const new_scale = this.view_scale;
+            this.view_center = movePointFromCenter(
+                this.view_center, // point
+                scaleCenter, // center
+                orig_scale / new_scale, // scale
+            )
+        }
         this.view_changed_handler();
     }
     // Rotation

@@ -576,12 +576,20 @@ export class EditorCanvas implements CanvasBase {
 
         if (ev.ctrlKey && !ev.shiftKey && !ev.altKey) {// Zoom in/out
             ev.preventDefault();
+            const scaleCenter = AnyCanvas.Util.convertViewToCanvas({
+                center: this.LayerManager.Canvas.View.Center,
+                size: { "width": (ev.target as HTMLCanvasElement).width, "height": (ev.target as HTMLCanvasElement).height },
+                scale: this.LayerManager.Canvas.View.Scale,
+                rotDeg: this.LayerManager.Canvas.View.RotationDegree,
+            }, // viewConfig
+                { "x": ev.offsetX, "y": ev.offsetY } // viewPoint
+            );
             if (ev.deltaY < 0) {
                 // ZOOM IN
-                this.LayerManager.Canvas.View.viewZoomIn(0.05, 8.0);
+                this.LayerManager.Canvas.View.viewZoomIn(0.05, 8.0, scaleCenter);
             } else if (ev.deltaY > 0) {
                 // zoom out
-                this.LayerManager.Canvas.View.viewZoomOut(0.05, 0.5);
+                this.LayerManager.Canvas.View.viewZoomOut(0.05, 0.5, scaleCenter);
             }
             this.refreshScaleTip(this.LayerManager.Canvas.View.RotationDegree, this.LayerManager.Canvas.View.Scale);
             return;
