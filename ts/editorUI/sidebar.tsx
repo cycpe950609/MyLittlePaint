@@ -135,7 +135,5 @@ export const SidebarComp: Snabbdom.Component<{}> = () => {
     </Div>
 
     // console.log("[DEB]", sidebar)
-    window.editorUI.CenterCanvas.isUpdate = false;
-
     return sidebar;
 }

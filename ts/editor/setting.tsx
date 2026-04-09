@@ -1,10 +1,9 @@
-import { type VNode } from "snabbdom";
 import type Snabbdom from '@herp-inc/snabbdom-jsx';
+import { type VNode } from "snabbdom";
 import { type CanvasInterfaceSettings, type CanvasSettingEntry, CanvasSettingType } from "../editorUI/canvas";
-// import EditorUI from "../editorUI-ng/EditorUI";
 import type SidebarInterface from "../editorUI/interface/sidebar";
-import { EditorCanvas } from "./modeEditor";
 import { Div, Input, Label, Span, Table, Td, Tr } from "../editorUI/util/Element";
+import { EditorCanvas } from "./canvas";
 
 export type HorizonRangerPropType = {
     min: number;

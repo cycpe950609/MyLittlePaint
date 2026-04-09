@@ -15,31 +15,26 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
-    "axios": "^1.13.6",
-    "immer": "^11.1.4",
-    "interactjs": "^1.10.27",
-    "konva": "^10.2.1",
+    "color": "^5.0.3",
     "lodash": "^4.17.23",
-    "math-expression-evaluator": "^2.0.7",
     "redux-logger": "^3.0.6",
     "snabbdom": "^3.6.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@herp-inc/snabbdom-jsx": "^0.22.0",
+    "@types/color": "^4.2.1",
     "@types/lodash": "^4.17.24",
-    "@types/math-expression-evaluator": "^2.0.0",
     "@types/node": "^25.5.0",
     "@types/redux-logger": "^3.0.13",
-    "@types/uuid": "^11.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.57.0",
-    "@typescript-eslint/parser": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
     "csstype": "^3.2.3",
     "eruda": "^3.4.3",
-    "eslint": "^10.0.3",
+    "eslint": "^10.1.0",
     "prettier": "^3.8.1",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.7"
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
   },
   "packageManager": "yarn@4.13.0"
 }

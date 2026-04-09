@@ -16,5 +16,14 @@
   "js/ts.tsdk.path": ".yarn/sdks/typescript/lib",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
-  "liveServer.settings.root": "/dist"
+  "liveServer.settings.root": "/dist",
+  "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.exclude": {
+    "**/test.**": true,
+    ".codex": true,
+    "node_modules": true,
+  },
 }

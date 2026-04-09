@@ -1,6 +1,6 @@
 import { type CanvasBase } from "../editorUI/canvas";
 import type FunctionInterface from "../editorUI/interface/function";
-import { EditorCanvas } from "./modeEditor";
+import { EditorCanvas } from "./canvas";
 
 
 export class btnUpload implements FunctionInterface {
@@ -11,7 +11,8 @@ export class btnUpload implements FunctionInterface {
     constructor() { }
 
     StartFunction = (cvs: CanvasBase) => {
-        (cvs as EditorCanvas).open();
+        throw new Error("btnUpload.StartFunction Not implemented");
+        // (cvs as EditorCanvas).open();
     };
 }
 
@@ -58,7 +59,7 @@ export class btnSave implements FunctionInterface {
     constructor() { }
 
     StartFunction = (cvs: CanvasBase) => {
-        (cvs as EditorCanvas).save();
+        void (cvs as EditorCanvas).save();
     };
 }
 

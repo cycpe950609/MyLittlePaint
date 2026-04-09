@@ -189,7 +189,7 @@ class EditorUI {
         this.Menubar = new Menubar();
         this.Mode = new ModeManger();
         window.addEventListener("resize", (e) => {
-            this.cvs.resizeCanvas(e);
+            this.cvs.resize(e);
         })
         this.container = document.createElement('div');
         this.lastVNode = <></>;
@@ -223,7 +223,7 @@ class EditorUI {
 
         // let canvas_group = <Div Id="canvas_group" className="canvas_group"></Div>
         if (this.Mode.ModeChanged) {
-            window.editorUI.CenterCanvas.attachCanvas(this.canvas_container_vnode.elm as HTMLDivElement)
+            window.editorUI.CenterCanvas.attach(this.canvas_container_vnode.elm as HTMLDivElement)
         }
         else {
             window.editorUI.CenterCanvas.render()

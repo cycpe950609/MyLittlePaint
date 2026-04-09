@@ -1,6 +1,6 @@
 # Custom Dictionary Words
 animateion
-anycanvas
+bbox
 buttongroup
 cycpe
 editorui
@@ -13,6 +13,7 @@ mdfunc
 menubox
 Mexp
 MODEMGR
+nesw
 OPCVS
 oper
 preced
