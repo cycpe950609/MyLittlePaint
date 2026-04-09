@@ -1,1 +1,0 @@
-import{P as e}from"./base-u58hVZC1.js";import"./HTMLElement-C-AnktP5.js";import"./index-BXTDgKwB.js";import"./modeEditor-BYvKOhR2.js";class r extends e{Name="Line";HistoryName="line";ImgName="line";Tip="Line";Path="M ${startX} ${startY} L ${endX} ${endY}"}export{r as LineCVSFunc};
