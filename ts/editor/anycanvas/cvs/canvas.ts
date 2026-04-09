@@ -6,11 +6,12 @@
  */
 
 import Konva from "konva";
-import { BackgroundCanvas } from "./background";
+import { BackCVSBase } from "./background";
 import { INTERNAL_LAYER, type Layer } from "./layer";
 import { createShape, type ShapeBase } from "./shape";
 import type { Point, Size } from "./utils";
 import { ViewManager } from "./view";
+import type { ImageConfig } from "konva/lib/Node";
 
 export class CanvasBase {
 
@@ -20,7 +21,7 @@ export class CanvasBase {
     protected view_width: number = 0;
 
     protected container: HTMLDivElement;
-    protected backgroundCVS: BackgroundCanvas;
+    protected backgroundCVS: BackCVSBase;
 
     protected render: Konva.Stage;
     protected ctx: Konva.Layer;
@@ -37,7 +38,7 @@ export class CanvasBase {
         this.ctx.rotation(this.View.RotationDegree);
     }
 
-    constructor(backgroundCVS: BackgroundCanvas) {
+    constructor(backgroundCVS: BackCVSBase) {
         this.backgroundCVS = backgroundCVS;
         this.container = document.createElement("div");
         this.container.appendChild(this.backgroundCVS.element);

@@ -13,7 +13,7 @@ export class CircleCVSFunc extends PolygonBase {
     HistoryName = 'polygon-circle';
     ImgName = 'circle';
     Tip = 'Circle';
-    DrawFunction = (Ctx: AnyCanvas.Layer, _rotate: number) => {
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
 
         let circle = Ctx.find(this.shapeID);
         if (circle === undefined) {

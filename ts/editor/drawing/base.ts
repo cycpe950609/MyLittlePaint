@@ -93,7 +93,7 @@ export class PathBase extends PolygonBase {
         }
     }
 
-    DrawFunction = (Ctx: AnyCanvas.Layer, rotate: number) => {
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number, angle: number) => {
         let path = Ctx.find(this.shapeID)
         if (path === undefined) {
             path = new AnyCanvas.Shape.Path({
@@ -109,7 +109,7 @@ export class PathBase extends PolygonBase {
         this.validPath();
 
         if (this.ifDrawing) {
-            let radian = (-rotate) * Math.PI / 180;
+            let radian = (-angle) * Math.PI / 180;
             let newDelta = this.rotatedDelta(radian);
             let new_dx = newDelta[0];
             let new_dy = newDelta[1];

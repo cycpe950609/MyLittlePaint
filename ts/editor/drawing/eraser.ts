@@ -17,7 +17,7 @@ class EraserCVSFunc extends DrawBase {
     CursorName = 'eraser';
     BrushWidth = 10;
     BrushColor = 'white';
-    DrawFunction = (Ctx: AnyCanvas.Layer, _rotate: number) => {
+    DrawFunction = (Ctx: AnyCanvas.Layer, _width: number, _height: number) => {
         let eraser = Ctx.find('prev-brush')
         if (eraser === undefined) {
             eraser = new AnyCanvas.Shape.Line({

@@ -31,8 +31,8 @@ export class LayerManager {
         // this.ctx = new Konva.Layer();
         // this.cvs.add(this.ctx);
 
-        // this.ctx = new AnyCanvas.WebCanvas({ width: 800, height: 400 });
-        this.ctx = new AnyCanvas.InfiniteCanvas();
+        this.ctx = new AnyCanvas.WebCanvas({ width: 800, height: 400 });
+        // this.ctx = new AnyCanvas.InfiniteCanvas()
 
         this.ctx.viewSize = { width: width, height: height };
         container.appendChild(this.ctx.element);
