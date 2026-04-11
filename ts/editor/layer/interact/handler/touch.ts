@@ -5,10 +5,12 @@
  *  TouchEvent Handler
  */
 
+import { max } from "lodash";
+import { radianToDegree } from "../../../utils/coordinate";
 import type { Point } from "../../../utils/misc";
 import { type InteractClickEvent, type InteractDragEvent, type PointEvent } from "../event";
 import { ViewPoint, type ViewportConfig } from "../state/utils";
-import { distanceSquare } from "../utils";
+import { distance } from "../utils";
 import { EventHandlerBase } from "./base";
 
 export type TouchClickExtraEvent = {
@@ -36,8 +38,13 @@ export type TouchDragHandler = (extra: TouchDragExtraEvent, e: InteractDragEvent
 export type TouchPinchEvent = {
     pointerIds: [number, number];
     centerPoint: Point;
-    distance: number;
     scale: number;
+    rotDegree: number;
+    delta: {
+        scale: number;
+        rotDegree: number;
+        offset: Point;
+    }
 };
 export type TouchPinchHandler = (e: TouchPinchEvent) => void;
 
@@ -58,32 +65,16 @@ export interface TouchHandlerMap {
 
 type TouchPointerData = {
     startOffset: Point;
-    currentOffset: Point;
-    isDragging: boolean;
-    isLongPressed: boolean;
-};
-
-type PinchData = {
-    pointerIds: [number, number];
-    startDistance: number;
-    lastDistance: number;
-};
-
-type TwoFingerClickData = {
-    pointerIds: [number, number];
-    startOffsets: [Point, Point];
-    latestOffsets: [Point, Point];
     startTime: number;
-    maxMoveSquare: number;
-    hasPinched: boolean;
+    prevOffset: Point;
+    currentOffset: Point;
+    upTime: number;
+    // For drag event
+    isDragging: boolean;
 };
 
 export class TouchEventHandler extends EventHandlerBase {
-    private static readonly CLICK_MOVE_TOLERANCE_PX = 8;
-    private static readonly DRAG_START_THRESHOLD_PX = 4;
-    private static readonly LONG_PRESS_THRESHOLD_MS = 500;
-    private static readonly PINCH_START_THRESHOLD_PX = 4;
-    private static readonly TWO_FINGER_CLICK_THRESHOLD_MS = 300;
+
 
     private event_handlers: {
         [K in keyof TouchHandlerMap]: TouchHandlerMap[K];
@@ -96,194 +87,255 @@ export class TouchEventHandler extends EventHandlerBase {
             touchTwoFingerClick: (_e: TouchTwoFingerClickEvent) => { },
         };
 
-    private activeTouches: Map<number, TouchPointerData> = new Map();
-    private longPressTimer: ReturnType<typeof setTimeout> | undefined;
-    private singleTouchPointerId: number | undefined;
-    private pinchData: PinchData | undefined;
-    private twoFingerClickData: TwoFingerClickData | undefined;
-    private lastViewportConfig: ViewportConfig = {
-        center: { x: 0, y: 0 },
-        size: { width: 0, height: 0 },
-        scale: 1,
-        rotDeg: 0,
-    };
-
-    protected on_pointer_down_handler(_prev_e: PointEvent, e: PointEvent, _viewport: ViewportConfig): void {
-        this.lastViewportConfig = structuredClone(_viewport);
-        if (e.type !== "touch") throw new Error(`Unexpect event type '${e.type}'`);
-
-        const now = Date.now();
-        const offset = clonePoint(e.offset);
-        this.activeTouches.set(e.pointerId, {
-            startOffset: offset,
-            currentOffset: offset,
-            isDragging: false,
-            isLongPressed: false,
-        });
-
-        if (this.activeTouches.size === 1) {
-            this.singleTouchPointerId = e.pointerId;
-            this.startLongPressTimer(e.pointerId);
-            return;
-        }
-
-        this.stopLongPressTimer();
-        this.singleTouchPointerId = undefined;
-
-        if (this.activeTouches.size === 2) {
-            const pair = this.getFirstTwoTouches();
-            if (pair === undefined) return;
-
-            const [a, b] = pair;
-            const startDistance = Math.sqrt(distanceSquare(a.currentOffset, b.currentOffset));
-            this.pinchData = {
-                pointerIds: [a.pointerId, b.pointerId],
-                startDistance,
-                lastDistance: startDistance,
-            };
-            this.twoFingerClickData = {
-                pointerIds: [a.pointerId, b.pointerId],
-                startOffsets: [clonePoint(a.startOffset), clonePoint(b.startOffset)],
-                latestOffsets: [clonePoint(a.currentOffset), clonePoint(b.currentOffset)],
-                startTime: now,
-                maxMoveSquare: 0,
-                hasPinched: false,
-            };
-        }
+    constructor() {
+        super();
+        this.current_viewport = {
+            center: { x: 0, y: 0 },
+            size: { width: 0, height: 0 },
+            scale: 1.0,
+            rotDeg: 0.0,
+        };
     }
 
-    protected on_pointer_move_handler(prev_e: PointEvent, e: PointEvent, viewport: ViewportConfig): void {
-        this.lastViewportConfig = structuredClone(viewport);
-        if (e.type !== "touch") throw new Error(`Unexpect event type '${e.type}'`);
 
-        const data = this.activeTouches.get(e.pointerId);
-        if (data === undefined) return;
+    protected on_pointer_down_handler(_prev_e: PointEvent, e: PointEvent, viewport: ViewportConfig): void {
+        console.log("touch down", e.pointerId);
+        this.current_viewport = structuredClone(viewport);
+        this.activeAllTouches.set(e.pointerId, {
+            startOffset: { x: e.offset.x, y: e.offset.y },
+            prevOffset: { x: e.offset.x, y: e.offset.y },
+            currentOffset: { x: e.offset.x, y: e.offset.y },
+            startTime: Date.now(),
+            upTime: 0,
+            isDragging: false,
+        });
+        this.touchesOrder.set(e.pointerId, this.maxTouchOrder + 1);
+        this.requestEventProcess();
+    }
 
-        data.currentOffset = clonePoint(e.offset);
-        const moveDistanceSquare = distanceSquare(data.startOffset, data.currentOffset);
-        const exceeds_drag_threshold = moveDistanceSquare > TouchEventHandler.DRAG_START_THRESHOLD_PX ** 2;
-        const isStart = !data.isDragging && exceeds_drag_threshold;
-
-        if (moveDistanceSquare > TouchEventHandler.DRAG_START_THRESHOLD_PX ** 2) {
-            data.isDragging = true;
-            this.stopLongPressTimer();
+    protected on_pointer_move_handler(_prev_e: PointEvent, e: PointEvent, viewport: ViewportConfig): void {
+        this.current_viewport = structuredClone(viewport);
+        const touchData = this.get_touch_event(e.pointerId);
+        if (touchData) {
+            touchData.currentOffset = { x: e.offset.x, y: e.offset.y };
         }
-
-        if (
-            this.singleTouchPointerId === e.pointerId
-            && this.activeTouches.size === 1
-            && data.isDragging
-        ) {
-            this.event_handlers["touchDrag"]({ pointerId: e.pointerId }, {
-                isStart: isStart,
-                startPoint: new ViewPoint(data.startOffset, viewport).cvsPoint,
-                currentPoint: new ViewPoint(data.currentOffset, viewport).cvsPoint,
-                delta: {
-                    x: e.offset.x - prev_e.offset.x,
-                    y: e.offset.y - prev_e.offset.y,
-                },
-            });
-            return;
-        }
-
-        if (this.activeTouches.size >= 2) {
-            const pair = this.getFirstTwoTouches();
-            if (pair === undefined) return;
-
-            const [a, b] = pair;
-            const distance = Math.sqrt(distanceSquare(a.currentOffset, b.currentOffset));
-
-            if (this.pinchData === undefined || !samePair(this.pinchData.pointerIds, [a.pointerId, b.pointerId])) {
-                this.pinchData = {
-                    pointerIds: [a.pointerId, b.pointerId],
-                    startDistance: distance,
-                    lastDistance: distance,
-                };
-            }
-
-            if (this.twoFingerClickData !== undefined) {
-                const firstMoveSquare = distanceSquare(this.twoFingerClickData.startOffsets[0], a.currentOffset);
-                const secondMoveSquare = distanceSquare(this.twoFingerClickData.startOffsets[1], b.currentOffset);
-                this.twoFingerClickData.maxMoveSquare = Math.max(
-                    this.twoFingerClickData.maxMoveSquare,
-                    firstMoveSquare,
-                    secondMoveSquare,
-                );
-                this.twoFingerClickData.latestOffsets = [clonePoint(a.currentOffset), clonePoint(b.currentOffset)];
-            }
-
-            if (
-                Math.abs(distance - this.pinchData.startDistance) >= TouchEventHandler.PINCH_START_THRESHOLD_PX
-                || this.pinchData.lastDistance !== distance
-            ) {
-                if (this.twoFingerClickData !== undefined
-                    && Math.abs(distance - this.pinchData.startDistance) >= TouchEventHandler.PINCH_START_THRESHOLD_PX) {
-                    this.twoFingerClickData.hasPinched = true;
-                }
-
-                const centerPoint = new ViewPoint(midpoint(a.currentOffset, b.currentOffset), viewport).cvsPoint;
-                const scale = this.pinchData.startDistance > 0
-                    ? distance / this.pinchData.startDistance
-                    : 1;
-
-                this.event_handlers["touchPinch"]({
-                    pointerIds: [a.pointerId, b.pointerId],
-                    centerPoint,
-                    distance,
-                    scale,
-                });
-                this.pinchData.lastDistance = distance;
-            }
-        }
+        this.requestEventProcess();
     }
 
     protected on_pointer_up_handler(_prev_e: PointEvent, e: PointEvent, viewport: ViewportConfig): void {
-        this.lastViewportConfig = structuredClone(viewport);
-        if (e.type !== "touch") throw new Error(`Unexpect event type '${e.type}'`);
-
-        const data = this.activeTouches.get(e.pointerId);
-        if (data === undefined) return;
-
-        this.stopLongPressTimer();
-
-        this.event_handlers["touchUp"]({ pointerId: e.pointerId }, { point: new ViewPoint(e.offset, viewport).cvsPoint, });
-
-        const wasSingleTouch = this.singleTouchPointerId === e.pointerId && this.activeTouches.size === 1;
-        if (wasSingleTouch) {
-            const moveDistanceSquare = distanceSquare(data.startOffset, e.offset);
-            const isClick = moveDistanceSquare <= TouchEventHandler.CLICK_MOVE_TOLERANCE_PX ** 2;
-            if (isClick && !data.isDragging && !data.isLongPressed) {
-                this.event_handlers["touchClick"]({ pointerId: e.pointerId, }, { point: new ViewPoint(e.offset, viewport).cvsPoint });
-            }
+        this.current_viewport = structuredClone(viewport);
+        const touchData = this.get_touch_event(e.pointerId);
+        if (touchData) {
+            touchData.upTime = Date.now();
         }
-
-        this.activeTouches.delete(e.pointerId);
-
-        if (this.activeTouches.size === 0) {
-            this.finalizeTwoFingerClick();
-            this.singleTouchPointerId = undefined;
-            this.pinchData = undefined;
-            return;
-        }
-
-        if (this.activeTouches.size === 1) {
-            const first = this.activeTouches.values().next().value as TouchPointerData | undefined;
-            const pointerId = this.activeTouches.keys().next().value as number | undefined;
-            if (first !== undefined && pointerId !== undefined) {
-                this.singleTouchPointerId = pointerId;
-                if (!first.isDragging) this.startLongPressTimer(pointerId);
-            }
-            this.pinchData = undefined;
-            return;
-        }
-
-        this.singleTouchPointerId = undefined;
-        this.pinchData = undefined;
+        this.requestEventProcess();
     }
 
     protected on_pointer_leave_handler(prev_e: PointEvent, e: PointEvent, viewport: ViewportConfig): void {
-        this.lastViewportConfig = structuredClone(viewport);
         this.on_pointer_up_handler(prev_e, e, viewport);
+    }
+
+    /** Event processing */
+    private is_process_requested: boolean = false;
+    private requestEventProcess(): void {
+        if (!this.is_process_requested) {
+            this.is_process_requested = true;
+            requestAnimationFrame(() => {
+                this.is_process_requested = false;
+                this.processEvents();
+            });
+        }
+    }
+
+    // private static readonly CLICK_MOVE_TOLERANCE_PX = 8;
+    private static readonly DRAG_START_THRESHOLD_PX = 8;
+    private static readonly CLICK_PRESS_THRESHOLD_MS = 250;
+    private static readonly LONG_PRESS_THRESHOLD_MS = 1000;
+    // private static readonly PINCH_START_THRESHOLD_PX = 4;
+    // private static readonly TWO_FINGER_CLICK_THRESHOLD_MS = 300;
+
+    private current_viewport: ViewportConfig;
+
+    private touchesOrder: Map<number, number> = new Map();
+    private get totalTouches() {
+        return Array.from(this.touchesOrder.values()).length;
+    }
+    private get maxTouchOrder() {
+        return max(Array.from(this.touchesOrder.values())) ?? 0;
+    }
+    private processEvents(): void {
+        // Process event every frame
+        this.process_and_emit_all_events();
+        this.process_and_emit_drag_events();
+        this.process_and_emit_pinch_events();
+        this.process_and_emit_click_events();
+    }
+
+    private get_touch_event(pointerId: number): TouchPointerData | undefined {
+        if (this.activeAllTouches.has(pointerId)) return this.activeAllTouches.get(pointerId)!;
+        if (this.activeDragTouches.has(pointerId)) return this.activeDragTouches.get(pointerId)!;
+        if (this.activePinchTouches.has(pointerId)) return this.activePinchTouches.get(pointerId)!;
+        if (this.activeUpTouches.has(pointerId)) return this.activeUpTouches.get(pointerId)!;
+        return undefined;
+    }
+
+    // Unclassified
+    private activeAllTouches: Map<number, TouchPointerData> = new Map();
+    private process_and_emit_all_events() {
+        // Not classified event
+        // NOTE: PointUp: move event to a `buffer`, process in `processClickEvent`
+        // NOTE: PointMove: move event to a `buffer`, process in `processDragEvent`
+        Array.from(this.activeAllTouches.keys()).forEach((pointerId: number) => {
+            const data = this.activeAllTouches.get(pointerId);
+            if (data === undefined) return; // already deleted
+            const pointUp: boolean = data.startTime < data.upTime;
+            const isDragging: boolean = distance(data.startOffset, data.currentOffset) > TouchEventHandler.DRAG_START_THRESHOLD_PX;
+            if (pointUp) {
+                this.activeUpTouches.set(pointerId, data);
+                this.activeAllTouches.delete(pointerId);
+            }
+            else if (isDragging) {
+                // If more than 1 touch, move first two event to pinch buffer
+                if (this.totalTouches >= 2 && !this.hasPinchEvent) {
+                    // Move first two touches to pinch buffer
+                    let firstTwoTouches: number[] = [pointerId];
+                    Array.from(this.activeAllTouches.keys()).forEach((pointerId: number) => {
+                        if (firstTwoTouches.length < 2 && !firstTwoTouches.includes(pointerId)) {
+                            firstTwoTouches.push(pointerId);
+                        }
+                    });
+
+                    const touchData1 = this.activeAllTouches.get(firstTwoTouches[0])!;
+                    const touchData2 = this.activeAllTouches.get(firstTwoTouches[1])!;
+
+                    console.log("Start Pinch event", this.totalTouches, firstTwoTouches, Array.from(this.activeAllTouches.keys()));
+                    this.activePinchTouches.set(firstTwoTouches[0], touchData1);
+                    this.activePinchTouches.set(firstTwoTouches[1], touchData2);
+                    this.activeAllTouches.delete(firstTwoTouches[0]);
+                    this.activeAllTouches.delete(firstTwoTouches[1]);
+                }
+                else {
+                    this.activeDragTouches.set(pointerId, {
+                        ...data,
+                        isDragging: false,
+                        prevOffset: structuredClone(data.currentOffset),
+                    });
+                    this.activeAllTouches.delete(pointerId);
+                }
+            }
+            data.prevOffset = structuredClone(data.currentOffset);
+        });
+    }
+    // Drag-based events
+    private activePinchTouches: Map<number, TouchPointerData> = new Map();
+    private get hasPinchEvent() {
+        return this.activePinchTouches.size > 0;
+    }
+    private get pinchEvents(): [TouchPointerData, TouchPointerData] {
+        const touchData = Array.from(this.activePinchTouches.values());
+        if (touchData.length !== 2) throw new Error(`Invalid pinch touch data length ${touchData.length}`);
+        return touchData as [TouchPointerData, TouchPointerData];
+    }
+    private get pinchKeys(): [number, number] {
+        const keys = Array.from(this.activePinchTouches.keys());
+        if (keys.length !== 2) throw new Error(`Invalid pinch touch keys length ${keys.length}`);
+        return keys as [number, number];
+    }
+    private process_and_emit_pinch_events() {
+        if (this.hasPinchEvent) {
+            if(this.activePinchTouches.size !== 2) throw new Error(`Invalid pinch touch data length ${this.activePinchTouches.size}`);
+            const [touch1, touch2] = this.pinchEvents;
+            const pointUp = touch1.startTime < touch1.upTime || touch2.startTime < touch2.upTime;
+            if (pointUp) {
+                Array.from(this.activePinchTouches.keys()).forEach((pointerId: number) => {
+                    this.activePinchTouches.delete(pointerId);
+                    this.touchesOrder.delete(pointerId);
+                });
+            }
+            else {
+                const origDistance = distance(touch1.startOffset, touch2.startOffset);
+                const prevDistance = distance(touch1.prevOffset, touch2.prevOffset);
+                const prev_scale = prevDistance / origDistance;
+                const prev_degree = Math.atan2(
+                    touch2.prevOffset.y - touch1.prevOffset.y,
+                    touch2.prevOffset.x - touch1.prevOffset.x,
+                );
+                const curDistance = distance(touch1.currentOffset, touch2.currentOffset);
+                const cur_scale = curDistance / origDistance;
+                const cur_degree = Math.atan2(
+                    touch2.currentOffset.y - touch1.currentOffset.y,
+                    touch2.currentOffset.x - touch1.currentOffset.x,
+                );
+                const prevCenterPoint = {
+                    x: (touch1.prevOffset.x + touch2.prevOffset.x) / 2,
+                    y: (touch1.prevOffset.y + touch2.prevOffset.y) / 2,
+                };
+                const currentCenterPoint = {
+                    x: (touch1.currentOffset.x + touch2.currentOffset.x) / 2,
+                    y: (touch1.currentOffset.y + touch2.currentOffset.y) / 2,
+                };
+                this.event_handlers["touchPinch"]({
+                    pointerIds: this.pinchKeys,
+                    centerPoint: new ViewPoint(currentCenterPoint, this.current_viewport).cvsPoint,
+                    scale: cur_scale,
+                    rotDegree: radianToDegree(cur_degree),
+                    delta: {
+                        scale: cur_scale - prev_scale,
+                        rotDegree: radianToDegree(cur_degree - prev_degree),
+                        offset: {
+                            x: currentCenterPoint.x - prevCenterPoint.x,
+                            y: currentCenterPoint.y - prevCenterPoint.y,
+                        }
+                    }
+                });
+            }
+            touch1.prevOffset = structuredClone(touch1.currentOffset);
+            touch2.prevOffset = structuredClone(touch2.currentOffset);
+        }
+    }
+    private activeDragTouches: Map<number, TouchPointerData> = new Map();
+    private process_and_emit_drag_events() {
+        // Drag
+        Array.from(this.activeDragTouches.keys()).forEach((pointerId: number) => {
+            const data: TouchPointerData = this.activeDragTouches.get(pointerId)!;
+            const pointUp: boolean = data.startTime < data.upTime;
+            if (pointUp) {
+                this.event_handlers["touchUp"]({ pointerId: pointerId }, { point: new ViewPoint(data.currentOffset, this.current_viewport).cvsPoint, });
+                this.activeDragTouches.delete(pointerId);
+                this.touchesOrder.delete(pointerId);
+            }
+            else {
+                this.event_handlers["touchDrag"]({ pointerId: pointerId }, {
+                    isStart: !data.isDragging,
+                    startPoint: new ViewPoint(data.startOffset, this.current_viewport).cvsPoint,
+                    currentPoint: new ViewPoint(data.currentOffset, this.current_viewport).cvsPoint,
+                    delta: {
+                        x: data.currentOffset.x - data.prevOffset.x,
+                        y: data.currentOffset.y - data.prevOffset.y,
+                    },
+                });
+                data.isDragging = true;
+            }
+            data.prevOffset = structuredClone(data.currentOffset);
+        });
+    }
+    // Up-base events
+    private activeUpTouches: Map<number, TouchPointerData> = new Map();
+    private process_and_emit_click_events() {
+        // Click, LongPress
+        // TODO: Add two finger click event
+        Array.from(this.activeUpTouches.keys()).forEach((pointerId: number) => {
+            const data: TouchPointerData = this.activeUpTouches.get(pointerId)!;
+            const duration = data.upTime - data.startTime;
+            if (duration <= TouchEventHandler.CLICK_PRESS_THRESHOLD_MS) {
+                this.event_handlers["touchClick"]({ pointerId: pointerId }, { point: new ViewPoint(data.currentOffset, this.current_viewport).cvsPoint });
+            }
+            else if (duration >= TouchEventHandler.LONG_PRESS_THRESHOLD_MS) {
+                this.event_handlers["touchLongPress"]({ pointerId: pointerId, point: new ViewPoint(data.currentOffset, this.current_viewport).cvsPoint, durationMs: duration });
+            }
+            this.activeUpTouches.delete(pointerId);
+            this.touchesOrder.delete(pointerId);
+        });
     }
 
     public on<K extends keyof TouchHandlerMap>(
@@ -292,73 +344,4 @@ export class TouchEventHandler extends EventHandlerBase {
     ) {
         this.event_handlers[eventType] = handler;
     }
-
-    private startLongPressTimer(pointerId: number): void {
-        this.stopLongPressTimer();
-        this.longPressTimer = setTimeout(() => {
-            const data = this.activeTouches.get(pointerId);
-            if (data === undefined) return;
-            if (this.activeTouches.size !== 1) return;
-            if (this.singleTouchPointerId !== pointerId) return;
-
-            const moveDistanceSquare = distanceSquare(data.startOffset, data.currentOffset);
-            if (data.isDragging || moveDistanceSquare > TouchEventHandler.CLICK_MOVE_TOLERANCE_PX ** 2) return;
-
-            data.isLongPressed = true;
-            this.event_handlers["touchLongPress"]({
-                pointerId,
-                point: new ViewPoint(data.currentOffset, this.lastViewportConfig).cvsPoint,
-                durationMs: TouchEventHandler.LONG_PRESS_THRESHOLD_MS,
-            });
-        }, TouchEventHandler.LONG_PRESS_THRESHOLD_MS);
-    }
-
-    private stopLongPressTimer(): void {
-        if (this.longPressTimer !== undefined) {
-            clearTimeout(this.longPressTimer);
-            this.longPressTimer = undefined;
-        }
-    }
-
-    private finalizeTwoFingerClick(): void {
-        const data = this.twoFingerClickData;
-        this.twoFingerClickData = undefined;
-        if (data === undefined) return;
-
-        const duration = Date.now() - data.startTime;
-        const isQuick = duration <= TouchEventHandler.TWO_FINGER_CLICK_THRESHOLD_MS;
-        const isStable = data.maxMoveSquare <= TouchEventHandler.CLICK_MOVE_TOLERANCE_PX ** 2;
-        if (!isQuick || !isStable || data.hasPinched) return;
-
-        this.event_handlers["touchTwoFingerClick"]({
-            pointerIds: data.pointerIds,
-            centerPoint: new ViewPoint(midpoint(data.latestOffsets[0], data.latestOffsets[1]), this.lastViewportConfig).cvsPoint,
-        });
-    }
-
-    private getFirstTwoTouches(): [
-        { pointerId: number } & TouchPointerData,
-        { pointerId: number } & TouchPointerData,
-    ] | undefined {
-        const iterator = this.activeTouches.entries();
-        const a = iterator.next();
-        const b = iterator.next();
-        if (a.done || b.done) return undefined;
-
-        return [
-            { pointerId: a.value[0], ...a.value[1] },
-            { pointerId: b.value[0], ...b.value[1] },
-        ];
-    }
 }
-
-const clonePoint = (p: Point): Point => ({ x: p.x, y: p.y });
-
-const midpoint = (a: Point, b: Point): Point => ({
-    x: (a.x + b.x) / 2,
-    y: (a.y + b.y) / 2,
-});
-
-const samePair = (a: [number, number], b: [number, number]): boolean => {
-    return (a[0] === b[0] && a[1] === b[1]) || (a[0] === b[1] && a[1] === b[0]);
-};

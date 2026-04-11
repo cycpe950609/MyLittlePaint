@@ -24,6 +24,7 @@ import type { ViewportConfig } from "./layer/interact/state/utils";
 import { btnCanvas } from "./modeEditor";
 
 import { ShapeExtension as shp } from "./extension/shape";
+import type { TouchPinchEvent } from "./layer/interact/handler/touch";
 
 type HistoryLogEntry<DATATYPE> = {
     layerID: string;
@@ -237,12 +238,12 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         // redo/undo
         if (e.key === "z" && e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); this.undo(); }
         if (e.key === "y" && e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); this.redo(); }
-        this.render();
+        this.requestRender();
     };
     private view_changed_handler(viewport: ViewportConfig) {
         this.background_layer.viewAt(viewport.center, viewport.rotDeg, viewport.scale);
         this.render_layer.viewAt(viewport.center, viewport.rotDeg, viewport.scale);
-        this.render();
+        this.requestRender();
     }
     private finish_editing_handler(editWith: string, ctx: LayerData) {
         // Trigger when finish editing (pointer up, etc)
@@ -258,7 +259,19 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         this.undo_stk_history.push(logs);
         this.redo_stk_history = new Array();
         this.startEdit(editWith); // Keep current editing tool for next edit
-        this.render();
+        this.requestRender();
+    }
+    private touch_pinch_handler(e: TouchPinchEvent) {
+        const scale = e.delta.scale;
+        if (scale > 0) {
+            this.interact_layer.View.viewZoomIn(e.delta.scale, 8.0, e.centerPoint);
+        }
+        else {
+            this.interact_layer.View.viewZoomOut(-e.delta.scale, 0.5, e.centerPoint);
+        }
+        this.interact_layer.View.viewRotate(e.delta.rotDegree, e.centerPoint);
+        this.interact_layer.View.viewRight(-e.delta.offset.x);
+        this.interact_layer.View.viewDown(-e.delta.offset.y);
     }
 
     /** Implement of CanvasBase */
@@ -275,6 +288,7 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         this.interact_layer.on("touchDrag", (_extra, e) => { (this.touch_drag_enabled) ? this.drag_view_handler(e) : this.dragging_draw_handler(e); })
         this.interact_layer.on("touchUp", (_extra, e) => { (this.touch_drag_enabled) ? {} : this.pointer_up_handler(e); })
         this.interact_layer.on("touchClick", (_extra, e) => { (this.touch_drag_enabled) ? {} : this.pointer_up_handler(e); })
+        this.interact_layer.on("touchPinch", (e) => { (this.touch_drag_enabled) ? this.touch_pinch_handler(e) : {} })
 
         window.addEventListener("keydown", (e) => this.key_down_handler(e));
 
@@ -293,11 +307,21 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         this.render_layer.viewSize = { width: view_width, height: view_height };
 
         this.interact_layer.View.viewSize = { width: view_width, height: view_height };
-        this.render();
+        this.requestRender();
         // TODO: Resize other state
     }
     public detach(): void { }
 
+    private is_render_requested: boolean = false;
+    private requestRender(): void {
+        if (!this.is_render_requested) {
+            this.is_render_requested = true;
+            requestAnimationFrame(() => {
+                this.is_render_requested = false;
+                this.render();
+            });
+        }
+    }
     public render(): void {
         // TODO: Update layers from CanvasState
         const prev_zIdx = this.canvas_state.activateLayer.zIndex;
@@ -316,7 +340,7 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         render_layers.forEach(layer => layer.rendered());
 
         if (this.editing_engine.editing) {
-            requestAnimationFrame(() => this.render());
+            this.requestRender();
         }
     }
 
@@ -337,11 +361,11 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         this.interact_layer.View.viewCenterAt({ x: 0, y: 0 });
     }
     public clear() {
-        let btnCancel = EditorUI.UIComp.HTML.Button("w-full mx-2rem", "Cancel");
+        let btnCancel = EditorUI.UIComp.HTML.Button("w-full mx-2rem my-2rem p-2", "Cancel");
         btnCancel.onclick = () => {
             dia.close();
         };
-        let btnOK = EditorUI.UIComp.HTML.Button("w-full mx-2rem", "OK");
+        let btnOK = EditorUI.UIComp.HTML.Button("w-full mx-2rem my-2rem p-2", "OK");
         btnOK.onclick = () => {
             this.resetCanvas();
             dia.close();
@@ -386,7 +410,7 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
 
     public save(): void {
         if (this.editing_engine.editing) this.editing_engine.stopEdit();
-        let btnOK = EditorUI.UIComp.HTML.Button("w-full mx-2rem", "OK");
+        let btnOK = EditorUI.UIComp.HTML.Button("w-full mx-2rem p-2", "OK");
         let txtName = EditorUI.UIComp.HTML.Text("w-full");
         let dia = new EditorUI.UIComp.Dialog(
             "Enter the name of image",
@@ -423,7 +447,7 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
             data: inverse_undo,
         });
         // console.log("undo", this.undo_stk_history, "redo", this.redo_stk_history);
-        this.render();
+        this.requestRender();
     }
     public redo(): void {
         // Get redo list and patch canvas_state
@@ -440,7 +464,7 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
             data: inverse_redo,
         });
         // console.log("undo", this.undo_stk_history, "redo", this.redo_stk_history);
-        this.render();
+        this.requestRender();
     }
 
     /** Editing */

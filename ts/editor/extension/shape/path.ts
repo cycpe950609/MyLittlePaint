@@ -128,22 +128,21 @@ export class PathRender extends ObjectRender<PathShape> {
             maxX = max([maxX, point.x]);
             maxY = max([maxY, point.y]);
         }
-        data.data.map(
-            (cmd) => {
-                switch (cmd.type) {
-                    case PathCommandType.M: { curX = cmd.x; curY = cmd.y; break; }
-                    case PathCommandType.L: { curX = cmd.x; curY = cmd.y; break; }
-                    case PathCommandType.H: { curX = cmd.x; break; }
-                    case PathCommandType.V: { curY = cmd.y; break; }
-                    case PathCommandType.C: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
-                    case PathCommandType.S: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
-                    case PathCommandType.Q: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
-                    case PathCommandType.T: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
-                    case PathCommandType.A: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
-                    case PathCommandType.Z: { break; }
-                }
-                updateMinMax(curX, curY);
-            })
+        data.data.forEach((cmd) => {
+            switch (cmd.type) {
+                case PathCommandType.M: { curX = cmd.x; curY = cmd.y; break; }
+                case PathCommandType.L: { curX = cmd.x; curY = cmd.y; break; }
+                case PathCommandType.H: { curX = cmd.x; break; }
+                case PathCommandType.V: { curY = cmd.y; break; }
+                case PathCommandType.C: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.S: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.Q: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.T: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.A: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.Z: { break; }
+            }
+            updateMinMax(curX, curY);
+        })
         const baseCornerLT = { x: minX - data.strokeWidth / 2, y: minY - data.strokeWidth / 2 };
         const cornerLT = (rotDegree === 0) ? baseCornerLT : rotateAround(baseCornerLT, center, rotDegree);
         return {
@@ -161,37 +160,28 @@ export class PathRender extends ObjectRender<PathShape> {
         ctx.lineWidth = data.strokeWidth || 1.0;
         ctx.fillStyle = data.fill || 'transparent';
 
-        const d = data.data
-            .map((cmd) => {
-                switch (cmd.type) {
-                    case PathCommandType.M:
-                        return `M ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.L:
-                        return `L ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.H:
-                        return `H ${cmd.x}`;
-                    case PathCommandType.V:
-                        return `V ${cmd.y}`;
-                    case PathCommandType.C:
-                        return `C ${cmd.x1} ${cmd.y1} ${cmd.x2} ${cmd.y2} ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.S:
-                        return `S ${cmd.x2} ${cmd.y2} ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.Q:
-                        return `Q ${cmd.x1} ${cmd.y1} ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.T:
-                        return `T ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.A:
-                        return `A ${cmd.rx} ${cmd.ry} ${cmd.xAxisRotation} ${cmd.largeArcFlag} ${cmd.sweepFlag} ${cmd.x} ${cmd.y}`;
-                    case PathCommandType.Z:
-                        return `Z`;
-                }
-            })
-            .join(" ");
-        const path = new Path2D(d);
+        let curX: number = 0;
+        let curY: number = 0;
+        ctx.beginPath();
+        data.data.forEach((cmd) => {
+            switch (cmd.type) {
+                case PathCommandType.M: { curX = cmd.x; curY = cmd.y; ctx.moveTo(curX, curY); break; }
+                case PathCommandType.L: { curX = cmd.x; curY = cmd.y; ctx.lineTo(curX, curY); break; }
+                case PathCommandType.H: { curX = cmd.x; ctx.lineTo(curX, curY); break; }
+                case PathCommandType.V: { curY = cmd.y; ctx.lineTo(curX, curY); break; }
+                case PathCommandType.C: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.S: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.Q: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.T: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.A: { throw new Error(`${cmd.type} not implemented in getBoundingBoxFrom for PathShape`); }
+                case PathCommandType.Z: { ctx.closePath(); break; }
+            }
+        });
+
         if (data.fill && data.fill !== 'transparent') {
-            ctx.fill(path);
+            ctx.fill();
         }
-        ctx.stroke(path);
+        ctx.stroke();
         ctx.restore();
     }
 }
@@ -300,7 +290,7 @@ export class PathEditable extends ClosedShapeBaseEditable {
     }
 
     public SettingsUpdate(ctx: CanvasState, rotDegree: number): void {
-        if(!ctx.activateLayer.has(this.current_path_name)) return;
+        if (!ctx.activateLayer.has(this.current_path_name)) return;
         const pathShape = this.getPath(ctx);
         pathShape.stroke = this.BorderBrush;
         pathShape.strokeWidth = this.BorderWidth;

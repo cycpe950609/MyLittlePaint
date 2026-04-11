@@ -3,7 +3,7 @@ export const DIV = (
     children?: HTMLElement[] | HTMLElement | DocumentFragment
 ) => {
     const dv = document.createElement("div");
-    className.split(' ').map((clsNme : string)=>dv.classList.add(clsNme))
+    className.trim().split(' ').map((clsNme : string)=>dv.classList.add(clsNme))
     if (children === undefined) return dv;
     if (children instanceof HTMLElement || children instanceof DocumentFragment)
         dv.appendChild(children);
@@ -87,7 +87,7 @@ export const LABEL = (
     children?: HTMLElement[] | HTMLElement | DocumentFragment | string
 ) => {
     const lbl = document.createElement("label");
-    className.split(' ').map((clsNme : string)=>lbl.classList.add(clsNme))
+    className.trim().split(' ').map((clsNme : string)=>lbl.classList.add(clsNme))
     if (children === undefined) return lbl;
     if (children instanceof HTMLElement || children instanceof DocumentFragment)
         lbl.appendChild(children);
@@ -102,14 +102,14 @@ export const LABEL = (
 
 export const SPAN = (className: string, children: string) => {
     const span = document.createElement("span");
-    className.split(' ').map((clsNme : string)=>span.classList.add(clsNme))
+    className.trim().split(' ').map((clsNme : string)=>span.classList.add(clsNme))
     span.append(children);
     return span;
 };
 
 export const CANVAS = (className: string) => {
     const cvs = document.createElement("canvas");
-    className.split(" ").map((clsNme: string) => cvs.classList.add(clsNme));
+    className.trim().split(" ").map((clsNme: string) => cvs.classList.add(clsNme));
     return cvs;
 };
 
@@ -117,7 +117,7 @@ export const TEXT = (
     className: string
 ) => {
     const txt = document.createElement("input")
-    className.split(' ').map((clsNme : string) => txt.classList.add(clsNme))
+    className.trim().split(' ').map((clsNme : string) => txt.classList.add(clsNme))
     txt.required = true;
     return txt
 }
@@ -128,7 +128,7 @@ export const BUTTON = (
 ) : HTMLElement => {
     const btn = document.createElement('input')
     btn.classList.add('button')
-    className.split(' ').map((clsNme : string) => btn.classList.add(clsNme))
+    className.trim().split(' ').map((clsNme : string) => btn.classList.add(clsNme))
     btn.type = 'button'
     if (children === undefined) return btn;
     if (children instanceof HTMLElement || children instanceof DocumentFragment)

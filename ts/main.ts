@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (process.env.NODE_ENV === 'development' && isTouchCapable) {
         // Only show eruda on touch capable devices, e.g. iPad
         let eruda = import(/* webpackChunkName: "eruda" */"eruda");
-        (await eruda).default.init();
+        (await eruda).default.init({
+            useShadowDom: true,
+        });
     }
 
     // __webpack_public_path__ = process.env.ASSET_PATH as string;

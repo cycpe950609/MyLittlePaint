@@ -13,6 +13,20 @@
     --button-font-color: var(--toolbar-font-color);
 }
 
+@media (pointer: coarse) {
+
+    /* Styles for touch-primary devices */
+    :root {
+        --menu-height: 45px;
+        --toolbar-width: 45px;
+    }
+
+    html,
+    body {
+        font-size: larger;
+    }
+}
+
 html,
 body {
     background-color: gray;
@@ -21,8 +35,17 @@ body {
     overflow: hidden;
     margin: 0;
     touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
-    font-family: monospace;
+    font-family: 'Fira Mono',
+        Consolas,
+        Menlo,
+        Monaco,
+        'Source Code Pro',
+        'DejaVu Sans Mono',
+        monospace;
 }
 
 /* Menu */
