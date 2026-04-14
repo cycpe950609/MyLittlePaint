@@ -1,9 +1,7 @@
 
 const logger = function (logFunc :(message?: any, ...optionalParams: any[]) => void ,loggerTagList : string[] = []) {
     return function () {
-        if (!(process.env.NODE_ENV === 'development')) {
-            return;
-        }
+        if (!import.meta.env.DEV) return;
 
         let inputStr = arguments[0]
         if(typeof inputStr !== 'string'){

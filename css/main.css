@@ -226,6 +226,17 @@ body {
     }
 }
 
+@media (pointer: coarse) {
+    .toolbar-item .toolbar-button:active {
+        background-color: rgb(222, 222, 222);
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .toolbar-item .toolbar-button:active+.tooltip-text {
+        visibility: visible;
+    }
+}
+
 /* Tooltip text */
 .toolbar-item .tooltip-text {
     visibility: hidden;

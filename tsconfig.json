@@ -28,5 +28,8 @@
     "jsxImportSource": "@herp-inc/snabbdom-jsx",
     //
     "experimentalDecorators": true,
+    "types": [
+      "vite/client"
+    ]
   }
 }
