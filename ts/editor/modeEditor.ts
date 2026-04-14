@@ -7,6 +7,7 @@ import { type NextFunctionState } from "../editorUI/interface/function";
 import { EditorCanvas } from "./canvas";
 import {
     btnClear,
+    btnDownload,
     btnRedo,
     btnResetPosition,
     btnResetRotate,
@@ -58,7 +59,8 @@ class modeEditor implements EditorUI.Interface.Mode {
         new btnResetScale(),
         new btnResetRotate(),
         new btnToggleTouch(),
-        new btnSave()
+        new btnSave(),
+        new btnDownload()
     ];
 
     public get LeftToolbarTop(): EditorUI.Interface.Function[] {

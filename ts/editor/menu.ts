@@ -54,7 +54,18 @@ export class btnClear implements FunctionInterface {
 export class btnSave implements FunctionInterface {
     Name = "btn_save";
     ImgName = "save";
-    Tip = "Download a image";
+    Tip = "Save to browser LocalStorage";
+
+    constructor() { }
+
+    StartFunction = (cvs: CanvasBase) => {
+        void (cvs as EditorCanvas).saveToLocalStorage();
+    };
+}
+export class btnDownload implements FunctionInterface {
+    Name = "btn_download";
+    ImgName = "download";
+    Tip = "Download as image";
 
     constructor() { }
 

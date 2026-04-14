@@ -32,6 +32,8 @@ type HistoryLogEntry<DATATYPE> = {
     data: DATATYPE;
 }
 
+const IMAGE_LOCAL_STORAGE_KEY: string = "my_little_paint-image-data";
+const SAVE_TIME_LOCAL_STORAGE_KEY: string = "my_little_paint-save-time";
 
 export class EditorCanvas implements EditorUI.Interface.Canvas {
     name = "EditorCanvas";
@@ -68,8 +70,12 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         this.editing_engine.on("finishEditing", (editWith, ctx) => this.finish_editing_handler(editWith, ctx));
         this.editing_engine.on("cursorChanged", (cursor) => { this.interact_layer.cursorName = cursor });
 
-        this.resetCanvas();
         this.initBuiltInExtensions();
+        if (this.loadFromLocalStorage()) {
+            this.background_layer.cvsSize = this.canvas_state.Size;
+        } else {
+            this.resetCanvas();
+        }
     }
     private resetCanvas() {
         this.undo_stk_history = new Array();
@@ -77,12 +83,9 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         this.canvas_state.clear();
 
         this.editing_engine.reset();
-        //NOTE : Testing
         this.canvas_state.add(new LayerData("Layer1", { globalCompositeOperation: "source-over" }));
-        this.canvas_state.add(new LayerData("Layer2", { globalCompositeOperation: "source-over" }));
-        this.canvas_state.add(new LayerData("Layer3", { globalCompositeOperation: "source-over" }));
-        this.canvas_state.add(new LayerData("Layer4", { globalCompositeOperation: "source-over" }));
-        this.canvas_state.add(new LayerData("Layer5", { globalCompositeOperation: "source-over" }));
+
+        this.background_layer.cvsSize = this.canvas_state.Size;
 
         // NOTE: `viewAt` should be called after add() since it will trigger rendering and we need to make sure the canvas has at least one layer to render
         this.interact_layer.View.viewAt({ x: 0, y: 0 }, 0, 1.0);
@@ -298,6 +301,8 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         container.appendChild(this.interact_layer.element);
 
         this.resize(); // Force resize to fit the view size
+        setInterval(() => { this.saveToLocalStorage() }, 60 * 1000);
+        // setInterval(() => { this.saveToLocalStorage() }, 1000);
     };
 
     public resize(_e?: UIEvent): void {
@@ -367,6 +372,7 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         };
         let btnOK = EditorUI.UIComp.HTML.Button("w-full mx-2rem my-2rem p-2", "OK");
         btnOK.onclick = () => {
+            localStorage.removeItem(IMAGE_LOCAL_STORAGE_KEY);
             this.resetCanvas();
             dia.close();
             window.editorUI.forceRerender();
@@ -428,6 +434,27 @@ export class EditorCanvas implements EditorUI.Interface.Canvas {
         };
         dia.show();
     }
+
+    public saveToLocalStorage(): void {
+        const json = this.canvas_state.toJSON();
+        console.log("Saving canvas state to localStorage", json);
+        localStorage.setItem(IMAGE_LOCAL_STORAGE_KEY, JSON.stringify(json));
+        localStorage.setItem(SAVE_TIME_LOCAL_STORAGE_KEY, new Date().toISOString());
+    };
+    public loadFromLocalStorage(): boolean {
+        const raw = localStorage.getItem(IMAGE_LOCAL_STORAGE_KEY);
+        if (!raw) return false;
+
+        try {
+            const json = JSON.parse(raw);
+            if (!json || Object.keys(json).length === 0) return false;
+            this.canvas_state.restoreFromJSON(json);
+            return true;
+        } catch (error) {
+            console.warn("Failed to load canvas state from localStorage", error);
+            return false;
+        }
+    };
 
     /** History */
     private undo_stk_history: HistoryLogEntry<GroupHistoryDiff>[] = new Array();

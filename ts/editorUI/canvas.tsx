@@ -11,6 +11,7 @@ export enum CanvasSettingType {
     Number,
     Color,
     Boolean,
+    DropDownList,
 }
 export type CanvasSettingEntry<DATATYPE> = {
     type: CanvasSettingType;

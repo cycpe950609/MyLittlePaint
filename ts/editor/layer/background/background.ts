@@ -24,8 +24,8 @@ export class BackgroundLayer {
     private view_at_rotDegree: number
     private view_at_scale: number
     private cvs_color: ColorInstance;
-    private cvs_width?: number;
-    private cvs_height?: number;
+    private cvs_width: number;
+    private cvs_height: number;
     private chessboard_size: number;
     private size_changed: boolean = true;
 
@@ -39,8 +39,8 @@ export class BackgroundLayer {
         cvs.style.height = "100%";
         cvs.style.pointerEvents = "none";
         this.cvs_color = config?.color || Color.rgb("white").alpha(0.5);
-        this.cvs_height = config?.height;
-        this.cvs_width = config?.width;
+        this.cvs_height = config?.height || Infinity;
+        this.cvs_width = config?.width || Infinity;
         this.chessboard_size = config?.chessboardSize || 96;
 
         let ctx = cvs.getContext("2d");
@@ -70,6 +70,11 @@ export class BackgroundLayer {
         this.ctx.canvas.height = Math.max(1, Math.round(size.height * dpr));
         this.size_changed = true;
         this.viewAt(this.view_at_center, this.view_at_rotDegree, this.view_at_scale);
+    }
+
+    public set cvsSize(size: Size) {
+        this.cvs_height = size.height;
+        this.cvs_width = size.width;
     }
 
     public get viewHeight(): number {
@@ -265,7 +270,7 @@ export class BackgroundLayer {
     }
     /** Clip the range that not in the canvas but in renderView */
     private clipCanvasMargin(viewConfig: ViewportConfig, renderConfig: RenderViewConfig) {
-        if (this.cvs_width === undefined || this.cvs_height === undefined) return;
+        if (this.cvs_width === Infinity || this.cvs_height === Infinity) return;
 
         const halfW = this.cvs_width / 2;
         const halfH = this.cvs_height / 2;

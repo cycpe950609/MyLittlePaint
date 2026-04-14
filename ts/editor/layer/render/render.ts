@@ -10,6 +10,7 @@ import { Group } from "../../state/canvas/data/group";
 import type { ObjectBase } from "../../state/canvas/data/object";
 import type { Point, Size } from "../../utils/misc";
 import type { ViewportConfig } from "../interact/state/utils";
+import type { Layer } from "../../state/canvas/data/layer";
 
 export type BoundingBox = {
     cornerLT: Point;
@@ -166,4 +167,8 @@ export class GroupRender extends ObjectRender<Group> {
 
 export class LayerRender extends GroupRender {
     // LayerRender should same as GroupRender
+    public render(ctx: OffscreenCanvasRenderingContext2D, data: Layer): void {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        super.render(ctx, data);
+    }
 }

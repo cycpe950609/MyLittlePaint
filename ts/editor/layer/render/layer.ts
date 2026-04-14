@@ -98,7 +98,10 @@ export class RenderLayer {
         layers.forEach(layer => {
             const cache_ctx = this.layers_cache.get(layer);
             if (cache_ctx === undefined) throw new Error("Cache context not found for layer during rendering");
+            this.render_ctx.save();
+            this.render_ctx.globalCompositeOperation = layer.globalCompositeOperation;
             this.render_ctx.drawImage(cache_ctx.canvas, 0, 0);
+            this.render_ctx.restore();
         });
         this.view_changed = false;
     }

@@ -101,4 +101,56 @@ export class CanvasState {
     private get_extension(type: string): ExtensionConstructor | undefined {
         return this.extensions[type];
     }
+    public restoreFromJSON(json: any): void {
+        const restored = CanvasState.fromJSON(json, (type) => this.get_extension(type));
+        restored.extensions = this.extensions;
+        this.cvs_config = restored.cvs_config;
+        this.layer_children = restored.layer_children;
+        this.layer_add_index = restored.layer_add_index;
+        this.activated_layer = restored.activated_layer;
+    }
+    /** JSON */
+    static fromJSON(json: any, resolver?: (type: string) => ExtensionConstructor | undefined): CanvasState {
+        const canvas = new CanvasState({
+            name: json?.name,
+            size: {
+                width: json?.size?.width ?? undefined,
+                height: json?.size?.height ?? undefined,
+            },
+        });
+
+        const layerEntries = Object.entries(json?.layers ?? {});
+        for (const [layer_name, layer_json] of layerEntries) {
+            if (resolver === undefined) {
+                throw new Error(`Extension resolver is required when restoring layer '${layer_name}'`);
+            }
+            const layer = Layer.fromJSON(layer_json, layer_name, resolver);
+            canvas.add(layer);
+        }
+
+        if (json?.addIdx !== undefined) {
+            Object.assign((canvas as any).layer_add_index, json.addIdx);
+        }
+
+        if (json?.activated !== undefined) {
+            canvas.activate(json.activated);
+        }
+
+        return canvas;
+    }
+    toJSON(): any {
+        let layerData: Record<string, any> = {};
+        Object.entries(this.layer_children).forEach(([name, layer]) => {
+            layerData[name] = layer.toJSON();
+        });
+        let layerAddIndex = structuredClone(this.layer_add_index);
+        let activatedLayerName = this.activated_layer?.Name;
+        return {
+            name: this.Name,
+            size: this.Size,
+            layers: layerData,
+            addIdx: layerAddIndex,
+            activated: activatedLayerName,
+        };
+    }
 };

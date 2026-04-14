@@ -6,7 +6,7 @@
  */
 
 import { v4 as uuid } from "uuid";
-import { type PaintEvent } from "../../../editorUI/canvas";
+import { CanvasSettingType, type CanvasInterfaceSettings, type PaintEvent } from "../../../editorUI/canvas";
 import type { BoundingBox } from "../../layer/render/render";
 import type { CanvasState } from "../../state/canvas/canvas";
 import { objAttr, type Point } from "../../state/canvas/data/object";
@@ -72,10 +72,14 @@ export class LineEditable extends ShapeBaseEditable {
     ToolName = "Line";
     public CanFinishDrawing: boolean = true;
     private current_line_name: string = 'line_preview';
+    private draw_from_center: boolean = false;
+    private startPoint: Point = { x: 0, y: 0 };
+
     public PointerDown(ctx: CanvasState, e: PaintEvent): void {
         const preview_layer = ctx.activateLayer;
         if (preview_layer === undefined) throw new Error(`No preview layer in canvas state`);
         this.current_line_name = `line_${uuid()}`;
+        this.startPoint = { x: e.X, y: e.Y };
         const line = new LineShape(
             this.current_line_name,
             {
@@ -92,6 +96,7 @@ export class LineEditable extends ShapeBaseEditable {
         if (preview_layer === undefined) throw new Error(`(PointerMove) No preview layer in canvas state`);
         let line = preview_layer.find(this.current_line_name);
         if (line === undefined || !(line instanceof LineShape)) throw new Error(`(PointerMove) No line preview object in preview layer`);
+        if(this.draw_from_center) line.start = {x: this.startPoint.x - (e.X - this.startPoint.x), y: this.startPoint.y - (e.Y - this.startPoint.y)};
         line.end = { x: e.X, y: e.Y };
     }
     public PointerUp(ctx: CanvasState, e: PaintEvent): void {
@@ -99,6 +104,28 @@ export class LineEditable extends ShapeBaseEditable {
         if (preview_layer === undefined) throw new Error(`(PointerUp) No preview layer in canvas state`);
         let line = preview_layer.find(this.current_line_name);
         if (line === undefined || !(line instanceof LineShape)) throw new Error(`(PointerUp) No line preview object in preview layer`);
+        if(this.draw_from_center) line.start = {x: this.startPoint.x - (e.X - this.startPoint.x), y: this.startPoint.y - (e.Y - this.startPoint.y)};
         line.end = { x: e.X, y: e.Y };
+    }
+
+    public get Settings() {
+        const rtv = super.Settings;
+        rtv.Settings?.set("DrawFromCenter", {
+            type: CanvasSettingType.Boolean,
+            label: "Draw from center",
+            value: this.draw_from_center,
+        });
+        return rtv;
+    }
+    public set Settings(setting: CanvasInterfaceSettings) {
+        if (setting.Settings === undefined)
+            throw new Error("INTERNAL_ERROR: Settings are missing");
+        super.Settings = setting;
+        let refreshWindow = false;
+        if (setting.Settings.get("DrawFromCenter") !== undefined) {
+            this.draw_from_center = setting.Settings.get("DrawFromCenter")?.value;
+            refreshWindow = true;
+        }
+        if (refreshWindow) window.editorUI.forceRerender();
     }
 }

@@ -104,12 +104,16 @@ export class ObjectBase<ObjectConfig extends ObjectBaseConfig> {
     declare public visible: boolean;
 
     /** Interface */
-    static fromJSON(_json: any): ObjectBase<any> {
-        throw new Error("Not implemented");
+    static fromJSON(this: new (name: string, config: any) => ObjectBase<any>, json: any, name?: string): ObjectBase<any> {
+        const object_name = name ?? json?.name;
+        if (typeof object_name !== "string" || object_name.length === 0) {
+            throw new Error(`Missing object name when restoring ${this.name}`);
+        }
+        return new this(object_name, json?.config ?? {});
     }
-    toJSON(): ObjectConfig & { type: string } {
+    toJSON(): { config: ObjectConfig, type: string } {
         return {
-            ...this.config,
+            config: structuredClone(this.config),
             type: this.type,
         };
     }

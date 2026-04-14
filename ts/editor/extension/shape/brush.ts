@@ -9,7 +9,7 @@ import type { CanvasInterfaceSettings, PaintEvent } from "../../../editorUI/canv
 import type { CanvasState } from "../../state/canvas/canvas";
 import { Layer } from "../../state/canvas/data/layer";
 import { CircleShape } from "./circle";
-import { PathCommandType, PathEditable, type SVGPathCommand } from "./path";
+import { PathCommandType, PathEditable, PathShape, type SVGPathCommand } from "./path";
 
 
 export class BrushEditable extends PathEditable {
@@ -40,15 +40,38 @@ export class BrushEditable extends PathEditable {
 export class EraserEditable extends BrushEditable {
     CursorName = 'eraser';
     ToolName = "Eraser";
-    // Cause we draw eraser on a preview layer, which cant eraser other layers
-    // So we use a semi-transparent red stroke to indicate the eraser area
-    protected BorderBrush: string = "#ff000077";
+    protected BorderBrush: string = "#000000";
+
+    public PointerDown(ctx: CanvasState, e: PaintEvent): void {
+        ctx.activateLayer.globalCompositeOperation = "destination-out";
+        super.PointerDown(ctx, e);
+        if (!ctx.has("eraser_preview")) {
+            const eraser_layer = new Layer("eraser_preview", { zIndex: 101 });
+            let path = this.createPath(this.current_path_name, e);
+            path.stroke = "#ff000066";
+            eraser_layer.add(path)
+            ctx.add(eraser_layer);
+        }
+    }
+
+    public PointerMove(ctx: CanvasState, e: PaintEvent): void {
+        super.PointerMove(ctx, e);
+        const preview_layer = ctx.find("eraser_preview");
+        if (preview_layer === undefined) throw new Error(`No eraser_preview layer in canvas state`);
+        const path = preview_layer.find(this.current_path_name);
+        if (!path || !(path instanceof PathShape)) {
+            throw new Error(`No path preview object '${this.current_path_name}' in preview layer`);
+        }
+        path.data = this.updateMovePath(path.data, e);
+    }
 
     public PointerUp(ctx: CanvasState, e: PaintEvent): void {
         super.PointerUp(ctx, e);
         let brush = this.getPath(ctx);
+        ctx.activateLayer.globalCompositeOperation = "source-over";
+        // NOTE: Reset composite operation to default after erasing, 
+        //       so that we wont change the composite operation of activated layer
         brush.globalCompositeOperation = "destination-out";
-        brush.stroke = "#000000"; // Stroke color should have 100% opacity for erasing
     }
 
     public get Settings() {

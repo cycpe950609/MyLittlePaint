@@ -9,7 +9,7 @@ import { HistoryAction, ObjectBase, type HistoryDiff, type ObjectBaseConfig } fr
 
 export type GroupHistoryDiff = HistoryDiff<ObjectBaseConfig & { children?: Record<string, HistoryDiff<any>> }>;
 export type ExtensionConstructor = new (name: string, config: any) => ObjectBase<any>;
-type ExtensionResolver = (type: string) => ExtensionConstructor | undefined;
+export type ExtensionResolver = (type: string) => ExtensionConstructor | undefined;
 export const groupSetExtensionResolver: unique symbol = Symbol("Group.setExtensionResolver");
 
 export class Group extends ObjectBase<ObjectBaseConfig> {
@@ -50,9 +50,57 @@ export class Group extends ObjectBase<ObjectBaseConfig> {
     }
 
     /** Interface */
-    static fromJSON(_json: { type: string } & any): ObjectBase<any> {
-        // TODO: Implement fromJSON for Group
-        throw new Error("Not implemented");
+    static fromJSON(this: new (name: string, config: any) => Group, json: any, name?: string, resolver?: ExtensionResolver): Group {
+        const group_name = name ?? json?.name;
+        if (typeof group_name !== "string" || group_name.length === 0) {
+            throw new Error(`Missing object name when restoring ${this.name}`);
+        }
+        const group = new this(group_name, json?.config ?? {});
+
+        const restoreObject = (object_json: any, object_name: string): ObjectBase<any> => {
+            const object_type = object_json?.type;
+            if (typeof object_type !== "string" || object_type.length === 0) {
+                throw new Error(`Missing object type when restoring '${object_name}' in group '${group.Name}'`);
+            }
+            const child_constructor = resolver?.(object_type);
+            if (!child_constructor) {
+                throw new Error(`ObjectBase '${object_type}' is not registered.`);
+            }
+
+            const child = new child_constructor(object_name, object_json?.config ?? {});
+            if (child instanceof Group && object_json?.children !== undefined && object_json.children !== null) {
+                child[groupSetExtensionResolver](resolver);
+                for (const [nested_name, nested_json] of Object.entries(object_json.children)) {
+                    child.add(restoreObject(nested_json, nested_name));
+                }
+            }
+            return child;
+        };
+
+        const children = json?.children;
+        if (children === undefined || children === null) {
+            return group;
+        }
+        if (resolver === undefined) {
+            throw new Error(`Extension resolver is not set in '${group.Name}'. Please add the group to Layer/CanvasState first`);
+        }
+        group[groupSetExtensionResolver](resolver);
+        for (const [child_name, child_json] of Object.entries(children)) {
+            group.add(restoreObject(child_json, child_name));
+        }
+        return group;
+    }
+    toJSON(): { type: string, config: ObjectBaseConfig, children: Record<string, any> } {
+        let childData: Record<string, any> = {};
+        Array.from(this.object_children.keys()).forEach((name) => {
+            const layer = this.object_children.get(name)!;
+            childData[name] = layer.toJSON();
+        });
+        return {
+            type: this.type,
+            config: structuredClone(this.config),
+            children: childData,
+        };
     }
     /** History */
 

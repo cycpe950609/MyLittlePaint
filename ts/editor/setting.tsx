@@ -28,6 +28,21 @@ const ToggleSwitch: Snabbdom.Component<ToggleSwitchPropType> = (props: ToggleSwi
     </Label>
 };
 
+export type DropDownPropType = {
+    options: string[];
+    defaultIdx: number;
+    changeHandler: any;
+}
+const DropDownSelector: Snabbdom.Component<DropDownPropType> = (props: DropDownPropType) => {
+    return <Div className="w-full">
+        <select className="w-full" value={props.options[props.defaultIdx]} onchange={props.changeHandler} id={`dropdown-${props.options[props.defaultIdx]}`}>
+            {props.options.map((option: string, idx: number) => {
+                return <option id={`option-${idx}`} value={option}>{option}</option>
+            })}
+        </select>
+    </Div>
+}
+
 class SettingPageSidebar implements SidebarInterface {
     Name: string = "SettingsPage"; // Tips of ToolButton
     ImgName?: string = "property";
@@ -133,6 +148,37 @@ class SettingPageSidebar implements SidebarInterface {
                         </Tr>
                     );
                     break;
+                case CanvasSettingType.DropDownList: {
+                    if(setting.info === undefined || setting.info.options === undefined) throw new Error("INTERNAL_ERROR: Setting info has wrong type");
+                    const option: string[] = setting.info.options ;   
+                    settingList.push(
+                        <Tr className="w-full">
+                            <Td>{setting.label}</Td>
+                            <Td>
+                                <DropDownSelector
+                                    options={setting.info?.options || []}
+                                    defaultIdx={setting.info?.value || setting.info?.defaultIdx || 0}
+                                    changeHandler={(ev: Event) => {
+                                        console.log("[DEB] DropDownList : ", (ev.target as HTMLInputElement).value)
+                                        let newSet: CanvasInterfaceSettings = {
+                                            Settings: new Map<string, CanvasSettingEntry<any>>([
+                                                [settingName, {
+                                                    type: setting.type,
+                                                    label: setting.label,
+                                                    info: setting.info,
+                                                    value: option.findIndex(v => v === (ev.target as HTMLInputElement).value)
+                                                }]
+                                            ])
+                                        };
+                                        (window.editorUI.CenterCanvas as EditorCanvas).settings = newSet;
+                                    }
+                                    }
+                                />
+                            </Td>
+                        </Tr>
+                    );
+                    break;
+                }
                 default:
                     settingList.push(<Div className="w-full">`Unsupported Setting Type ${setting.type}`</Div>);
                     break;

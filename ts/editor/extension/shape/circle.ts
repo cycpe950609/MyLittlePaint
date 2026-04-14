@@ -5,9 +5,9 @@
  *  CircleShape     
  */
 
+import { max } from "lodash";
 import { v4 as uuid } from "uuid";
-import type { PaintEvent } from "../../../editorUI/canvas";
-import type { ViewportConfig } from "../../layer/interact/state/utils";
+import { CanvasSettingType, type CanvasInterfaceSettings, type PaintEvent } from "../../../editorUI/canvas";
 import type { BoundingBox } from "../../layer/render/render";
 import type { CanvasState } from "../../state/canvas/canvas";
 import { objAttr, type Point } from "../../state/canvas/data/object";
@@ -59,19 +59,79 @@ export class CircleRender extends ClosedShapeBaseRender<CircleShape> {
         ctx.arc(data.center.x, data.center.y, data.radius, 0, Math.PI * 2);
     }
 }
+
+type ComputedCircle = {
+    center: Point;
+    radius: number;
+}
+const CircleDrawingMethod: string[] = [
+    "Start: Center, To: Border",
+    "Start: Corner, To: Border (Long Edge as Diameter length)",
+    "Start: Border, To: Border (Diameter)",
+];
 export class CircleEditable extends ClosedShapeBaseEditable {
     ToolName = "Circle";
     public CanFinishDrawing: boolean = true;
     private current_circle_name: string = 'circle_preview';
+
+    private drawing_index: number = 0;
+    private startPoint: Point = { x: 0, y: 0 };
+    private calcCircle(from: Point, to: Point, method: number, rotDegree: number): ComputedCircle {
+        const start = rotateAround(from, { x: 0, y: 0 }, -rotDegree);
+        const end = rotateAround(to, { x: 0, y: 0 }, -rotDegree);
+        switch (method) {
+            case 0: // Start: Center, To: Border
+                return {
+                    center: rotateAround(start, { x: 0, y: 0 }, rotDegree),
+                    radius: Math.hypot(end.x - start.x, end.y - start.y),
+                }
+            case 1: { // Start: Corner, To: Border
+                const w = Math.abs(end.x - start.x);
+                const h = Math.abs(end.y - start.y);
+                const circleW = max([w, h]);
+                let cornerLT: Point = { x: 0, y: 0 };
+                if (start.x <= end.x && start.y > end.y) { // 1st quadrant
+                    // Start is cornerLB
+                    cornerLT = { x: start.x, y: start.y - circleW };
+                }
+                if (start.x > end.x && start.y >= end.y) { // 2nd quadrant
+                    // Start is cornerRB
+                    cornerLT = { x: start.x - circleW, y: start.y - circleW };
+                }
+                if (start.x >= end.x && start.y < end.y) { // 3rd quadrant
+                    // Start is cornerRT
+                    cornerLT = { x: start.x - circleW, y: start.y };
+                }
+                if (start.x < end.x && start.y <= end.y) { // 4th quadrant
+                    // Start is cornerLT
+                    cornerLT = start;
+                }
+                return {
+                    center: rotateAround({ x: cornerLT.x + circleW / 2, y: cornerLT.y + circleW / 2 }, { x: 0, y: 0 }, rotDegree),
+                    radius: circleW / 2,
+                }
+            }
+            case 2: // Start: Border, To: Border (Diameter)
+                return {
+                    center: rotateAround({ x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 }, { x: 0, y: 0 }, rotDegree),
+                    radius: Math.hypot(end.x - start.x, end.y - start.y) / 2,
+                }
+            default:
+                throw new Error(`Invalid drawing method index ${method}`)
+        }
+    }
+
     public PointerDown(ctx: CanvasState, e: PaintEvent): void {
         const preview_layer = ctx.activateLayer;
         if (preview_layer === undefined) throw new Error(`No preview layer in canvas state`);
         this.current_circle_name = `circle_${uuid()}`;
+        this.startPoint = { x: e.X, y: e.Y };
+        const new_circle_cfg = this.calcCircle(this.startPoint, { x: e.X, y: e.Y }, this.drawing_index, e.rotDegree);
         const circle = new CircleShape(
             this.current_circle_name,
             {
-                center: { x: e.X, y: e.Y },
-                radius: 1,
+                center: new_circle_cfg.center,
+                radius: new_circle_cfg.radius,
                 stroke: this.BorderBrush,
                 strokeWidth: this.BorderWidth,
                 fill: (this.CanFilled) ? this.ContentColor : undefined,
@@ -86,9 +146,9 @@ export class CircleEditable extends ClosedShapeBaseEditable {
         if (preview_layer === undefined) throw new Error(`(PointerMove) No preview layer in canvas state`);
         let circle = preview_layer.find(this.current_circle_name);
         if (circle === undefined || !(circle instanceof CircleShape)) throw new Error(`(PointerMove) No circle preview object in preview layer`);
-        const dx = e.X - circle.center.x;
-        const dy = e.Y - circle.center.y;
-        circle.radius = Math.hypot(dx, dy);
+        const new_circle_cfg = this.calcCircle(this.startPoint, { x: e.X, y: e.Y }, this.drawing_index, e.rotDegree);
+        circle.center = new_circle_cfg.center;
+        circle.radius = new_circle_cfg.radius;
         const bbox = CircleRender.prototype.getBoundingBoxFrom(circle, e.rotDegree);
         this.drawPreviewBBox(ctx, bbox, e.rotDegree);
     }
@@ -97,11 +157,35 @@ export class CircleEditable extends ClosedShapeBaseEditable {
         if (preview_layer === undefined) throw new Error(`(PointerUp) No preview layer in canvas state`);
         let circle = preview_layer.find(this.current_circle_name);
         if (circle === undefined || !(circle instanceof CircleShape)) throw new Error(`(PointerUp) No circle preview object in preview layer`);
-        const dx = e.X - circle.center.x;
-        const dy = e.Y - circle.center.y;
-        circle.radius = Math.hypot(dx, dy);
+        const new_circle_cfg = this.calcCircle(this.startPoint, { x: e.X, y: e.Y }, this.drawing_index, e.rotDegree);
+        circle.center = new_circle_cfg.center;
+        circle.radius = new_circle_cfg.radius;
         const bbox = CircleRender.prototype.getBoundingBoxFrom(circle, e.rotDegree);
         this.drawPreviewBBox(ctx, bbox, e.rotDegree);
+    }
+    public get Settings() {
+        const rtv = super.Settings;
+        rtv.Settings?.set("DrawingMethod", {
+            type: CanvasSettingType.DropDownList,
+            label: "Drawing Method",
+            info: {
+                options: CircleDrawingMethod,
+                defaultIdx: 0
+            },
+            value: this.drawing_index,
+        });
+        return rtv;
+    }
+    public set Settings(setting: CanvasInterfaceSettings) {
+        if (setting.Settings === undefined)
+            throw new Error("INTERNAL_ERROR: Settings are missing");
+        super.Settings = setting;
+        let refreshWindow = false;
+        if (setting.Settings.get("DrawingMethod") !== undefined) {
+            this.drawing_index = setting.Settings.get("DrawingMethod")?.value;
+            refreshWindow = true;
+        }
+        if (refreshWindow) window.editorUI.forceRerender();
     }
 }
 
@@ -124,12 +208,6 @@ export class EllipseShape extends ClosedShapeBase<EllipseConfig> {
             distance: config.distance,
         } as Required<EllipseConfig>;
     }
-    protected isInView(_view: ViewportConfig): boolean {
-        return true;
-    }
-
-    protected renderSelf(_ctx: OffscreenCanvasRenderingContext2D, _view: ViewportConfig): void { }
-
 }
 
 export class EllipseRender extends ClosedShapeBaseRender<EllipseShape> {

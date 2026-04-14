@@ -19,16 +19,3 @@ A simple painting application based on web canvas
   * Brush outline
   * Bounding Box of polygon (4 corners, center)
 * Drawing Polygons keep relative to the users' eyes
-
-# TODO
-
-* [ ] Layer manager 
-  * [ ] Create/Visibility/Delete/Merge
-  * [ ] Group of layers
-* [ ] More size of canvas
-  * [ ] Select size of canvas 
-  * [x] Infinite Canvas
-* [ ] More tools
-    * [ ] Paint Bucket
-    * [ ] Text
-* [ ] Use LocalStorage to prevent accidentally closing
