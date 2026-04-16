@@ -1,5 +1,5 @@
 {
-  "name": "my_little_paint2",
+  "name": "my_little_paint",
   "version": "0.0.1-dev",
   "description": "MyLittlePaint",
   "main": "index.js",
@@ -34,7 +34,8 @@
     "eslint": "^10.1.0",
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
-    "vite": "^8.0.3"
+    "vite": "^8.0.3",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "packageManager": "yarn@4.13.0"
 }
