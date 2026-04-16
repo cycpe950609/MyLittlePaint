@@ -1,0 +1,1 @@
+{"name":"My Little Paint","short_name":"Painter","description":"MyLittlePaint","start_url":"./","display":"standalone","background_color":"#ffffff","theme_color":"#000000","lang":"en","scope":"./","icons":[{"src":"icons/icon-512.svg","sizes":"512x512","type":"image/svg+xml","purpose":"any"}]}
