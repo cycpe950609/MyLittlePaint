@@ -1,10 +1,10 @@
-# MyLittlePaint-v2
+# MyLittlePaint
 
 ![screen_shot](./img/screenshot.png)
 
 A simple painting application based on web canvas
 
-* Previous Version: [MyLittlePaint](https://github.com/cycpe950609/MyLittlePaint)
+* Previous Version: [WebCanvas](https://github.com/cycpe950609/WebCanvas)
 
 # Features
 
